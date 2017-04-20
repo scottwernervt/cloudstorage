@@ -1,0 +1,11 @@
+recursive-include tests *
+
+include CHANGELOG.rst
+include LICENSE
+include MANIFEST.in
+include README.rst
+
+graft docs
+prune docs/_build
+
+global-exclude *.pyc *.ini *.json .git*
