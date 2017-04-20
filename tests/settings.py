@@ -5,7 +5,6 @@ from time import time
 
 from prettyconf.configuration import Configuration
 
-
 config = Configuration()
 
 # Append epoch to prevent test runs from clobbering each other.
