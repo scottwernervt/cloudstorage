@@ -5,6 +5,7 @@ from time import time
 
 from prettyconf.configuration import Configuration
 
+
 config = Configuration()
 
 # Append epoch to prevent test runs from clobbering each other.
@@ -41,8 +42,7 @@ RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)
 RACKSPACE_SECRET = config('RACKSPACE_SECRET', default=None)
 RACKSPACE_REGION = config('RACKSPACE_REGION', default='IAD')
 
-LOCAL_KEY = config('LOCAL_KEY',
-                   default=lambda _: mkdtemp(prefix=CONTAINER_PREFIX))
+LOCAL_KEY = config('LOCAL_KEY', default=mkdtemp(prefix='cloud-storage-test-'))
 if not os.path.exists(LOCAL_KEY):
     os.makedirs(LOCAL_KEY)
 LOCAL_SECRET = config('LOCAL_SECRET', default='local-storage-secret')
