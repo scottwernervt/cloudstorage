@@ -37,9 +37,12 @@ AMAZON_REGION = config('AMAZON_REGION', default='us-east-1')
 
 GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None)
 
-RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)
-RACKSPACE_SECRET = config('RACKSPACE_SECRET', default=None)
-RACKSPACE_REGION = config('RACKSPACE_REGION', default='IAD')
+RACKSPACE_KEY = os.getenv('RACKSPACE_KEY')
+RACKSPACE_SECRET = os.getenv('RACKSPACE_SECRET')
+RACKSPACE_REGION = os.getenv('RACKSPACE_REGION')
+# RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)
+# RACKSPACE_SECRET = config('RACKSPACE_SECRET', default=None)
+# RACKSPACE_REGION = config('RACKSPACE_REGION', default='IAD')
 
 LOCAL_KEY = config('LOCAL_KEY', default=mkdtemp(prefix='cloud-storage-test-'))
 if not os.path.exists(LOCAL_KEY):
