@@ -5,7 +5,11 @@ python:
 - '3.5'
 - '3.6'
 install: pip install tox-travis
-script: tox
+script:
+  - export RACKSPACE_KEY=$RACKSPACE_KEY
+  - export RACKSPACE_SECRET=$RACKSPACE_SECRET
+  - export RACKSPACE_REGION=$RACKSPACE_REGION
+  - tox
 env:
   global:
   - RACKSPACE_REGION=IAD
