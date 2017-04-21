@@ -7,6 +7,9 @@ Cloud Storage
 .. image:: https://img.shields.io/pypi/l/cloudstorage.svg
     :target: https://pypi.python.org/pypi/cloudstorage
 
+.. image:: https://img.shields.io/pypi/wheel/cloudstorage.svg
+    :target: https://pypi.python.org/pypi/cloudstorage
+
 .. image:: https://img.shields.io/pypi/pyversions/cloudstorage.svg
     :target: https://pypi.python.org/pypi/requests
 
