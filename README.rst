@@ -1,6 +1,18 @@
 Cloud Storage
 =============
 
+.. image:: https://img.shields.io/pypi/v/cloudstorage.svg
+    :target: https://pypi.python.org/pypi/cloudstorage
+
+.. image:: https://img.shields.io/pypi/l/cloudstorage.svg
+    :target: https://pypi.python.org/pypi/cloudstorage
+
+.. image:: https://img.shields.io/pypi/pyversions/cloudstorage.svg
+    :target: https://pypi.python.org/pypi/requests
+
+.. image:: https://travis-ci.org/scottwernervt/cloudstorage.svg?branch=master
+    :target: https://travis-ci.org/scottwernervt/cloudstorage
+
 `Cloud Storage`_ is a Python +3.4 package which creates a unified API for the
 cloud storage services: Amazon Simple Storage Service (S3), Rackspace Cloud
 Files, Google Cloud Storage, and the Local File System.
