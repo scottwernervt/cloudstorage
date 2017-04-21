@@ -121,8 +121,7 @@ class S3Driver(Driver):
             try:
                 bucket.wait_until_exists()
             except WaiterError as e:
-                # TODO: QUESTION: Raise NotFoundError exception?
-                logging.error(e, exc_info=True)
+                logger.error(e)
 
         return bucket
 
@@ -236,7 +235,11 @@ class S3Driver(Driver):
             msg = e.kwargs.get('report', container_name_invalid)
             raise CloudStorageError(msg)
 
-        bucket.wait_until_exists()
+        try:
+            bucket.wait_until_exists()
+        except WaiterError as e:
+            logger.error(e)
+
         return self._make_container(bucket)
 
     def get_container(self, container_name: str) -> Container:
