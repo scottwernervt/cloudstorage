@@ -11,7 +11,7 @@ Cloud Storage
     :target: https://pypi.python.org/pypi/cloudstorage
 
 .. image:: https://img.shields.io/pypi/pyversions/cloudstorage.svg
-    :target: https://pypi.python.org/pypi/requests
+    :target: https://pypi.python.org/pypi/cloudstorage
 
 .. image:: https://travis-ci.org/scottwernervt/cloudstorage.svg?branch=master
     :target: https://travis-ci.org/scottwernervt/cloudstorage
