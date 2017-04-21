@@ -35,6 +35,9 @@ def get_version():
     return VERSION_RE.search(init).group(1)
 
 
+download_url = 'https://github.com/scottwernervt/cloudstorage/' \
+               'archive/%s.tar.gz' % get_version()
+
 setup(
     name='cloudstorage',
     version=get_version(),
@@ -56,7 +59,7 @@ setup(
         'gcs',
     ]),
     url='https://github.com/scottwernervt/cloudstorage',
-    # download_url='https://github.com/scottwernervt/cloudstorage/archive/0.1.tar.gz',
+    download_url=download_url,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
