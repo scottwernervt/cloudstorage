@@ -5,7 +5,7 @@ from typing import Dict, Iterable, List, Union
 from urllib.parse import quote, urljoin
 
 import boto3
-from botocore.exceptions import ClientError, WaiterError, ParamValidationError
+from botocore.exceptions import ClientError, ParamValidationError, WaiterError
 from inflection import camelize, underscore
 
 from cloudstorage.base import (Blob, Container, ContentLength, Driver,
@@ -44,13 +44,16 @@ class S3Driver(Driver):
 
     :param region: (optional) Region to connect to. Defaults to `us-east-1`.
     :type region: str
+    
+    :param kwargs: (optional) Catch invalid options.
+    :type kwargs: dict
     """
     name = 'S3'
     hash_type = 'md5'
     url = 'https://aws.amazon.com/s3/'
 
-    def __init__(self, key: str, secret: str = None,
-                 region: str = 'us-east-1') -> None:
+    def __init__(self, key: str, secret: str = None, region: str = 'us-east-1',
+                 **kwargs: Dict) -> None:
         region = region.lower()
         super().__init__(key=key, secret=secret, region=region)
 

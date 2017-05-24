@@ -82,6 +82,9 @@ class LocalDriver(Driver):
                  pre-signed URLs. For more information. see `itsdangerous 
                  <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
+    
+    :param kwargs: (optional) Catch invalid options.
+    :type kwargs: dict
 
     :raise NotADirectoryError: If the key storage path is invalid or does not 
                                exist.
@@ -90,7 +93,8 @@ class LocalDriver(Driver):
     hash_type = 'md5'
     url = ''
 
-    def __init__(self, key: str, secret: str = None, salt: str = None) -> None:
+    def __init__(self, key: str, secret: str = None, salt: str = None,
+                 **kwargs: Dict) -> None:
         super().__init__(key, secret)
 
         self.base_path = key

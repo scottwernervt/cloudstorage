@@ -77,13 +77,16 @@ class CloudFilesDriver(Driver):
         * Sydney (`SYD`)
         * Hong Kong (`HKG`)
     :type region: str
+    
+    :param kwargs: (optional) Catch invalid options.
+    :type kwargs: dict
     """
     name = 'CLOUDFILES'
     hash_type = 'md5'
     url = 'https://www.rackspace.com/cloud/files'
 
-    def __init__(self, key: str, secret: str = None,
-                 region: str = 'IAD') -> None:
+    def __init__(self, key: str, secret: str = None, region: str = 'IAD',
+                 **kwargs: Dict) -> None:
         region = region.upper()
         if region not in self.regions:
             raise CloudStorageError(region_not_found % region)
