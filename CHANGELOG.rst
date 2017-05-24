@@ -3,6 +3,11 @@
 Changelog
 ---------
 
+0.3 (2017-05-24)
+++++++++++++++++
+
+* Fixes #6: Add kwargs to each driver's init method.
+
 0.2 (2017-04-21)
 ++++++++++++++++
 

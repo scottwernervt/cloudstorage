@@ -21,7 +21,7 @@ __all__ = [
 ]
 
 __title__ = 'Cloud Storage'
-__version__ = '0.2'
+__version__ = '0.3'
 __author__ = 'Scott Werner'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 Scott Werner'
