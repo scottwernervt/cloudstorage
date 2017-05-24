@@ -49,7 +49,8 @@ class S3Driver(Driver):
     hash_type = 'md5'
     url = 'https://aws.amazon.com/s3/'
 
-    def __init__(self, key, secret=None, region='us-east-1') -> None:
+    def __init__(self, key: str, secret: str = None,
+                 region: str = 'us-east-1') -> None:
         region = region.lower()
         super().__init__(key=key, secret=secret, region=region)
 
