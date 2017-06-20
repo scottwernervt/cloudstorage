@@ -274,7 +274,7 @@ class GoogleStorageDriver(Driver):
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None,
+                    content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         extra = extra if extra is not None else {}
         extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
@@ -296,7 +296,8 @@ class GoogleStorageDriver(Driver):
             blob.upload_from_filename(filename=filename,
                                       content_type=content_type)
         else:
-            blob.upload_from_file(file_obj=filename, content_type=content_type)
+            blob.upload_from_file(file_obj=filename, content_type=content_type,
+                                  size=chunk_size)
 
         if acl:
             blob.acl.save_predefined(acl)

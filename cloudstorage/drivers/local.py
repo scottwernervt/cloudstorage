@@ -393,7 +393,7 @@ class LocalDriver(Driver):
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None,
+                    content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
             logger.info(option_not_supported % 'acl')

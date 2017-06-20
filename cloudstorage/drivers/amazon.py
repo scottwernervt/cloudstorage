@@ -280,12 +280,14 @@ class S3Driver(Driver):
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None,
+                    content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         meta_data = {} if meta_data is None else meta_data
         extra = {} if extra is None else extra
 
         extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
+
+        config = boto3.s3.transfer.TransferConfig(io_chunksize=chunk_size)
 
         # Default arguments
         if acl:
@@ -313,11 +315,13 @@ class S3Driver(Driver):
         if isinstance(filename, str):
             self.s3.Bucket(container.name).upload_file(Filename=filename,
                                                        Key=blob_name,
-                                                       ExtraArgs=extra_args)
+                                                       ExtraArgs=extra_args,
+                                                       Config=config)
         else:
             self.s3.Bucket(container.name).upload_fileobj(Fileobj=filename,
                                                           Key=blob_name,
-                                                          ExtraArgs=extra_args)
+                                                          ExtraArgs=extra_args,
+                                                          Config=config)
 
         return self.get_blob(container, blob_name)
 
