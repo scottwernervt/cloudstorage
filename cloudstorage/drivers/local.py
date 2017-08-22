@@ -42,13 +42,13 @@ IGNORE_FOLDERS = ['.lock', '.hash', '.DS_STORE']
 @contextmanager
 def lock_local_file(path: str) -> contextmanager:
     """Platform dependent file lock.
-    
+
     :param path: File or directory path to lock.
     :type path: str
-    
+
     :yield: File lock context manager.
     :yield type: :class:`filelock.FileLock`
-    
+
     :raise CloudStorageError: If lock could not be acquired.
     """
     lock = filelock.FileLock(path + '.lock')
@@ -68,15 +68,15 @@ def lock_local_file(path: str) -> contextmanager:
 
 class LocalDriver(Driver):
     """Driver for interacting with local file-system.
-    
+
     .. code-block:: python
-        
+
         from cloudstorage.drivers.local import LocalDriver
-        
+
         path = '/home/user/webapp/storage'
         storage = LocalDriver(key=path, secret='<my-secret>', salt='<my-salt>')
         # <Driver: LOCAL>
-    
+
     Modified Source: 
     `libcloud.storage.drivers.local.LocalCloudDriver <https://github.com/apache
     /libcloud/blob/trunk/libcloud/storage/drivers/local.py>`_
@@ -92,7 +92,7 @@ class LocalDriver(Driver):
                  pre-signed URLs. For more information. see `itsdangerous 
                  <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
-    
+
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
 
@@ -147,7 +147,7 @@ class LocalDriver(Driver):
 
     def _make_serializer(self) -> itsdangerous.URLSafeTimedSerializer:
         """Returns URL Safe Timed Serializer for signing payloads.
-        
+
         :return: Serializer for dumping and loading into a URL safe string.
         :rtype: :class:`itsdangerous.URLSafeTimedSerializer`
         """
@@ -159,7 +159,7 @@ class LocalDriver(Driver):
 
     def _get_folders(self) -> Iterable[str]:
         """Iterate over first level folders found in base path.
-        
+
         :yield: Iterable[str] 
         :yield type: str 
         """
@@ -173,16 +173,16 @@ class LocalDriver(Driver):
     def _get_folder_path(self, container: Container,
                          validate: bool = True) -> str:
         """Get the container's full folder path.
-        
+
         :param container: A container instance. 
         :type container: :class:`.Container`
-        
+
         :param validate: If True, verify that folder exists.
         :type validate: bool
-        
+
         :return: Full folder path to the container.
         :rtype: str 
-        
+
         :raises NotFoundError: If the container doesn't exist.
         """
         full_path = os.path.join(self.base_path, container.name)
@@ -193,23 +193,23 @@ class LocalDriver(Driver):
 
     def _set_file_attributes(self, filename: str, attributes: Dict) -> None:
         """Set extended filesystem attributes to a file.
-        
+
         Metadata is set to `user.metadata.<attr-name>` and remaining attributes 
         are set to `user.<attr-name>`.
-        
+
         References:
-        
+
         * `xattr <https://github.com/xattr/xattr>`_
-        
+
         :param filename: Filename path.
         :type filename: str 
-        
+
         :param attributes: Dictionary of `meta_data`, `content_<name>`, etc.
         :type attributes: dict
-        
+
         :return: NoneType 
         :rtype: None
-        
+
         :raises CloudStorageError: If the local file system does not support 
                                    extended filesystem attributes.
         """
@@ -224,7 +224,7 @@ class LocalDriver(Driver):
                     for meta_key, meta_value in value.items():
                         # user.metadata.name
                         attr_name = self._OBJECT_META_PREFIX + 'metadata.' + \
-                                    meta_key
+                            meta_key
                         x[attr_name] = meta_value.encode('utf-8')
                 else:
                     # user.name
@@ -247,16 +247,16 @@ class LocalDriver(Driver):
     @staticmethod
     def _make_path(path: str, ignore_existing: bool = True) -> None:
         """Create a folder.
-        
+
         :param path: Folder path to create.
         :type path: str
-        
+
         :param ignore_existing: If True, ignore existing folder.
         :type ignore_existing: bool
-        
+
         :return: NoneType
         :rtype: None
-        
+
         :raises CloudStorageError: If folder exists and  `ignore_existing` is 
                                    False.
         """
@@ -270,13 +270,13 @@ class LocalDriver(Driver):
 
     def _make_container(self, folder_name: str) -> Container:
         """Convert a folder name to a Cloud Storage Container.
-        
+
         :param folder_name: The folder name to convert.
         :type folder_name: str
-        
+
         :return: A container instance.
         :rtype: :class:`.Container`
-        
+
         :raises FileNotFoundError: If container does not exist.
         """
         full_path = os.path.join(self.base_path, folder_name)

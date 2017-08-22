@@ -28,16 +28,16 @@ logger = logging.getLogger(__name__)
 
 class S3Driver(Driver):
     """Driver for interacting with Amazon Simple Storage Service (S3).
-    
+
     .. code-block:: python
-        
+
         from cloudstorage.drivers.amazon import S3Driver
-        
+
         storage = S3Driver(key='<my-aws-access-key-id>',
                    secret='<my-aws-secret-access-key>',
                    region='us-east-1')
         # <Driver: S3 us-east-1>
-        
+
     References:
 
     * `Boto 3 Docs <http://boto3.readthedocs.io>`_
@@ -52,7 +52,7 @@ class S3Driver(Driver):
 
     :param region: (optional) Region to connect to. Defaults to `us-east-1`.
     :type region: str
-    
+
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
     """
@@ -102,16 +102,16 @@ class S3Driver(Driver):
 
     def _get_bucket(self, bucket_name: str, validate: bool = True):
         """Get a S3 bucket.
-        
+
         :param bucket_name: The Bucket's name identifier.
         :type bucket_name: str 
-         
+
         :param validate: If True, verify that the bucket exists.
         :type validate: bool
-         
+
         :return: S3 bucket resource object.
         :rtype: :class:`boto3.s3.Bucket`
-        
+
         :raises NotFoundError: If the bucket does not exist.
         :raises CloudStorageError: Boto 3 client error.
         """
@@ -139,16 +139,16 @@ class S3Driver(Driver):
 
     def _make_blob(self, container: Container, object_summary) -> Blob:
         """Convert S3 Object Summary to Blob instance.
-        
+
         :param container: The container that holds the blob.
         :type container: :class:`.Container`
-        
+
         :param object_summary: S3 object summary.
         :type object_summary: :class:`boto3.s3.ObjectSummary`
-        
+
         :return: A blob object.
         :rtype: :class:`.Blob` 
-        
+
         :raise NotFoundError: If the blob object doesn't exist.
         """
         try:
@@ -184,10 +184,10 @@ class S3Driver(Driver):
 
     def _make_container(self, bucket) -> Container:
         """Convert S3 Bucket to Container.
-        
+
         :param bucket: S3 bucket object.
         :type bucket: :class:`boto3.s3.Bucket`
-        
+
         :return: The container if it exists.
         :rtype: :class:`.Container`
         """
@@ -199,7 +199,7 @@ class S3Driver(Driver):
     @property
     def session(self) -> boto3.session.Session:
         """Amazon Web Services session.
-        
+
         :return: AWS session.
         :rtype: :class:`boto3.session.Session`
         """
@@ -209,7 +209,7 @@ class S3Driver(Driver):
     @property
     def s3(self) -> boto3.resources.base.ServiceResource:
         """S3 service resource.
-        
+
         :return: The s3 resource instance.
         :rtype: :class:`boto3.resources.base.ServiceResource`
         """

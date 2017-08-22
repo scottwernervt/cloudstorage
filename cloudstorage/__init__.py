@@ -57,7 +57,7 @@ def get_driver(driver: DriverName) -> Drivers:
     """Get driver class by DriverName enumeration member.
 
     .. code-block:: python
-        
+
         >>> from cloudstorage import DriverName, get_driver
         >>> driver_cls = get_driver(DriverName.LOCAL)
         <class 'cloudstorage.drivers.local.LocalDriver'>
@@ -80,13 +80,13 @@ def get_driver_by_name(driver_name: str) -> Drivers:
     """Get driver class by driver name.
 
     .. code-block:: python
-        
+
         >>> from cloudstorage import get_driver_by_name
         >>> driver_cls = get_driver_by_name('LOCAL')
         <class 'cloudstorage.drivers.local.LocalDriver'>
 
     :param driver_name: Driver name.
-    
+
         * `LOCAL`
         * `S3`
         * `CLOUDFILES`

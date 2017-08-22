@@ -9,7 +9,7 @@ def rgetattr(obj, attr, default=_sentinel):
     """Get a nested named attribute from an object.
 
     Example: ::
-        
+
         b = type('B', (), {'c': True})()
         a = type('A', (), {'b': b})()
         # True

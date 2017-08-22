@@ -45,11 +45,11 @@ MetaTempKey = Tuple[Union[str, None], Union[str, None]]
 
 class CloudFilesDriver(Driver):
     """Driver for interacting with Rackspace Cloud Files.
-    
+
     .. code-block:: python
-        
+
         from cloudstorage.drivers.rackspace import CloudFilesDriver
-        
+
         storage = CloudFilesDriver(key='<my-rackspace-username>',
                                    secret='<my-rackspace-secret-key>',
                                    region='IAD')
@@ -78,7 +78,7 @@ class CloudFilesDriver(Driver):
     :type secret: str
 
     :param region: (optional) Rackspace region. Defaults to `IAD`.
-    
+
         * Dallas-Fort Worth (`DFW`)
         * Chicago (`ORD`)
         * Northern Virginia (`IAD`)
@@ -86,7 +86,7 @@ class CloudFilesDriver(Driver):
         * Sydney (`SYD`)
         * Hong Kong (`HKG`)
     :type region: str
-    
+
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
     """
@@ -152,10 +152,10 @@ class CloudFilesDriver(Driver):
 
     def _get_temp_url_key(self) -> str:
         """Get one of the account metadata keys for signing URLs.
-        
+
         :return: Account metadata key.
         :rtype: str
-        
+
         :raises CloudStorageError: If both account metadata keys are empty.
         """
         keys = self.get_account_temp_url_keys()
@@ -168,7 +168,7 @@ class CloudFilesDriver(Driver):
 
     def _get_server_public_url(self, service_name: str) -> str:
         """Return the public endpoint URL for a particular service region.
-        
+
         `https://storage101.iad3.clouddrive.com/v1/MossoCloudFS_XXXXX`
 
         :param service_name: Service name: `cloudFiles` or `cloudFilesCDN`.
@@ -176,7 +176,7 @@ class CloudFilesDriver(Driver):
 
         :return: Public URL for the requested service.
         :rtype: str
-        
+
         :raises CloudStorageError: If service name is not found in catalog.
         """
         service_catalog = self.conn.authenticator.auth_ref. \
@@ -193,13 +193,13 @@ class CloudFilesDriver(Driver):
 
     def _get_container(self, container_name: str):
         """Get Rackspace container by name.
-        
+
         :param container_name: Container name to get.
         :type container_name: str
-        
+
         :return: Openstack object store container.
         :rtype: :class:`openstack.object_store.v1.container.Container`
-        
+
         :raises NotFoundError: If container does not exist.
         """
         try:
@@ -212,13 +212,13 @@ class CloudFilesDriver(Driver):
 
         :param container_name: Container name that contains the object.
         :type container_name: str
-        
+
         :param object_name: Object name to get.
         :type object_name: str
 
         :return: Openstack object store object.
         :rtype: :class:`openstack.object_store.v1.obj.Object`
-        
+
         :raises NotFoundError: If object does not exist.
         """
         try:
@@ -259,7 +259,7 @@ class CloudFilesDriver(Driver):
 
         :return: NoneType
         :rtype: None
-        
+
         :raises CloudStorageError: If setting the metadata failed. 
         """
         # TODO: BUG: Throws error due to legacy iteritems().
@@ -299,7 +299,7 @@ class CloudFilesDriver(Driver):
 
         :return: NoneType
         :rtype: None
-        
+
         :raises CloudStorageError: If setting the metadata failed. 
         """
         object_url = self._get_server_public_url('cloudFiles')
@@ -365,7 +365,7 @@ class CloudFilesDriver(Driver):
     @property
     def _token(self) -> str:
         """Rackspace authentication token for manual requests.
-        
+
         :return: Session token id.
         :rtype: str 
         """
@@ -375,7 +375,7 @@ class CloudFilesDriver(Driver):
     @property
     def conn(self):
         """Rackspace connection.
-        
+
         :return: Rackspace connection.
         :rtype: rackspace.connection.Connection
         """
@@ -384,7 +384,7 @@ class CloudFilesDriver(Driver):
     @property
     def object_store(self):
         """Rackspace object store proxy.
-        
+
         :return: Proxy to Rackspace object store.
         :rtype: rackspace.object_store.v1._proxy.Proxy
         """
@@ -682,9 +682,9 @@ class CloudFilesDriver(Driver):
         """Return URL meta keys for signing temporary URLs.
 
         For example:
-        
+
         .. code-block:: python
-            
+
             storage.get_account_temp_url_keys()
             # ('<meta_temp_url_key>', '<meta_temp_url_key_2>')
 
@@ -705,9 +705,9 @@ class CloudFilesDriver(Driver):
         """Set URL meta keys for signing temporary URLs.
 
         For example:
-        
+
         .. code-block:: python
-            
+
             # Set key
             storage.set_account_temp_url_keys(temp_url_key_2='<my-new-key>')
             # ('<my-key>', '<my-new-key>')

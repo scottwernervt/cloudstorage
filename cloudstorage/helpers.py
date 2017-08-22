@@ -36,21 +36,21 @@ def read_in_chunks(file_object: FileIO,
 def file_checksum(filename: str, hash_type: str = 'md5',
                   block_size: int = 4096) -> str:
     """Returns checksum for file.
-   
+
     .. code-block:: python
-        
+
         from cloudstorage.helpers import file_checksum
-        
+
         picture_path = '/path/picture.png'
         file_checksum(picture_path, hash_type='sha256')
         # '03ef90ba683795018e541ddfb0ae3e958a359ee70dd4fccc7e747ee29b5df2f8'
 
     Source: `get-md5-hash-of-big-files-in-python <http://stackoverflow.com/
     questions/1131220/get-md5-hash-of-big-files-in-python>`_
-    
+
     :param filename: File path.
     :type filename: str
-    
+
     :param hash_type: Hash algorithm function name.
     :type hash_type:  str
 
@@ -59,7 +59,7 @@ def file_checksum(filename: str, hash_type: str = 'md5',
 
     :return: Hex digest of file.
     :rtype: :func:`hash.hexdigest`
-    
+
     :raise RuntimeError: If the hash algorithm is not found in :mod:`hashlib`.
     """
     try:
@@ -105,10 +105,10 @@ def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
 
 def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
     """Guess content type for file path or file like object.
-    
+
     :param filename: File path or file like object.
     :type filename: str or file 
-    
+
     :return: Content type.
     :rtype: str
     """

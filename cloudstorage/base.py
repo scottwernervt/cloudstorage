@@ -27,9 +27,9 @@ FormPost = Dict[str, Dict[str, str]]
 
 class DocstringMeta(type):
     """Metaclass that allows docstring 'inheritance'.
-    
+
     Dirty hack for sphinx...
-    
+
     Source: `Use method docstring from abstract base class if derived class 
     has none #3140 <https://github.com/sphinx-doc/sphinx/issues/3140>`_
     """
@@ -52,9 +52,9 @@ class DocstringMeta(type):
 
 class Blob:
     """Represents an object blob.
-    
+
     .. code-block:: python
-        
+
         picture_blob = container.get_blob('picture.png')
         picture_blob.size
         # 50301
@@ -70,7 +70,7 @@ class Blob:
 
     :param checksum: Checksum of this blob.
     :type checksum: str
-    
+
     :param etag: Blob etag which can also be the checksum. The etag for 
                  `LocalDriver` is a SHA1 hexdigest of the blob's full path. 
     :type etag: str
@@ -188,7 +188,7 @@ class Blob:
     @property
     def cdn_url(self) -> str:
         """The Content Delivery Network URL for this blob.
-            
+
         `https://container-name.storage.com/picture.png`
 
         :return: The CDN URL for this blob.
@@ -199,7 +199,7 @@ class Blob:
     @property
     def path(self) -> str:
         """Relative URL path for this blob.
-            
+
         `container-name/picture.png`
 
         :return: The relative URL path to this blob.
@@ -209,9 +209,9 @@ class Blob:
 
     def delete(self) -> None:
         """Delete this blob from the container.
-          
+
         .. code-block:: python
-        
+
             picture_blob = container.get_blob('picture.png')
             picture_blob.delete()
             picture_blob in container
@@ -219,7 +219,7 @@ class Blob:
 
         :return: NoneType
         :rtype: None
-        
+
         :raises NotFoundError: If the blob object doesn't exist.
         """
         self.driver.delete_blob(blob=self)
@@ -229,19 +229,19 @@ class Blob:
         a named file.
 
         Filename:
-        
+
         .. code-block:: python
-            
+
             picture_blob = container.get_blob('picture.png')
             picture_blob.download('/path/picture-copy.png')
 
         File object:
-        
+
         .. IMPORTANT:: Always use write binary mode `wb` when downloading a 
             blob to a file object.
-        
+
         .. code-block:: python
-            
+
             picture_blob = container.get_blob('picture.png')
             with open('/path/picture-copy.png', 'wb') as picture_file:
                 picture_blob.download(picture_file)
@@ -267,7 +267,7 @@ class Blob:
         within a certain time period. This is particularly useful if you don’t 
         want publicly accessible blobs, but don’t want to require users to 
         explicitly log in. [#f1]_
-        
+
         .. [#f1] `Blobs / Objects — google-cloud 0.24.0 documentation 
          <https://googlecloudplatform.github.io/google-cloud-python/
          stable/storage-blobs.html>`_
@@ -277,7 +277,7 @@ class Blob:
         .. code-block:: python
 
             import requests
-            
+
             picture_blob = container.get_blob('picture.png')
             download_url = picture_blob.download_url(expires=3600)
 
@@ -287,26 +287,26 @@ class Blob:
             with open('/path/picture-download.png', 'wb') as picture_file:
                 for chunk in response.iter_content(chunk_size=128):
                     picture_file.write(chunk)
-                    
+
         Response Content-Disposition example:
-        
+
         .. code-block:: python
-            
+
             picture_blob = container.get_blob('picture.png')
-            
+
             params = {
                 'expires': 3600,
                 'content_disposition': 'attachment; filename=attachment.png'
             }
             download_url = picture_blob.download_url(**params)
-            
+
             response = requests.get(download_url)
             # <Response [200]>
             response.headers['content-disposition']
             # attachment; filename=attachment.png
-            
+
         References:
-        
+
         * `Boto 3: S3.Client.generate_presigned_url 
           <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
           S3.Client.generate_presigned_url>`_
@@ -316,7 +316,7 @@ class Blob:
         * `Rackspace: TempURL 
           <https://developer.rackspace.com/docs/cloud-files/v1/use-cases/
           public-access-to-your-cloud-files-account/#tempurl>`_
-                 
+
         :param expires: (optional) Expiration in seconds.
         :type expires: int
 
@@ -328,19 +328,19 @@ class Blob:
         :type content_disposition: str or None
 
         :param extra: (optional) Extra parameters for the request.
-                          
+
                       * All
-                      
+
                         * **content_type** *(str) --* Sets the Content-Type 
                           header of the response.
-                    
+
                       * Google Cloud Storage
-                      
+
                         * **version** *(str) --* A value that indicates which 
                           generation of the resource to fetch.
-                        
+
                       * Amazon S3
-        
+
                         * **version_id** *(str) --* Version of the object.
         :type extra: Dict[str, str] or None
 
@@ -357,12 +357,12 @@ class Blob:
 
     def patch(self) -> None:
         """Saves all changed attributes for this blob.
-        
+
         .. warning:: Not supported by all drivers yet.
-        
+
         :return: NoneType
         :rtype: None
-        
+
         :raises NotFoundError: If the blob object doesn't exist.
         """
         self.driver.patch_blob(blob=self)
@@ -374,9 +374,9 @@ class Blob:
 
 class Container:
     """Represents a container (bucket or folder) which contains blobs.
-    
+
     .. code-block:: python
-        
+
         container = storage.get_container('container-name')
         container.name
         # container-name
@@ -384,19 +384,19 @@ class Container:
         # 2017-04-11 08:58:12-04:00
         len(container)
         # 20
-                  
+
     .. todo:: Add option to delete blobs before deleting the container.
     .. todo:: Support extra headers like Content-Encoding.
-        
+
     :param name: Container name (must be unique).
     :type name: str
 
     :param driver: Reference to this container's driver.
     :type driver: Driver
-    
+
     :param acl: (optional) Container's canned Access Control List (ACL). 
                 If `None`, defaults to storage backend default.
-                
+
                 * private
                 * public-read
                 * public-read-write
@@ -406,10 +406,10 @@ class Container:
                 * aws-exec-read (Amazon S3)
                 * project-private (Google Cloud Storage)
     :type acl: str or None
-    
+
     :param meta_data: (optional) Metadata stored with this container.
     :type meta_data: Dict[str, str] or None
-    
+
     :param created_at: Creation time of this container.
     :type created_at: datetime.datetime or None
     """
@@ -489,14 +489,14 @@ class Container:
 
     def __iter__(self) -> Iterable[Blob]:
         """Get all blobs associated to the container.
-        
+
         .. code-block:: python
-            
+
             container = storage.get_container('container-name')
             for blob in container:
                 blob.name
                 # blob-1.ext, blob-2.ext
-    
+
         :return: Iterable of all blobs belonging to this container.
         :rtype: Iterable{Blob]
         """
@@ -513,10 +513,10 @@ class Container:
 
     def __ne__(self, other: Blob) -> bool:
         """Override the default not equals behavior.
-        
+
         :param other: The other container.
         :type other: Container
-        
+
         :return: True if the containers are not the same.
         :rtype: bool
         """
@@ -525,7 +525,7 @@ class Container:
     @property
     def cdn_url(self) -> str:
         """The Content Delivery Network URL for this container.
-        
+
         `https://container-name.storage.com/`
 
         :return: The CDN URL for this container.
@@ -535,32 +535,32 @@ class Container:
 
     def patch(self) -> None:
         """Saves all changed attributes for this container.
-        
+
         .. warning:: Not supported by all drivers yet.
 
         :return: NoneType
         :rtype: None
-        
+
         :raises NotFoundError: If the container doesn't exist.
         """
         self.driver.patch_container(container=self)
 
     def delete(self) -> None:
         """Delete this container.
-        
+
         .. important:: All blob objects in the container must be deleted before 
                        the container itself can be deleted.
-        
+
         .. code-block:: python
-            
+
             container = storage.get_container('container-name')
             container.delete()
             container in storage
             # False
-    
+
         :return: NoneType
         :rtype: None
-        
+
         :raises IsNotEmptyError: If the container is not empty.
         :raises NotFoundError: If the container doesn't exist.
         """
@@ -571,7 +571,7 @@ class Container:
                     content_type: str = None, content_disposition: str = None,
                     chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
         """Upload a filename or file like object to a container.
-        
+
         If `content_type` is `None`, Cloud Storage will attempt to guess the 
         standard MIME type using the packages: `python-magic` or `mimetypes`. If
         that fails, Cloud Storage will leave it up to the storage backend to  
@@ -581,43 +581,43 @@ class Container:
                      “versioning” and “lifecycle” policies defined on the blob’s 
                      container. In the absence of those policies, upload will 
                      overwrite any existing contents.
-            
+
         Basic example:
-        
+
         .. code-block:: python
-            
+
             container = storage.get_container('container-name')
             picture_blob = container.upload_blob('/path/picture.png')
             # <Blob picture.png container-name S3>
-        
+
         Set Content-Type example:
-        
+
         .. code-block:: python
-            
+
             container = storage.get_container('container-name')
             with open('/path/resume.doc', 'rb') as resume_file:
                 resume_blob = container.upload_blob(resume_file, 
                     content_type='application/msword')
                 resume_blob.content_type
                 # 'application/msword'
-        
+
         Set Metadata and ACL:
-        
+
         .. code-block:: python
-            
+
             picture_file = open('/path/picture.png', 'rb)
                 'acl': 'public-read',
             meta_data = {
                 'owner-email': 'user.one@startup.com',
                 'owner-id': '1'
             }
-            
+
             container = storage.get_container('container-name')
             picture_blob = container.upload_blob(picture_file, 
                 acl='public-read', meta_data=meta_data)
             picture_blob.meta_data
             # {owner-id': '1', 'owner-email': 'user.one@startup.com'}
-        
+
         References:
 
         * `Boto 3: PUT Object 
@@ -638,7 +638,7 @@ class Container:
 
         :param acl: (optional) Blob canned Access Control List (ACL). 
                     If `None`, defaults to storage backend default. 
-        
+
                     * private
                     * public-read
                     * public-read-write
@@ -685,9 +685,9 @@ class Container:
 
     def get_blob(self, blob_name: str) -> Blob:
         """Get a blob object by name.
-        
+
         .. code-block:: python
-            
+
             container = storage.get_container('container-name')
             picture_blob = container.get_blob('picture.png')
             # <Blob picture.png container-name S3>
@@ -713,30 +713,30 @@ class Container:
 
         This method gives your website a way to upload objects to a container 
         through a web form without giving the user direct write access.
-        
+
         Basic example:
-        
+
         .. code-block:: python
-            
+
             import requests
-            
+
             picture_file = open('/path/picture.png', 'rb')
-            
+
             container = storage.get_container('container-name')
             form_post = container.generate_upload_url('avatar-user-1.png')
-            
+
             url = form_post['url']
             fields = form_post['fields']
             multipart_form_data = {
                 'file': ('avatar.png', picture_file, 'image/png'),
             }
-            
+
             resp = requests.post(url, data=fields, files=multipart_form_data)
             # <Response [201]> or <Response [204]> 
-            
+
             avatar_blob = container.get_blob('avatar-user-1.png')
             # <Blob avatar-user-1.png container-name S3>
-            
+
         Form example:
 
         .. code-block:: python
@@ -764,7 +764,7 @@ class Container:
             print('\\n'.join(upload_form))
 
         .. code-block:: html
-            
+
             <!--Google Cloud Storage Generated Form-->
             <form action="https://container-name.storage.googleapis.com" 
                   method="post" enctype="multipart/form-data">
@@ -776,13 +776,13 @@ class Container:
             <input name="file" type="file" />
             <input type="submit" value="Upload" />
             </form>
-            
+
         Content-Disposition and Metadata example:
-        
+
         .. code-block:: python
-            
+
             import requests
-    
+
             params = {
                 'blob_name': 'avatar-user-1.png',
                 'meta_data': {
@@ -793,22 +793,22 @@ class Container:
                 'content_disposition': 'attachment; filename=attachment.png'
             }
             form_post = container.generate_upload_url(**params)
-            
+
             url = form_post['url']
             fields = form_post['fields']
             multipart_form_data = {
                 'file': open('/path/picture.png', 'rb'),
             }
-            
+
             resp = requests.post(url, data=fields, files=multipart_form_data)
             # <Response [201]> or <Response [204]>
-            
+
             avatar_blob = container.get_blob('avatar-user-1.png')
             avatar_blob.content_disposition
             # 'attachment; filename=attachment.png'
-            
+
         References:
-        
+
         * `Boto 3: S3.Client.generate_presigned_post 
           <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
           S3.Client.generate_presigned_post>`_
@@ -822,13 +822,13 @@ class Container:
                           providing a file name. Note, Rackspace Cloud Files 
                           only supports prefixes.
         :type blob_name: str or None
-        
+
         :param expires: (optional) Expiration in seconds.
         :type expires: int
-        
+
         :param acl: (optional) Container canned Access Control List (ACL). 
                     If `None`, defaults to storage backend default.
-        
+
                     * private
                     * public-read
                     * public-read-write
@@ -838,7 +838,7 @@ class Container:
                     * aws-exec-read (Amazon S3)
                     * project-private (Google Cloud Storage)
         :type acl: str or None
-        
+
         :param meta_data: (optional) A map of metadata to store with the blob.
         :type meta_data: Dict[str, str] or None
 
@@ -849,14 +849,14 @@ class Container:
         :param content_type: (optional) A standard MIME type describing the 
                              format of the object data.
         :type content_type: str or None
-        
+
         :param content_length: Specifies that uploaded files can only be 
                                between a certain size range in bytes: 
                                `(<min>, <max>)`.
         :type content_length: tuple[int, int] or None
 
         :param extra: (optional) Extra parameters for the request.
-            
+
                       * **success_action_redirect** *(str) --* A URL that users 
                         are redirected to when an upload is successful. If you 
                         do not provide a URL, Cloud Storage responds with the 
@@ -903,16 +903,16 @@ class Container:
 
 class Driver(metaclass=DocstringMeta):
     """Abstract Base Driver Class (:class:`abc.ABCMeta`) to derive from.
-    
+
     .. todo::
-     
+
         * Create driver abstract method to get total number of containers.
         * Create driver abstract method to get total number of blobs
           in a container.
         * Support for ACL permission grants.
         * Support for CORS.
         * Support for container / blob expiration (delete_at).
-    
+
     :param key: API key, username, credentials file, or local directory.
     :type key: str
 
@@ -921,7 +921,7 @@ class Driver(metaclass=DocstringMeta):
 
     :param region: (optional) Region to connect to.
     :type region: str
-    
+
     :param kwargs: (optional) Extra options for the driver.
     :type kwargs: dict
     """
@@ -988,7 +988,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def __len__(self) -> int:
         """The total number of containers in the driver.
-        
+
         :return: Number of containers belonging to this driver.
         :rtype: int
         """
@@ -999,15 +999,15 @@ class Driver(metaclass=DocstringMeta):
     def _normalize_parameters(params: Dict[str, str],
                               normalizers: Dict[str, str]) -> Dict[str, str]:
         """Transform parameter key names to match syntax required by the driver.
-        
+
         :param params: Dictionary of parameters for method.
         :type params: dict
-        
+
         :param normalizers: Dictionary mapping of key names.            
         :type normalizers: dict
-        
+
         :return: Dictionary of transformed key names.
-        
+
             ::
 
                 {
@@ -1015,7 +1015,7 @@ class Driver(metaclass=DocstringMeta):
                     'meta_data': 'Metadata',
                     'content_disposition': 'ContentDisposition'
                 }
-        
+
         :rtype: Dict[str, str]
         """
         pass
@@ -1034,11 +1034,11 @@ class Driver(metaclass=DocstringMeta):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         """Create a new container.
-        
+
         For example:
-        
+
         .. code-block:: python
-            
+
             container = storage.create_container('container-name')
             # <Container container-name driver-name>
 
@@ -1047,7 +1047,7 @@ class Driver(metaclass=DocstringMeta):
 
         :param acl: (optional) Container canned Access Control List (ACL). 
                     If `None`, defaults to storage backend default.
-            
+
                     * private
                     * public-read
                     * public-read-write
@@ -1057,14 +1057,14 @@ class Driver(metaclass=DocstringMeta):
                     * aws-exec-read (Amazon S3)
                     * project-private (Google Cloud Storage)
         :type acl: str or None
-        
+
         :param meta_data: (optional) A map of metadata to store with the 
                           container.
         :type meta_data: Dict[str, str] or None
 
         :return: The newly created or existing container.
         :rtype: :class:`.Container`
-        
+
         :raises CloudStorageError: If the container name contains invalid 
                                    characters.
         """
@@ -1073,11 +1073,11 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def get_container(self, container_name: str) -> Container:
         """Get a container by name.
-        
+
         For example:
-        
+
         .. code-block:: python
-            
+
             container = storage.get_container('container-name')
             # <Container container-name driver-name>
 
@@ -1094,7 +1094,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def patch_container(self, container: Container) -> None:
         """Saves all changed attributes for the container. 
-        
+
         .. important:: This class method is called by :meth:`.Container.save`.
 
         :param container: A container instance.
@@ -1102,7 +1102,7 @@ class Driver(metaclass=DocstringMeta):
 
         :return: NoneType
         :rtype: None
-        
+
         :raises NotFoundError: If the container doesn't exist.
         """
         pass
@@ -1139,10 +1139,10 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def enable_container_cdn(self, container: Container) -> bool:
         """(Optional) Enable Content Delivery Network (CDN) for the container.
-        
+
         .. important:: This class method is called by 
                        :meth:`.Container.enable_cdn`.
-        
+
         :param container: A container instance.
         :type container: :class:`.Container`
 
@@ -1155,7 +1155,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def disable_container_cdn(self, container: Container) -> bool:
         """(Optional) Disable Content Delivery Network (CDN) on the container.
-        
+
         .. important:: This class method is called by 
                        :meth:`.Container.disable_cdn`.
 
@@ -1175,33 +1175,33 @@ class Driver(metaclass=DocstringMeta):
                     content_disposition: str = None, chunk_size=1024,
                     extra: ExtraOptions = None) -> Blob:
         """Upload a filename or file like object to a container.
-        
+
         .. important:: This class method is called by 
                        :param chunk_size:
                        :type chunk_size:
                        :meth:`.Container.upload_blob`.
-        
+
         :param container: The container to upload the blob to.
         :type container: :class:`.Container`
 
         :param filename: A file handle open for reading or the path to the file.
         :type filename: file or str
-        
+
         :param acl: (optional) Blob canned Access Control List (ACL). 
         :type acl: str or None
-        
+
         :param blob_name: (optional) Override the blob's name. If not set, will
                           default to the filename from path or filename of 
                           iterator object.
         :type blob_name: str or None
-        
+
         :param meta_data: (optional) A map of metadata to store with the blob.
         :type meta_data: Dict[str, str] or None
-        
+
         :param content_type: (optional) A standard MIME type describing the 
                              format of the object data.
         :type content_type: str or None
-        
+
         :param content_disposition: (optional) Specifies presentational 
                                     information for the blob.
         :type content_disposition: str or None
@@ -1209,10 +1209,10 @@ class Driver(metaclass=DocstringMeta):
         :param chunk_size: (optional) Optional chunk size for streaming a
                            transfer.
         :type chunk_size: int
-        
+
         :param extra: (optional) Extra parameters for the request.
         :type extra: Dict[str, str] or None
-        
+
         :return: The uploaded blob.
         :rtype: Blob
         """
@@ -1221,7 +1221,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def get_blob(self, container: Container, blob_name: str) -> Blob:
         """Get a blob object by name.
-        
+
         .. important:: This class method is called by :meth:`.Blob.get_blob`.
 
         :param container: The container that holds the blob.
@@ -1240,7 +1240,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def get_blobs(self, container: Container) -> Iterable[Blob]:
         """Get all blobs associated to the container.
-        
+
         .. important:: This class method is called by :meth:`.Blob.__iter__`.
 
         :param container: A container instance.
@@ -1256,7 +1256,7 @@ class Driver(metaclass=DocstringMeta):
                       destination: Union[str, FileLike]) -> None:
         """Download the contents of this blob into a file-like object or into 
         a named file.
-        
+
         .. important:: This class method is called by :meth:`.Blob.download`.
 
         :param blob: The blob object to download.
@@ -1289,7 +1289,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def delete_blob(self, blob: Blob) -> None:
         """Deletes a blob from storage.
-        
+
         .. important:: This class method is called by :meth:`.Blob.delete`.
 
         :param blob: The blob to delete.
@@ -1305,7 +1305,7 @@ class Driver(metaclass=DocstringMeta):
     @abstractmethod
     def blob_cdn_url(self, blob: Blob) -> str:
         """The Content Delivery Network URL for the blob.
-        
+
         .. important:: This class method is called by :attr:`.Blob.cdn_url`.
 
         :param blob: The public blob object.
@@ -1327,7 +1327,7 @@ class Driver(metaclass=DocstringMeta):
                                       extra: ExtraOptions = None) -> FormPost:
         """Generate a signature and policy for uploading objects to the 
         container.
-        
+
         .. important:: This class method is called by 
                        :meth:`.Container.generate_upload_url`.
 
@@ -1338,13 +1338,13 @@ class Driver(metaclass=DocstringMeta):
                           providing a file name. Note, Rackspace Cloud Files 
                           only supports prefixes.
         :type blob_name: str or None
-        
+
         :param expires: (optional) Expiration in seconds.
         :type expires: int
-        
+
         :param acl: (optional) Container canned Access Control List (ACL). 
         :type acl: str or None
-        
+
         :param meta_data: (optional) A map of metadata to store with the blob.
         :type meta_data: Dict[str, str] or None
 
@@ -1355,7 +1355,7 @@ class Driver(metaclass=DocstringMeta):
         :param content_type: (optional) A standard MIME type describing the 
                              format of the object data.
         :type content_type: str or None
-        
+
         :param content_length: Specifies that uploaded files can only be 
                                between a certain size range in bytes.
         :type content_length: tuple[int, int] or None
@@ -1375,7 +1375,7 @@ class Driver(metaclass=DocstringMeta):
                                    content_disposition: str = None,
                                    extra: ExtraOptions = None) -> str:
         """Generates a signed URL for this blob.
-        
+
         .. important:: This class method is called by 
                        :meth:`.Blob.generate_download_url`.
 
