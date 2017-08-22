@@ -303,8 +303,7 @@ class GoogleStorageDriver(Driver):
             blob.upload_from_filename(filename=filename,
                                       content_type=content_type)
         else:
-            blob.upload_from_file(file_obj=filename, content_type=content_type,
-                                  size=chunk_size)
+            blob.upload_from_file(file_obj=filename, content_type=content_type)
 
         if acl:
             blob.acl.save_predefined(acl)
