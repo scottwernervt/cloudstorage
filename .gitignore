@@ -91,6 +91,6 @@ ENV/
 # JetBrains
 .idea
 
-# Test settings ini file.
+# Test API key and secret files
 settings.ini
-*.json
+gcs-service-account.json
