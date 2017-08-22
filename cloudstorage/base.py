@@ -7,7 +7,7 @@ from io import BytesIO, FileIO, TextIOWrapper
 from typing import Dict, IO, Iterable, List, Union
 
 from cloudstorage.exceptions import NotFoundError
-from cloudstorage.messages import *
+from cloudstorage.messages import feature_not_supported
 
 __all__ = [
     'Blob',

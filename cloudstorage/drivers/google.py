@@ -24,12 +24,19 @@ from google.cloud.storage.blob import Blob as GoogleBlob
 from google.cloud.storage.bucket import Bucket
 from inflection import underscore
 
-from cloudstorage.base import (Blob, Container, ContentLength, Driver,
-                               ExtraOptions, FileLike, FormPost, MetaData)
-from cloudstorage.exceptions import (CloudStorageError, IsNotEmptyError,
-                                     NotFoundError)
+from cloudstorage.base import (
+    Blob, Container, ContentLength, Driver,
+    ExtraOptions, FileLike, FormPost, MetaData,
+)
+from cloudstorage.exceptions import (
+    CloudStorageError, IsNotEmptyError,
+    NotFoundError,
+)
 from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.messages import *
+from cloudstorage.messages import (
+    blob_not_found, container_not_empty, container_not_found,
+    option_not_supported, container_exists,
+)
 
 logger = logging.getLogger(__name__)
 

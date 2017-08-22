@@ -16,13 +16,23 @@ import itsdangerous
 import xattr
 from inflection import underscore
 
-from cloudstorage.base import (Blob, Container, ContentLength, Driver,
-                               ExtraOptions, FileLike, FormPost, MetaData)
-from cloudstorage.exceptions import (CloudStorageError, IsNotEmptyError,
-                                     NotFoundError, SignatureExpiredError)
-from cloudstorage.helpers import (file_checksum, file_content_type,
-                                  read_in_chunks, validate_file_or_path)
-from cloudstorage.messages import *
+from cloudstorage.base import (
+    Blob, Container, ContentLength, Driver,
+    ExtraOptions, FileLike, FormPost, MetaData,
+)
+from cloudstorage.exceptions import (
+    CloudStorageError, IsNotEmptyError,
+    NotFoundError, SignatureExpiredError,
+)
+from cloudstorage.helpers import (
+    file_checksum, file_content_type,
+    read_in_chunks, validate_file_or_path,
+)
+from cloudstorage.messages import (
+    blob_not_found, container_exists, container_name_invalid,
+    container_not_empty, container_not_found, feature_not_supported,
+    local_no_attributes, option_not_supported,
+)
 
 logger = logging.getLogger(__name__)
 

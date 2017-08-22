@@ -8,12 +8,20 @@ import boto3
 from botocore.exceptions import ClientError, ParamValidationError, WaiterError
 from inflection import camelize, underscore
 
-from cloudstorage.base import (Blob, Container, ContentLength, Driver,
-                               ExtraOptions, FileLike, FormPost, MetaData)
-from cloudstorage.exceptions import (CloudStorageError, IsNotEmptyError,
-                                     NotFoundError)
+from cloudstorage.base import (
+    Blob, Container, ContentLength, Driver,
+    ExtraOptions, FileLike, FormPost, MetaData,
+)
+from cloudstorage.exceptions import (
+    CloudStorageError, IsNotEmptyError,
+    NotFoundError,
+)
 from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.messages import *
+from cloudstorage.messages import (
+    blob_not_found, container_name_invalid, container_not_empty,
+    container_not_found, feature_not_supported, option_not_supported,
+    region_not_found,
+)
 
 logger = logging.getLogger(__name__)
 
