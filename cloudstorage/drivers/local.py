@@ -364,7 +364,7 @@ class LocalDriver(Driver):
 
         self._make_path(full_path, ignore_existing=True)
         try:
-            with lock_local_file(full_path) as _:
+            with lock_local_file(full_path):
                 self._make_path(full_path, ignore_existing=True)
         except FileNotFoundError:
             raise CloudStorageError(container_name_invalid)
