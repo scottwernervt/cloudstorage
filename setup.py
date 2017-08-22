@@ -16,8 +16,7 @@ install_requires = [
     'python-dateutil',  # Simplified BSD
     'python-magic',  # MIT
     'rackspacesdk',  # Apache 2.0
-    # keystoneauth1 package dependency: requests!=2.12.2,!=2.13.0,>=2.10.0
-    'requests!=2.12.2,!=2.13.0,>=2.10.0',  # Apache 2.0
+    'requests',  # Apache 2.0
     'rfc6266-parser',  # GNU LGPL
     'xattr',  # MIT
 ]
