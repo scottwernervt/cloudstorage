@@ -86,6 +86,7 @@ setup(
     },
     setup_requires=[
         'pytest-runner',  # MIT
+        'flake8',
     ],
     tests_require=[
         'pytest',  # MIT
