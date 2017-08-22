@@ -2,10 +2,10 @@
 
 import functools
 
-sentinel = object()
+_sentinel = object()
 
 
-def rgetattr(obj, attr, default=sentinel):
+def rgetattr(obj, attr, default=_sentinel):
     """Get a nested named attribute from an object.
 
     Example: ::
@@ -31,7 +31,7 @@ def rgetattr(obj, attr, default=sentinel):
     :return: Attribute value.
     :rtype:  object
     """
-    if default is sentinel:
+    if default is _sentinel:
         _getattr = getattr
     else:
         def _getattr(obj_, name):
