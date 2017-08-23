@@ -213,7 +213,7 @@ class LocalDriver(Driver):
         :raises CloudStorageError: If the local file system does not support 
                                    extended filesystem attributes.
         """
-        attributes = xattr.xattr(filename)
+        xattrs = xattr.xattr(filename)
 
         for key, value in attributes.items():
             if not value:
@@ -225,11 +225,11 @@ class LocalDriver(Driver):
                         # user.metadata.name
                         attr_name = self._OBJECT_META_PREFIX + 'metadata.' + \
                             meta_key
-                        attributes[attr_name] = meta_value.encode('utf-8')
+                        xattrs[attr_name] = meta_value.encode('utf-8')
                 else:
                     # user.name
                     attr_name = self._OBJECT_META_PREFIX + key
-                    attributes[attr_name] = value.encode('utf-8')
+                    xattrs[attr_name] = value.encode('utf-8')
             except OSError:
                 logger.warning(LOCAL_NO_ATTRIBUTES)
 
