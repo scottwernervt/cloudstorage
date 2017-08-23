@@ -12,10 +12,11 @@ from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
-    'Driver',
-    'Container',
     'Blob',
-    'DriverName'
+    'Driver',
+    'Drivers',
+    'DriverName',
+    'Container',
     'get_driver',
     'get_driver_by_name',
 ]
