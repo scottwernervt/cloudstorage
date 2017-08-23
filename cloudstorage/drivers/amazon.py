@@ -121,19 +121,19 @@ class S3Driver(Driver):
             try:
                 response = self.s3.meta.client.head_bucket(Bucket=bucket_name)
                 logger.debug('response=%s', response)
-            except ClientError as e:
-                error_code = int(e.response['Error']['Code'])
+            except ClientError as err:
+                error_code = int(err.response['Error']['Code'])
                 if error_code == 404:
                     raise NotFoundError(CONTAINER_NOT_FOUND % bucket_name)
 
                 raise CloudStorageError('%s: %s' % (
-                    e.response['Error']['Code'],
-                    e.response['Error']['Message']))
+                    err.response['Error']['Code'],
+                    err.response['Error']['Message']))
 
             try:
                 bucket.wait_until_exists()
-            except WaiterError as e:
-                logger.error(e)
+            except WaiterError as err:
+                logger.error(err)
 
         return bucket
 
@@ -165,15 +165,15 @@ class S3Driver(Driver):
             modified_at = object_summary.last_modified
             created_at = None
             expires_at = None  # TODO: FEATURE: Delete at / expires at
-        except ClientError as e:
-            error_code = int(e.response['Error']['Code'])
+        except ClientError as err:
+            error_code = int(err.response['Error']['Code'])
             if error_code == 404:
                 raise NotFoundError(BLOB_NOT_FOUND % (container.name,
                                                       object_summary.key))
 
             raise CloudStorageError('%s: %s' % (
-                e.response['Error']['Code'],
-                e.response['Error']['Message']))
+                err.response['Error']['Code'],
+                err.response['Error']['Message']))
 
         return Blob(name=name, checksum=checksum, etag=etag, size=size,
                     container=container, driver=self, acl=acl,
@@ -243,14 +243,14 @@ class S3Driver(Driver):
 
         try:
             bucket = self.s3.create_bucket(**params)
-        except ParamValidationError as e:
-            msg = e.kwargs.get('report', CONTAINER_NAME_INVALID)
+        except ParamValidationError as err:
+            msg = err.kwargs.get('report', CONTAINER_NAME_INVALID)
             raise CloudStorageError(msg)
 
         try:
             bucket.wait_until_exists()
-        except WaiterError as e:
-            logger.error(e)
+        except WaiterError as err:
+            logger.error(err)
 
         return self._make_container(bucket)
 
@@ -266,8 +266,8 @@ class S3Driver(Driver):
 
         try:
             bucket.delete()
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
+        except ClientError as err:
+            error_code = err.response['Error']['Code']
             if error_code == 'BucketNotEmpty':
                 raise IsNotEmptyError(CONTAINER_NOT_EMPTY % bucket.name)
             raise
@@ -367,8 +367,8 @@ class S3Driver(Driver):
         try:
             response = self.s3.meta.client.delete_object(**params)
             logger.debug('response=%s', response)
-        except ClientError as e:
-            error_code = int(e.response['Error']['Code'])
+        except ClientError as err:
+            error_code = int(err.response['Error']['Code'])
             if error_code != 200 or error_code != 204:
                 raise NotFoundError(BLOB_NOT_FOUND % (blob.name,
                                                       blob.container.name))
