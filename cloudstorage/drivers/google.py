@@ -232,12 +232,12 @@ class GoogleStorageDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if meta_data:
-            logger.warning(OPTION_NOT_SUPPORTED % 'meta_data')
+            logger.warning(OPTION_NOT_SUPPORTED, 'meta_data')
 
         try:
             bucket = self.client.create_bucket(container_name)
         except Conflict:
-            logger.debug(CONTAINER_EXISTS % container_name)
+            logger.debug(CONTAINER_EXISTS, container_name)
             bucket = self._get_bucket(container_name)
         except ValueError as e:
             raise CloudStorageError(str(e))
@@ -406,8 +406,8 @@ class GoogleStorageDriver(Driver):
             else:  # prefix + user provided filename
                 fields['key'] = blob_name + '${filename}'
 
-        logger.debug('conditions=%s' % conditions)
-        logger.debug('fields=%s' % fields)
+        logger.debug('conditions=%s', conditions)
+        logger.debug('fields=%s', fields)
 
         expiration = datetime.utcnow() + timedelta(seconds=expires)
 
