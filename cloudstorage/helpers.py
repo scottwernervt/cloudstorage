@@ -63,16 +63,16 @@ def file_checksum(filename: str, hash_type: str = 'md5',
     :raise RuntimeError: If the hash algorithm is not found in :mod:`hashlib`.
     """
     try:
-        m = getattr(hashlib, hash_type)()
+        hash_method = getattr(hashlib, hash_type)()
     except AttributeError:
         raise RuntimeError('Invalid or unsupported hash type: %s' % hash_type)
 
-    with open(filename, 'rb') as f:
+    with open(filename, 'rb') as file_:
         # for chunk in iter(lambda: f.read(block_size), b''):
-        for chunk in read_in_chunks(f, block_size=block_size):
-            m.update(chunk)
+        for chunk in read_in_chunks(file_, block_size=block_size):
+            hash_method.update(chunk)
 
-    return m.hexdigest()
+    return hash_method.hexdigest()
 
 
 def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
