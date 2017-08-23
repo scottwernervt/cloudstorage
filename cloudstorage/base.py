@@ -1149,7 +1149,7 @@ class Driver(metaclass=DocstringMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(feature_not_supported % 'enable_container_cdn')
+        logger.warning(feature_not_supported, 'enable_container_cdn')
         return False
 
     @abstractmethod
@@ -1165,7 +1165,7 @@ class Driver(metaclass=DocstringMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(feature_not_supported % 'disable_container_cdn')
+        logger.warning(feature_not_supported, 'disable_container_cdn')
         return False
 
     @abstractmethod
