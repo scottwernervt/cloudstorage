@@ -239,8 +239,8 @@ class GoogleStorageDriver(Driver):
         except Conflict:
             logger.debug(CONTAINER_EXISTS, container_name)
             bucket = self._get_bucket(container_name)
-        except ValueError as e:
-            raise CloudStorageError(str(e))
+        except ValueError as err:
+            raise CloudStorageError(str(err))
 
         if acl:
             bucket.acl.save_predefined(acl)
@@ -259,8 +259,8 @@ class GoogleStorageDriver(Driver):
 
         try:
             bucket.delete()
-        except Conflict as e:
-            if e.code == HTTPStatus.CONFLICT:
+        except Conflict as err:
+            if err.code == HTTPStatus.CONFLICT:
                 raise IsNotEmptyError(CONTAINER_NOT_EMPTY % bucket.name)
             raise
 
