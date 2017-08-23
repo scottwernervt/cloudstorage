@@ -120,7 +120,7 @@ class S3Driver(Driver):
         if validate:
             try:
                 response = self.s3.meta.client.head_bucket(Bucket=bucket_name)
-                logger.debug('response=%s' % response)
+                logger.debug('response=%s', response)
             except ClientError as e:
                 error_code = int(e.response['Error']['Code'])
                 if error_code == 404:
@@ -222,7 +222,7 @@ class S3Driver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if meta_data:
-            logger.info(OPTION_NOT_SUPPORTED % 'meta_data')
+            logger.info(OPTION_NOT_SUPPORTED, 'meta_data')
 
         # Required parameters
         params = {
@@ -239,7 +239,7 @@ class S3Driver(Driver):
                 'LocationConstraint': self.region,
             }
 
-        logger.debug('params=%s' % params)
+        logger.debug('params=%s', params)
 
         try:
             bucket = self.s3.create_bucket(**params)
@@ -278,11 +278,11 @@ class S3Driver(Driver):
         return '%s/%s' % (endpoint_url, container.name)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED % 'enable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED % 'disable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
@@ -318,7 +318,7 @@ class S3Driver(Driver):
         else:
             extra_args['ContentType'] = content_type
 
-        logger.debug('extra_args=%s' % extra_args)
+        logger.debug('extra_args=%s', extra_args)
 
         if isinstance(filename, str):
             self.s3.Bucket(container.name).upload_file(Filename=filename,
@@ -362,11 +362,11 @@ class S3Driver(Driver):
             'Key': blob.name,
         }
 
-        logger.debug('params=%s' % params)
+        logger.debug('params=%s', params)
 
         try:
             response = self.s3.meta.client.delete_object(**params)
-            logger.debug('response=%s' % response)
+            logger.debug('response=%s', response)
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])
             if error_code != 200 or error_code != 204:
@@ -449,7 +449,7 @@ class S3Driver(Driver):
         if content_disposition:
             params['ResponseContentDisposition'] = content_disposition
 
-        logger.debug('params=%s' % params)
+        logger.debug('params=%s', params)
         return self.s3.meta.client.generate_presigned_url(
             ClientMethod='get_object', Params=params, ExpiresIn=int(expires),
             HttpMethod=method.lower())
