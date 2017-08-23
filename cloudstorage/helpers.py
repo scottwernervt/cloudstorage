@@ -1,7 +1,7 @@
 """Helper methods for Cloud Storage."""
 
 import mimetypes
-from typing import Iterable, Union
+from typing import Iterator, Union
 
 import hashlib
 # noinspection PyPackageRequirements
@@ -12,7 +12,7 @@ from cloudstorage.base import FileLike
 
 
 def read_in_chunks(file_object: FileLike,
-                   block_size: int = 4096) -> Iterable[bytes]:
+                   block_size: int = 4096) -> Iterator[bytes]:
     """Return a generator which yields data in chunks.
 
     Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file 

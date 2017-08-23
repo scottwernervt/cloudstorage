@@ -508,12 +508,12 @@ class LocalDriver(Driver):
         extra = extra if extra is not None else {}
 
         expiration = datetime.utcnow() + timedelta(seconds=expires)
-        expiration = int(expiration.timestamp())
+        expires_at = expiration.timestamp()
 
         fields = {
             'blob_name': blob_name,
             'container': container.name,
-            'expires': expiration,
+            'expires': expires_at,
         }
 
         payload = {
@@ -541,11 +541,11 @@ class LocalDriver(Driver):
         serializer = self._make_serializer()
 
         expiration = datetime.utcnow() + timedelta(seconds=expires)
-        expiration = int(expiration.timestamp())
+        expires_at = expiration.timestamp()
 
         payload = {
             'max_age': int(expires),
-            'expires': expiration,
+            'expires': expires_at,
             'blob_name': blob.name,
             'container': blob.container.name,
             'method': method,
