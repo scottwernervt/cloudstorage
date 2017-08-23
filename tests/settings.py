@@ -1,9 +1,9 @@
-import hashlib
-import os
-from tempfile import mkdtemp
 from time import time
 
+import hashlib
+import os
 from prettyconf.configuration import Configuration
+from tempfile import mkdtemp
 
 config = Configuration()
 
@@ -34,6 +34,9 @@ BINARY_OPTIONS = {
 AMAZON_KEY = config('AMAZON_KEY', default=None)
 AMAZON_SECRET = config('AMAZON_SECRET', default=None)
 AMAZON_REGION = config('AMAZON_REGION', default='us-east-1')
+
+AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME', default=None)
+AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY', default=None)
 
 GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None)
 
