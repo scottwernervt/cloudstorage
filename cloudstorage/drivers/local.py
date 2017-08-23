@@ -1,18 +1,18 @@
 """Local File System Driver."""
 
 import errno
-import hashlib
 import logging
-import os
 import pathlib
-import shutil
 import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Iterable, List, Union
 
 import filelock
+import hashlib
 import itsdangerous
+import os
+import shutil
 import xattr
 from inflection import underscore
 
@@ -40,7 +40,7 @@ IGNORE_FOLDERS = ['.lock', '.hash', '.DS_STORE']
 
 
 @contextmanager
-def lock_local_file(path: str) -> contextmanager:
+def lock_local_file(path: str) -> filelock.FileLock:
     """Platform dependent file lock.
 
     :param path: File or directory path to lock.
@@ -224,7 +224,7 @@ class LocalDriver(Driver):
                     for meta_key, meta_value in value.items():
                         # user.metadata.name
                         attr_name = self._OBJECT_META_PREFIX + 'metadata.' + \
-                            meta_key
+                                    meta_key
                         xattrs[attr_name] = meta_value.encode('utf-8')
                 else:
                     # user.name
@@ -554,7 +554,7 @@ class LocalDriver(Driver):
         payload.update(**extra)
 
         signature = serializer.dumps(payload)
-        return signature
+        return str(signature)
 
     def validate_signature(self, signature):
         """Validate signed signature and return payload if valid.

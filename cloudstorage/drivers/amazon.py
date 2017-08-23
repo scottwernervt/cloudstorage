@@ -1,7 +1,7 @@
 """Amazon Simple Storage Service (S3) Driver."""
 
 import logging
-from typing import Dict, Iterable, List, Union
+from typing import Any, Dict, Iterable, List, Union
 from urllib.parse import quote, urljoin
 
 import boto3
@@ -227,7 +227,7 @@ class S3Driver(Driver):
         # Required parameters
         params = {
             'Bucket': container_name,
-        }
+        }  # type: Dict[Any, Any]
 
         if acl:
             params['ACL'] = acl.lower()
@@ -394,8 +394,8 @@ class S3Driver(Driver):
         extra = {} if extra is None else extra
         extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
 
-        conditions = []
-        fields = {}
+        conditions = []  # type: List[Any]
+        fields = {}  # type: Dict[Any, Any]
 
         if acl:
             conditions.append({'acl': acl})
@@ -454,7 +454,7 @@ class S3Driver(Driver):
             ClientMethod='get_object', Params=params, ExpiresIn=int(expires),
             HttpMethod=method.lower())
 
-    _OBJECT_META_PREFIX = 'x-amz-meta-'
+    _OBJECT_META_PREFIX = 'x-amz-meta-'  # type: str
 
     #: `S3.Client.generate_presigned_post
     #: <http://boto3.readthedocs.io/en/latest/reference/services/s3.html

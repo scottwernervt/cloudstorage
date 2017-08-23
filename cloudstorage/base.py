@@ -24,7 +24,7 @@ Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
 ExtraOptions = Optional[Dict[Any, Any]]
-FormPost = Dict[str, Union(str, Dict)]
+FormPost = Dict[str, Union[str, Dict]]
 
 
 class DocstringMeta(type):

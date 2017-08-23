@@ -1,18 +1,19 @@
 """Google Cloud Storage Driver."""
 
-import base64
-import codecs
 import logging
-import os
 import pathlib
 from datetime import datetime, timedelta
+
+import base64
+import codecs
+import os
 
 try:
     from http import HTTPStatus
 except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List, Union, Any
 
 # noinspection PyPackageRequirements
 from google.cloud import storage
@@ -317,8 +318,8 @@ class GoogleStorageDriver(Driver):
         return self._make_blob(container, blob)
 
     def get_blob(self, container: Container, blob_name: str) -> Blob:
-        blob = self._get_blob(container.name, blob_name)
-        return self._make_blob(container, blob)
+        g_blob = self._get_blob(container.name, blob_name)
+        return self._make_blob(container, g_blob)
 
     def get_blobs(self, container: Container) -> Iterable[Blob]:
         bucket = self._get_bucket(container.name)
@@ -327,19 +328,19 @@ class GoogleStorageDriver(Driver):
 
     def download_blob(self, blob: Blob,
                       destination: Union[str, FileLike]) -> None:
-        blob = self._get_blob(blob.container.name, blob.name)
+        g_blob = self._get_blob(blob.container.name, blob.name)
 
         if isinstance(destination, str):
-            blob.download_to_filename(destination)
+            g_blob.download_to_filename(destination)
         else:
-            blob.download_to_file(destination)
+            g_blob.download_to_file(destination)
 
     def patch_blob(self, blob: Blob) -> None:
         raise NotImplementedError
 
     def delete_blob(self, blob: Blob) -> None:
-        blob_ = self._get_blob(blob.container.name, blob.name)
-        blob_.delete()
+        g_blob = self._get_blob(blob.container.name, blob.name)
+        g_blob.delete()
 
     def blob_cdn_url(self, blob: Blob) -> str:
         return self._get_blob(blob.container.name, blob.name).public_url
@@ -361,10 +362,10 @@ class GoogleStorageDriver(Driver):
         conditions = [
             # file name can start with any valid character.
             ['starts-with', '$key', '']
-        ]
+        ]  # type: List[Any]
         fields = {}
 
-        if acl:  # noinspection PyTypeChecker
+        if acl:
             conditions.append({'acl': acl})
             fields['acl'] = acl
 
@@ -387,13 +388,11 @@ class GoogleStorageDriver(Driver):
         for meta_name, meta_value in meta_data.items():
             meta_name = self._OBJECT_META_PREFIX + meta_name
             fields[meta_name] = meta_value
-            # noinspection PyTypeChecker
             conditions.append({meta_name: meta_value})
 
         # Add extra conditions and fields
         for extra_name, extra_value in extra_norm.items():
             fields[extra_name] = extra_value
-            # noinspection PyTypeChecker
             conditions.append({extra_name: extra_value})
 
         # Determine key value for blob name when uploaded
@@ -432,8 +431,8 @@ class GoogleStorageDriver(Driver):
         response_type = params.get('content_type', None)
         generation = params.get('version', None)
 
-        blob = self._get_blob(blob.container.name, blob.name)
-        return blob.generate_signed_url(
+        g_blob = self._get_blob(blob.container.name, blob.name)
+        return g_blob.generate_signed_url(
             expiration=expiration, method=method_norm,
             content_type='', generation=generation,
             response_disposition=content_disposition,

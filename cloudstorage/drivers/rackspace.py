@@ -1,8 +1,9 @@
 """Rackspace Cloud Files Driver."""
 
+import logging
+
 import hashlib
 import hmac
-import logging
 
 try:
     from http import HTTPStatus
@@ -10,7 +11,7 @@ except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
 from time import time
-from typing import Dict, Iterable, List, Tuple, Union
+from typing import Dict, Iterable, List, Tuple, Union, Any
 from urllib.parse import quote, urlencode, urljoin
 
 # noinspection PyPackageRequirements
@@ -35,7 +36,7 @@ from cloudstorage.exceptions import (
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.messages import (
     BLOB_NOT_FOUND, CDN_NOT_ENABLED, CONTAINER_NOT_EMPTY, CONTAINER_NOT_FOUND,
-    OPTION_NOT_SUPPORTED,
+    OPTION_NOT_SUPPORTED, REGION_NOT_FOUND,
 )
 
 logger = logging.getLogger(__name__)
@@ -98,7 +99,7 @@ class CloudFilesDriver(Driver):
                  **kwargs: Dict) -> None:
         region = region.upper()
         if region not in self.regions:
-            raise CloudStorageError(region_not_found % region)
+            raise CloudStorageError(REGION_NOT_FOUND % region)
 
         super().__init__(key=key, secret=secret, region=region)
         self._conn = connection.Connection(username=key, api_key=secret,
@@ -508,7 +509,7 @@ class CloudFilesDriver(Driver):
                 content_type = file_content_type(blob_name)
 
         if isinstance(filename, str):
-            file_obj = open(filename, 'rb')
+            file_obj = open(filename, 'rb')  # type: FileLike
         else:
             file_obj = filename
 
@@ -608,7 +609,7 @@ class CloudFilesDriver(Driver):
         _, container_path = url.split('/v1/')
         path = '/v1/' + container_path
 
-        fields = {}
+        fields = {}  # type: Dict[Any, Any]
 
         # Optional parameters and attributes
         redirect = (extra_norm.get('success_action_redirect') or
