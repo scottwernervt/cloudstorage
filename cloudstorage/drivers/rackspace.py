@@ -403,8 +403,8 @@ class CloudFilesDriver(Driver):
         try:
             cont = self.object_store.create_container(
                 **dict(name=container_name))
-        except HttpException as e:
-            raise CloudStorageError(e.details)
+        except HttpException as err:
+            raise CloudStorageError(err.details)
 
         meta_data = meta_data if meta_data is not None else {}
         self._set_container_meta(cont, meta_data)
@@ -438,10 +438,10 @@ class CloudFilesDriver(Driver):
             self.object_store.delete_container(container.name)
         except ResourceNotFound:
             raise NotFoundError(CONTAINER_NOT_FOUND % container.name)
-        except HttpException as e:
-            if e.http_status == HTTPStatus.CONFLICT:
+        except HttpException as err:
+            if err.http_status == HTTPStatus.CONFLICT:
                 raise IsNotEmptyError(CONTAINER_NOT_EMPTY % container.name)
-            raise CloudStorageError(e.details)
+            raise CloudStorageError(err.details)
 
     def container_cdn_url(self, container: Container) -> str:
         endpoint_url = self._get_server_public_url(
