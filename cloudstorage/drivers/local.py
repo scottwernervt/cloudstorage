@@ -317,9 +317,9 @@ class LocalDriver(Driver):
         content_disposition = None
 
         try:
-            x = xattr.xattr(full_path)
+            attributes = xattr.xattr(full_path)
 
-            for attr_key, attr_value in x.items():
+            for attr_key, attr_value in attributes.items():
                 value_str = attr_value.decode('utf-8')
 
                 if attr_key.startswith(self._OBJECT_META_PREFIX + 'metadata'):
@@ -386,8 +386,8 @@ class LocalDriver(Driver):
         with lock_local_file(path):
             try:
                 shutil.rmtree(path)
-            except shutil.Error as e:
-                raise CloudStorageError(e.strerror)
+            except shutil.Error as err:
+                raise CloudStorageError(err.strerror)
 
     def container_cdn_url(self, container: Container) -> str:
         return self._get_folder_path(container)
@@ -490,8 +490,8 @@ class LocalDriver(Driver):
         with lock_local_file(path):
             try:
                 os.unlink(path)
-            except OSError as e:
-                logger.exception(e)
+            except OSError as err:
+                logger.exception(err)
 
     def blob_cdn_url(self, blob: Blob) -> str:
         return os.path.join(self.base_path, blob.container.name, blob.name)
