@@ -263,7 +263,7 @@ class LocalDriver(Driver):
         try:
             os.makedirs(path)
         except OSError:
-            logger.debug(CONTAINER_EXISTS % path)
+            logger.debug(CONTAINER_EXISTS, path)
             exp = sys.exc_info()[1]
             if exp.errno == errno.EEXIST and not ignore_existing:
                 raise CloudStorageError(exp.strerror)
@@ -330,7 +330,7 @@ class LocalDriver(Driver):
                 elif attr_key.endswith('content-disposition'):
                     content_disposition = value_str
                 else:
-                    logger.warning("Unknown file attribute '%s'" % attr_key)
+                    logger.warning("Unknown file attribute '%s'", attr_key)
         except OSError:
             logger.warning(LOCAL_NO_ATTRIBUTES)
 
@@ -355,10 +355,10 @@ class LocalDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED % 'acl')
+            logger.info(OPTION_NOT_SUPPORTED, 'acl')
 
         if meta_data:
-            logger.info(OPTION_NOT_SUPPORTED % 'meta_data')
+            logger.info(OPTION_NOT_SUPPORTED, 'meta_data')
 
         full_path = os.path.join(self.base_path, container_name)
 
@@ -393,11 +393,11 @@ class LocalDriver(Driver):
         return self._get_folder_path(container)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED % 'enable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED % 'disable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
@@ -406,7 +406,7 @@ class LocalDriver(Driver):
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED % 'acl')
+            logger.info(OPTION_NOT_SUPPORTED, 'acl')
 
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}
