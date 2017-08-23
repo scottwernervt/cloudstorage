@@ -605,7 +605,7 @@ class CloudFilesDriver(Driver):
         # POST URL and path field
         url = '%s/%s/%s' % (storage_public_url, quote(container.name),
                             quote(blob_name))
-        base_url, container_path = url.split('/v1/')
+        _, container_path = url.split('/v1/')
         path = '/v1/' + container_path
 
         fields = {}
