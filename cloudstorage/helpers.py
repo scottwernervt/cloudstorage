@@ -1,18 +1,17 @@
 """Helper methods for Cloud Storage."""
 
-import hashlib
 import mimetypes
-import os
-from io import FileIO
 from typing import Iterable, Union
 
+import hashlib
 # noinspection PyPackageRequirements
 import magic
+import os
 
 from cloudstorage.base import FileLike
 
 
-def read_in_chunks(file_object: FileIO,
+def read_in_chunks(file_object: FileLike,
                    block_size: int = 4096) -> Iterable[bytes]:
     """Return a generator which yields data in chunks.
 
@@ -96,7 +95,7 @@ def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
         name = os.path.basename(filename)
     else:
         try:
-            name = os.path.basename(filename.name)
+            name = os.path.basename(str(filename.name))
         except AttributeError:
             name = None
 

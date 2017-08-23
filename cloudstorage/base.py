@@ -1,10 +1,11 @@
 """Provides base classes for working with storage drivers."""
 
 import logging
-from abc import abstractmethod
 from datetime import datetime
+from typing import Any, Dict, IO, Iterable, List, Optional, Union
+
+from abc import abstractmethod
 from io import BytesIO, FileIO, TextIOWrapper
-from typing import Dict, IO, Iterable, List, Union
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
@@ -18,11 +19,12 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 # TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IO[BytesIO], BytesIO, FileIO, TextIOWrapper]
-MetaData = Dict[str, str]
+FileLike = Union[IO, BytesIO, FileIO, TextIOWrapper]
+Acl = Optional[Dict[Any, Any]]
+MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
-ExtraOptions = Dict[str, str]
-FormPost = Dict[str, Dict[str, str]]
+ExtraOptions = Optional[Dict[Any, Any]]
+FormPost = Dict[str, Union(str, Dict)]
 
 
 class DocstringMeta(type):
@@ -109,7 +111,7 @@ class Blob:
     """
 
     def __init__(self, name: str, checksum: str, etag: str, size: int,
-                 container: 'Container', driver: 'Driver', acl: str = None,
+                 container: 'Container', driver: 'Driver', acl: Acl = None,
                  meta_data: MetaData = None, content_disposition: str = None,
                  content_type: str = None, created_at: datetime = None,
                  modified_at: datetime = None,
@@ -132,9 +134,9 @@ class Blob:
         self.modified_at = modified_at
         self.expires_at = expires_at
 
-        self._attr = {}
-        self._acl = {}
-        self._meta_data = {}
+        self._attr = {}  # type: Dict
+        self._acl = {}  # type: Dict
+        self._meta_data = {}  # type: Dict
 
         # Track attributes for object PUT
         for key, value in locals().items():
@@ -145,7 +147,7 @@ class Blob:
             else:
                 self._attr[key] = value
 
-    def __eq__(self, other: 'Blob') -> bool:
+    def __eq__(self, other: 'Blob') -> bool:  # type: ignore
         """Override the default equals behavior.
 
         :param other: The other Blob.
@@ -154,10 +156,11 @@ class Blob:
         :return: True if the Blobs are the same.
         :rtype: bool
         """
-        return (isinstance(other, self.__class__) and
-                self.checksum == other.checksum)
+        if isinstance(other, self.__class__):
+            return self.checksum == other.checksum
+        return NotImplemented
 
-    def __hash__(self) -> hash:
+    def __hash__(self) -> int:
         """Override the default hash behavior.
 
         :return: Hash.
@@ -174,7 +177,7 @@ class Blob:
         """
         return self.size
 
-    def __ne__(self, other: 'Blob') -> bool:
+    def __ne__(self, other: 'Blob') -> bool:  # type: ignore
         """Override the default not equals behavior.
 
         :param other: The other blob.
@@ -183,7 +186,7 @@ class Blob:
         :return: True if the containers are not the same.
         :rtype: bool
         """
-        return self.checksum != other.checksum
+        return not self.__eq__(other)
 
     @property
     def cdn_url(self) -> str:
@@ -427,9 +430,9 @@ class Container:
         self.meta_data = meta_data
         self.created_at = created_at
 
-        self._attr = {}
-        self._acl = {}
-        self._meta_data = {}
+        self._attr = {}  # type: Dict
+        self._acl = acl  # type: str
+        self._meta_data = {}  # type: Dict
 
         # Track attributes for object PUT
         for key, value in locals().items():
@@ -440,7 +443,7 @@ class Container:
             else:
                 self._attr[key] = value
 
-    def __contains__(self, blob: Blob) -> bool:
+    def __contains__(self, blob: Union[Blob, str]) -> bool:
         """Determines whether or not the blob exists in this container.
 
         .. code-block:: python
@@ -458,7 +461,10 @@ class Container:
         :return: True if the blob exists.
         :rtype: bool
         """
-        blob_name = blob.name if hasattr(blob, 'name') else blob
+        if hasattr(blob, 'name'):
+            blob_name = blob.name
+        else:
+            blob_name = blob
 
         try:
             self.driver.get_blob(container=self, blob_name=blob_name)
@@ -466,7 +472,8 @@ class Container:
         except NotFoundError:
             return False
 
-    def __eq__(self, other: Blob) -> bool:
+    def __eq__(self, other: Blob,  # type: ignore
+               implemented=NotImplemented) -> bool:  # type: ignore
         """Override the default equals behavior.
 
         :param other: The other container.
@@ -475,11 +482,12 @@ class Container:
         :return: True if the containers are the same.
         :rtype: bool
         """
-        return (isinstance(other, self.__class__)
-                and self.name == other.name
-                and self.driver.name == other.driver.name)
+        if isinstance(other, self.__class__):
+            return self.name == other.name and \
+                   self.driver.name == other.driver.name
+        return implemented
 
-    def __hash__(self) -> hash:
+    def __hash__(self) -> int:
         """Override the default hash behavior.
 
         :return: Hash.
@@ -511,7 +519,7 @@ class Container:
         blobs = self.driver.get_blobs(container=self)
         return len(list(blobs))
 
-    def __ne__(self, other: Blob) -> bool:
+    def __ne__(self, other: Blob) -> bool:  # type: ignore
         """Override the default not equals behavior.
 
         :param other: The other container.
@@ -869,7 +877,7 @@ class Container:
 
         :return: Dictionary with URL and form fields (includes signature or 
                  policy).                
-        :rtype: Dict[str, str]
+        :rtype: Dict[Any, Any]
         """
         return self.driver.generate_container_upload_url(
             container=self,
@@ -927,13 +935,13 @@ class Driver(metaclass=DocstringMeta):
     """
 
     #: Unique `str` driver name.
-    name = None
+    name = None  # type: str
 
     #: :mod:`hashlib` function `str` name used by driver.
-    hash_type = 'md5'
+    hash_type = 'md5'  # type: str
 
     #: Unique `str` driver URL.
-    url = None
+    url = None  # type: Optional[str]
 
     def __init__(self, key: str, secret: str = None, region: str = None,
                  **kwargs: Dict) -> None:
@@ -1346,7 +1354,7 @@ class Driver(metaclass=DocstringMeta):
         :type acl: str or None
 
         :param meta_data: (optional) A map of metadata to store with the blob.
-        :type meta_data: Dict[str, str] or None
+        :type meta_data: Dict[Any, Any] or None
 
         :param content_disposition: (optional) Specifies presentational 
                                     information for the blob.
@@ -1361,11 +1369,11 @@ class Driver(metaclass=DocstringMeta):
         :type content_length: tuple[int, int] or None
 
         :param extra: (optional) Extra parameters for the request.
-        :type extra: Dict[str, str] or None
+        :type extra: Dict[Any, Any] or None
 
         :return: Dictionary with URL and form fields (includes signature or 
                  policy).                
-        :rtype: Dict[str, str]
+        :rtype: Dict[Any, Any]
         """
         pass
 
@@ -1393,7 +1401,7 @@ class Driver(metaclass=DocstringMeta):
         :type content_disposition: str or None
 
         :param extra: (optional) Extra parameters for the request.
-        :type extra: Dict[str, str] or None
+        :type extra: Dict[Any, Any] or None
 
         :return: Pre-signed URL for downloading a blob.
         :rtype: str
@@ -1406,12 +1414,12 @@ class Driver(metaclass=DocstringMeta):
 
         return '<Driver: %s>' % self.name
 
-    _POST_OBJECT_KEYS = {}
-    _GET_OBJECT_KEYS = {}
-    _PUT_OBJECT_KEYS = {}
-    _DELETE_OBJECT_KEYS = {}
+    _POST_OBJECT_KEYS = {}  # type: Dict
+    _GET_OBJECT_KEYS = {}  # type: Dict
+    _PUT_OBJECT_KEYS = {}  # type: Dict
+    _DELETE_OBJECT_KEYS = {}  # type: Dict
 
-    _POST_CONTAINER_KEYS = {}
-    _GET_CONTAINER_KEYS = {}
-    _PUT_CONTAINER_KEYS = {}
-    _DELETE_CONTAINER_KEYS = {}
+    _POST_CONTAINER_KEYS = {}  # type: Dict
+    _GET_CONTAINER_KEYS = {}  # type: Dict
+    _PUT_CONTAINER_KEYS = {}  # type: Dict
+    _DELETE_CONTAINER_KEYS = {}  # type: Dict

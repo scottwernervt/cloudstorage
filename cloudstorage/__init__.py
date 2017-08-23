@@ -5,10 +5,15 @@
 """
 
 import logging
-from enum import Enum, unique
 from typing import Union
 
+from enum import Enum, unique
+
 from cloudstorage.base import Blob, Container, Driver
+from cloudstorage.drivers.amazon import S3Driver
+from cloudstorage.drivers.google import GoogleStorageDriver
+from cloudstorage.drivers.local import LocalDriver
+from cloudstorage.drivers.rackspace import CloudFilesDriver
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
@@ -28,10 +33,10 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 Scott Werner'
 
 Drivers = Union[
-    'S3Driver',
-    'GoogleStorageDriver',
-    'LocalDriver',
-    'CloudFilesDriver',
+    S3Driver,
+    GoogleStorageDriver,
+    LocalDriver,
+    CloudFilesDriver,
 ]
 
 
