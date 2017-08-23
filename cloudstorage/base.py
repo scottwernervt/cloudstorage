@@ -1403,8 +1403,8 @@ class Driver(metaclass=DocstringMeta):
     def __repr__(self):
         if self.region:
             return '<Driver: %s %s>' % (self.name, self.region)
-        else:
-            return '<Driver: %s>' % self.name
+
+        return '<Driver: %s>' % self.name
 
     _POST_OBJECT_KEYS = {}
     _GET_OBJECT_KEYS = {}
