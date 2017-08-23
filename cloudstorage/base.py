@@ -36,8 +36,8 @@ class DocstringMeta(type):
 
     # noinspection PyInitNewSignature
     # noinspection PyMethodParameters
-    def __new__(mcls, name, bases, namespace):
-        cls = super().__new__(mcls, name, bases, namespace)
+    def __new__(mcs, name, bases, namespace):
+        cls = super().__new__(mcs, name, bases, namespace)
         mro = cls.__mro__[1:]
         for name, member in namespace.items():
             if not getattr(member, '__doc__'):
@@ -114,7 +114,7 @@ class Blob:
                  content_type: str = None, created_at: datetime = None,
                  modified_at: datetime = None,
                  expires_at: datetime = None) -> None:
-        # acl = acl if acl is not None else {}
+        acl = acl if acl is not None else {}
         meta_data = meta_data if meta_data is not None else {}
 
         self.name = name
@@ -124,7 +124,7 @@ class Blob:
         self.container = container
         self.driver = driver
 
-        # self.acl = acl
+        self.acl = acl
         self.meta_data = meta_data
         self.content_disposition = content_disposition
         self.content_type = content_type
