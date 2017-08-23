@@ -34,8 +34,8 @@ from cloudstorage.exceptions import (
 )
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.messages import (
-    blob_not_found, cdn_not_enabled, container_not_empty, container_not_found,
-    option_not_supported, region_not_found,
+    BLOB_NOT_FOUND, CDN_NOT_ENABLED, CONTAINER_NOT_EMPTY, CONTAINER_NOT_FOUND,
+    OPTION_NOT_SUPPORTED,
 )
 
 logger = logging.getLogger(__name__)
@@ -205,7 +205,7 @@ class CloudFilesDriver(Driver):
         try:
             return self.object_store.get_container_metadata(container_name)
         except NotFoundException:
-            raise NotFoundError(container_not_found % container_name)
+            raise NotFoundError(CONTAINER_NOT_FOUND % container_name)
 
     def _get_object(self, container_name: str, object_name: str):
         """Get Rackspace container by name.
@@ -225,7 +225,7 @@ class CloudFilesDriver(Driver):
             obj = self.object_store.get_object_metadata(
                 obj=object_name, container=container_name)
         except (ResourceNotFound, NotFoundException):
-            raise NotFoundError(blob_not_found % (object_name, container_name))
+            raise NotFoundError(BLOB_NOT_FOUND % (object_name, container_name))
 
         return obj
 
@@ -398,7 +398,7 @@ class CloudFilesDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if acl:
-            logger.info(option_not_supported % 'acl')
+            logger.info(OPTION_NOT_SUPPORTED, 'acl')
 
         try:
             cont = self.object_store.create_container(
@@ -437,10 +437,10 @@ class CloudFilesDriver(Driver):
         try:
             self.object_store.delete_container(container.name)
         except ResourceNotFound:
-            raise NotFoundError(container_not_found % container.name)
+            raise NotFoundError(CONTAINER_NOT_FOUND % container.name)
         except HttpException as e:
             if e.http_status == HTTPStatus.CONFLICT:
-                raise IsNotEmptyError(container_not_empty % container.name)
+                raise IsNotEmptyError(CONTAINER_NOT_EMPTY % container.name)
             raise CloudStorageError(e.details)
 
     def container_cdn_url(self, container: Container) -> str:
@@ -453,7 +453,7 @@ class CloudFilesDriver(Driver):
 
         uri = response.headers.get('x-cdn-ssl-uri')
         if not uri:
-            raise CloudStorageError(cdn_not_enabled % container.name)
+            raise CloudStorageError(CDN_NOT_ENABLED % container.name)
 
         return uri
 
@@ -489,7 +489,7 @@ class CloudFilesDriver(Driver):
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
-            logger.warning(option_not_supported % 'acl')
+            logger.warning(OPTION_NOT_SUPPORTED, 'acl')
 
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
@@ -549,7 +549,7 @@ class CloudFilesDriver(Driver):
             else:
                 destination.write(data)
         except ResourceNotFound:
-            raise NotFoundError(blob_not_found % (blob.name,
+            raise NotFoundError(BLOB_NOT_FOUND % (blob.name,
                                                   blob.container.name))
 
     def patch_blob(self, blob: Blob) -> None:
@@ -568,7 +568,7 @@ class CloudFilesDriver(Driver):
             self.object_store.delete_object(obj=blob.name, ignore_missing=False,
                                             container=blob.container.name)
         except ResourceNotFound:
-            raise NotFoundError(blob_not_found % (blob.name,
+            raise NotFoundError(BLOB_NOT_FOUND % (blob.name,
                                                   blob.container.name))
 
     def blob_cdn_url(self, blob: Blob) -> str:
@@ -585,16 +585,16 @@ class CloudFilesDriver(Driver):
                                       content_type: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         if acl:
-            logger.warning(option_not_supported % 'acl')
+            logger.warning(OPTION_NOT_SUPPORTED, 'acl')
 
         if meta_data:
-            logger.warning(option_not_supported % 'meta_data')
+            logger.warning(OPTION_NOT_SUPPORTED, 'meta_data')
 
         if content_disposition:
-            logger.warning(option_not_supported % 'content_disposition')
+            logger.warning(OPTION_NOT_SUPPORTED, 'content_disposition')
 
         if content_type:
-            logger.warning(option_not_supported % 'content_type')
+            logger.warning(OPTION_NOT_SUPPORTED, 'content_type')
 
         extra = extra if extra is not None else {}
         extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
@@ -643,7 +643,7 @@ class CloudFilesDriver(Driver):
                                    content_disposition: str = None,
                                    extra: ExtraOptions = None) -> str:
         if extra:
-            logger.info(option_not_supported % 'extra')
+            logger.info(OPTION_NOT_SUPPORTED, 'extra')
 
         key = self._get_temp_url_key()
         storage_public_url = self._get_server_public_url('cloudFiles')
