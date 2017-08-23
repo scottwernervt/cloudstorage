@@ -29,9 +29,9 @@ from cloudstorage.helpers import (
     read_in_chunks, validate_file_or_path,
 )
 from cloudstorage.messages import (
-    blob_not_found, container_exists, container_name_invalid,
-    container_not_empty, container_not_found, feature_not_supported,
-    local_no_attributes, option_not_supported,
+    BLOB_NOT_FOUND, CONTAINER_EXISTS, CONTAINER_NAME_INVALID,
+    CONTAINER_NOT_EMPTY, CONTAINER_NOT_FOUND, FEATURE_NOT_SUPPORTED,
+    LOCAL_NO_ATTRIBUTES, OPTION_NOT_SUPPORTED,
 )
 
 logger = logging.getLogger(__name__)
@@ -187,7 +187,7 @@ class LocalDriver(Driver):
         """
         full_path = os.path.join(self.base_path, container.name)
         if validate and not os.path.isdir(full_path):
-            raise NotFoundError(container_not_found % container.name)
+            raise NotFoundError(CONTAINER_NOT_FOUND % container.name)
 
         return full_path
 
@@ -231,7 +231,7 @@ class LocalDriver(Driver):
                     attr_name = self._OBJECT_META_PREFIX + key
                     x[attr_name] = value.encode('utf-8')
             except OSError:
-                logger.warning(local_no_attributes)
+                logger.warning(LOCAL_NO_ATTRIBUTES)
 
     def _get_file_path(self, blob: Blob) -> str:
         """Get the blob's full folder path.
@@ -263,7 +263,7 @@ class LocalDriver(Driver):
         try:
             os.makedirs(path)
         except OSError:
-            logger.debug(container_exists % path)
+            logger.debug(CONTAINER_EXISTS % path)
             exp = sys.exc_info()[1]
             if exp.errno == errno.EEXIST and not ignore_existing:
                 raise CloudStorageError(exp.strerror)
@@ -284,7 +284,7 @@ class LocalDriver(Driver):
         try:
             stat = os.stat(full_path)
         except FileNotFoundError:
-            raise NotFoundError(container_not_found % folder_name)
+            raise NotFoundError(CONTAINER_NOT_FOUND % folder_name)
 
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
 
@@ -310,7 +310,7 @@ class LocalDriver(Driver):
         try:
             stat = os.stat(str(object_path))
         except FileNotFoundError:
-            raise NotFoundError(blob_not_found % (object_name, container.name))
+            raise NotFoundError(BLOB_NOT_FOUND % (object_name, container.name))
 
         meta_data = {}
         content_type = None
@@ -332,7 +332,7 @@ class LocalDriver(Driver):
                 else:
                     logger.warning("Unknown file attribute '%s'" % attr_key)
         except OSError:
-            logger.warning(local_no_attributes)
+            logger.warning(LOCAL_NO_ATTRIBUTES)
 
         # TODO: QUESTION: Option to disable checksum for large files?
         # TODO: QUESTION: Save a .hash file for each file?
@@ -355,10 +355,10 @@ class LocalDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if acl:
-            logger.info(option_not_supported % 'acl')
+            logger.info(OPTION_NOT_SUPPORTED % 'acl')
 
         if meta_data:
-            logger.info(option_not_supported % 'meta_data')
+            logger.info(OPTION_NOT_SUPPORTED % 'meta_data')
 
         full_path = os.path.join(self.base_path, container_name)
 
@@ -367,7 +367,7 @@ class LocalDriver(Driver):
             with lock_local_file(full_path):
                 self._make_path(full_path, ignore_existing=True)
         except FileNotFoundError:
-            raise CloudStorageError(container_name_invalid)
+            raise CloudStorageError(CONTAINER_NAME_INVALID)
 
         return self._make_container(container_name)
 
@@ -379,7 +379,7 @@ class LocalDriver(Driver):
 
     def delete_container(self, container: Container) -> None:
         for _ in self.get_blobs(container):
-            raise IsNotEmptyError(container_not_empty % container.name)
+            raise IsNotEmptyError(CONTAINER_NOT_EMPTY % container.name)
 
         path = self._get_folder_path(container, validate=True)
 
@@ -393,11 +393,11 @@ class LocalDriver(Driver):
         return self._get_folder_path(container)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(feature_not_supported % 'enable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED % 'enable_container_cdn')
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(feature_not_supported % 'disable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED % 'disable_container_cdn')
         return False
 
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
@@ -406,7 +406,7 @@ class LocalDriver(Driver):
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
-            logger.info(option_not_supported % 'acl')
+            logger.info(OPTION_NOT_SUPPORTED % 'acl')
 
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}

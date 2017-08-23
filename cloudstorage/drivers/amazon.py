@@ -18,9 +18,9 @@ from cloudstorage.exceptions import (
 )
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.messages import (
-    blob_not_found, container_name_invalid, container_not_empty,
-    container_not_found, feature_not_supported, option_not_supported,
-    region_not_found,
+    BLOB_NOT_FOUND, CONTAINER_NAME_INVALID, CONTAINER_NOT_EMPTY,
+    CONTAINER_NOT_FOUND, FEATURE_NOT_SUPPORTED, OPTION_NOT_SUPPORTED,
+    REGION_NOT_FOUND,
 )
 
 logger = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ class S3Driver(Driver):
 
         # session required for loading regions list
         if region not in self.regions:
-            raise CloudStorageError(region_not_found % region)
+            raise CloudStorageError(REGION_NOT_FOUND % region)
 
     def __iter__(self) -> Iterable[Container]:
         for bucket in self.s3.buckets.all():
@@ -124,7 +124,7 @@ class S3Driver(Driver):
             except ClientError as e:
                 error_code = int(e.response['Error']['Code'])
                 if error_code == 404:
-                    raise NotFoundError(container_not_found % bucket_name)
+                    raise NotFoundError(CONTAINER_NOT_FOUND % bucket_name)
 
                 raise CloudStorageError('%s: %s' % (
                     e.response['Error']['Code'],
@@ -168,7 +168,7 @@ class S3Driver(Driver):
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])
             if error_code == 404:
-                raise NotFoundError(blob_not_found % (container.name,
+                raise NotFoundError(BLOB_NOT_FOUND % (container.name,
                                                       object_summary.key))
 
             raise CloudStorageError('%s: %s' % (
@@ -222,7 +222,7 @@ class S3Driver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if meta_data:
-            logger.info(option_not_supported % 'meta_data')
+            logger.info(OPTION_NOT_SUPPORTED % 'meta_data')
 
         # Required parameters
         params = {
@@ -244,7 +244,7 @@ class S3Driver(Driver):
         try:
             bucket = self.s3.create_bucket(**params)
         except ParamValidationError as e:
-            msg = e.kwargs.get('report', container_name_invalid)
+            msg = e.kwargs.get('report', CONTAINER_NAME_INVALID)
             raise CloudStorageError(msg)
 
         try:
@@ -269,7 +269,7 @@ class S3Driver(Driver):
         except ClientError as e:
             error_code = e.response['Error']['Code']
             if error_code == 'BucketNotEmpty':
-                raise IsNotEmptyError(container_not_empty % bucket.name)
+                raise IsNotEmptyError(CONTAINER_NOT_EMPTY % bucket.name)
             raise
 
     def container_cdn_url(self, container: Container) -> str:
@@ -278,11 +278,11 @@ class S3Driver(Driver):
         return '%s/%s' % (endpoint_url, container.name)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(feature_not_supported % 'enable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED % 'enable_container_cdn')
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(feature_not_supported % 'disable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED % 'disable_container_cdn')
         return False
 
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
@@ -370,7 +370,7 @@ class S3Driver(Driver):
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])
             if error_code != 200 or error_code != 204:
-                raise NotFoundError(blob_not_found % (blob.name,
+                raise NotFoundError(BLOB_NOT_FOUND % (blob.name,
                                                       blob.container.name))
             raise
 

@@ -7,7 +7,7 @@ from io import BytesIO, FileIO, TextIOWrapper
 from typing import Dict, IO, Iterable, List, Union
 
 from cloudstorage.exceptions import NotFoundError
-from cloudstorage.messages import feature_not_supported
+from cloudstorage.messages import FEATURE_NOT_SUPPORTED
 
 __all__ = [
     'Blob',
@@ -1149,7 +1149,7 @@ class Driver(metaclass=DocstringMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(feature_not_supported, 'enable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     @abstractmethod
@@ -1165,7 +1165,7 @@ class Driver(metaclass=DocstringMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(feature_not_supported, 'disable_container_cdn')
+        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     @abstractmethod

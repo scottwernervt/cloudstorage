@@ -34,8 +34,8 @@ from cloudstorage.exceptions import (
 )
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.messages import (
-    blob_not_found, container_not_empty, container_not_found,
-    option_not_supported, container_exists,
+    BLOB_NOT_FOUND, CONTAINER_NOT_EMPTY, CONTAINER_NOT_FOUND,
+    OPTION_NOT_SUPPORTED, CONTAINER_EXISTS,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,22 +43,22 @@ logger = logging.getLogger(__name__)
 
 class GoogleStorageDriver(Driver):
     """Driver for interacting with Google Cloud Storage.
-
+    
     The driver will check for `GOOGLE_APPLICATION_CREDENTIALS` environment 
     variable before connecting. If not found, the driver will use service 
     worker credentials json file path passed to `key` argument.
-
+    
     .. code-block:: python
-
+        
         from cloudstorage.drivers.google import GoogleStorageDriver
-
+        
         credentials_json_file = '/path/cloud-storage-service-account.json'
         storage = GoogleStorageDriver(key=credentials_json_file)
         # <Driver: GOOGLESTORAGE>
 
     .. todo: Support for container or blob encryption key.
     .. todo: Support for buckets with more than 256 objects on iteration.
-
+    
     References:
 
     * `Google Cloud Storage Documentation 
@@ -68,13 +68,13 @@ class GoogleStorageDriver(Driver):
     * `snippets.py 
       <https://github.com/GoogleCloudPlatform/python-docs-samples/blob/
       master/storage/cloud-client/snippets.py>`_
-
+    
     :param key: (optional) File path to service worker credentials json file.
     :type key: str or None
-
+    
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
-
+    
     :raise CloudStorageError: If `GOOGLE_APPLICATION_CREDENTIALS` environment
                               variable is not set and/or credentials json file 
                               is not passed to the `key` argument.
@@ -129,13 +129,13 @@ class GoogleStorageDriver(Driver):
 
     def _get_blob(self, bucket_name: str, blob_name: str) -> GoogleBlob:
         """Get a blob object by name.
-
+        
         :param bucket_name: The name of the container that containers the blob.
         :type bucket_name: 
-
+        
         :param blob_name: The name of the blob to get.
         :type blob_name: str 
-
+        
         :return: The blob object if it exists.
         :rtype: :class:`google.client.storage.blob.Blob`
         """
@@ -143,23 +143,23 @@ class GoogleStorageDriver(Driver):
 
         blob = bucket.get_blob(blob_name)
         if not blob:
-            raise NotFoundError(blob_not_found % (blob_name, bucket_name))
+            raise NotFoundError(BLOB_NOT_FOUND % (blob_name, bucket_name))
 
         return blob
 
     def _get_bucket(self, bucket_name: str) -> Bucket:
         """Get a bucket by name.
-
+        
         :param bucket_name: The name of the bucket to get.
         :type bucket_name: str
-
+         
         :return: The bucket matching the name provided. 
         :rtype: :class:`google.cloud.storage.bucket.Bucket`
         """
         try:
             return self.client.get_bucket(bucket_name)
         except NotFound:
-            raise NotFoundError(container_not_found % bucket_name)
+            raise NotFoundError(CONTAINER_NOT_FOUND % bucket_name)
 
     def _make_container(self, bucket: Bucket) -> Container:
         """Convert Google Storage Bucket to Cloud Storage Container.
@@ -177,17 +177,17 @@ class GoogleStorageDriver(Driver):
 
     def _make_blob(self, container: Container, blob: GoogleBlob) -> Blob:
         """Convert Google Storage Blob to a Cloud Storage Blob.
-
+        
         References:
-
+        
         * `Objects <https://cloud.google.com/storage/docs/json_api/v1/objects>`_
-
+        
         :param container: Container instance.
         :type container: :class:`.Container`
-
+        
         :param blob: Google Storage blob.
         :type blob: :class:`google.cloud.storage.blob.Blob`
-
+        
         :return: Blob instance.
         :rtype: :class:`.Blob`
         """
@@ -218,7 +218,7 @@ class GoogleStorageDriver(Driver):
     @property
     def client(self) -> storage.client.Client:
         """The client bound to this driver.
-
+        
         :return: Client for interacting with the Google Cloud Storage API.
         :rtype: :class:`google.cloud.storage.client.Client`
         """
@@ -232,12 +232,12 @@ class GoogleStorageDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if meta_data:
-            logger.warning(option_not_supported % 'meta_data')
+            logger.warning(OPTION_NOT_SUPPORTED % 'meta_data')
 
         try:
             bucket = self.client.create_bucket(container_name)
         except Conflict:
-            logger.debug(container_exists % container_name)
+            logger.debug(CONTAINER_EXISTS % container_name)
             bucket = self._get_bucket(container_name)
         except ValueError as e:
             raise CloudStorageError(str(e))
@@ -261,7 +261,7 @@ class GoogleStorageDriver(Driver):
             bucket.delete()
         except Conflict as e:
             if e.code == HTTPStatus.CONFLICT:
-                raise IsNotEmptyError(container_not_empty % bucket.name)
+                raise IsNotEmptyError(CONTAINER_NOT_EMPTY % bucket.name)
             raise
 
     def container_cdn_url(self, container: Container) -> str:

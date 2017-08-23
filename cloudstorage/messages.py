@@ -1,12 +1,12 @@
 """Standardized error messages for Cloud Storage."""
 
-blob_not_found = "Blob '%s' not found in container '%s'."
-cdn_not_enabled = "CDN not enabled on container '%s'."
-container_exists = "Container '%s' already exists."
-container_not_empty = "Container '%s' is not empty."
-container_not_found = "Container '%s' not found."
-container_name_invalid = 'Invalid container name.'
-feature_not_supported = "Feature '%s' is not supported by driver."
-local_no_attributes = 'Extended filesystem attributes not supported.'
-option_not_supported = "Option '%s' is not supported."
-region_not_found = "Unknown region name '%s'."
+BLOB_NOT_FOUND = "Blob '%s' not found in container '%s'."
+CDN_NOT_ENABLED = "CDN not enabled on container '%s'."
+CONTAINER_EXISTS = "Container '%s' already exists."
+CONTAINER_NOT_EMPTY = "Container '%s' is not empty."
+CONTAINER_NOT_FOUND = "Container '%s' not found."
+CONTAINER_NAME_INVALID = 'Invalid container name.'
+FEATURE_NOT_SUPPORTED = "Feature '%s' is not supported by driver."
+LOCAL_NO_ATTRIBUTES = 'Extended filesystem attributes not supported.'
+OPTION_NOT_SUPPORTED = "Option '%s' is not supported."
+REGION_NOT_FOUND = "Unknown region name '%s'."
