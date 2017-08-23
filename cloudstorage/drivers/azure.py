@@ -9,15 +9,23 @@ except ImportError:
     from httpstatus import HTTPStatus
 from typing import Dict, Iterable, List, Union
 
+from azure.common import AzureMissingResourceHttpError, AzureHttpError, AzureConflictHttpError
+from azure.storage.blob import PublicAccess
 from azure.storage.blob import BlockBlobService
 from azure.storage.blob.models import Blob as AzureBlob
 from azure.storage.blob.models import Container as AzureContainer
 
 from inflection import underscore
 
+from cloudstorage.exceptions import (
+    NotFoundError, CloudStorageError,
+)
 from cloudstorage.base import (
     Blob, Container, ContentLength, Driver,
     ExtraOptions, FileLike, FormPost, MetaData,
+)
+from cloudstorage.messages import (
+    CONTAINER_NOT_FOUND, CONTAINER_EXISTS,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,10 +46,13 @@ class AzureStorageDriver(Driver):
                                          account_key=key, **kwargs)
 
     def __iter__(self) -> Iterable[Container]:
-        pass
+        azure_containers = self.service.list_containers(include_metadata=True)
+        for azure_container in azure_containers:
+            yield self._wrap_azure_container(azure_container)
 
     def __len__(self) -> int:
-        pass
+        azure_containers = self.service.list_containers()
+        return len(azure_containers)
 
     @staticmethod
     def _normalize_parameters(params: Dict[str, str],
@@ -62,17 +73,42 @@ class AzureStorageDriver(Driver):
 
         return normalized
 
-    def _get_blob(self, container_name: str, blob_name: str) -> AzureBlob:
+    def _get_azure_blob(self, container_name: str, blob_name: str) -> AzureBlob:
         pass
 
-    def _get_container(self, container_name: str) -> AzureContainer:
-        pass
+    def _wrap_azure_blob(self, container: Container,
+                         azure_blob: AzureBlob) -> Blob:
+        return Blob(name=azure_blob.name,
+                    size=None,
+                    checksum=None,
+                    etag=None,
+                    container=container,
+                    driver=self,
+                    acl=None,
+                    meta_data=azure_blob.metadata,
+                    content_disposition=None,
+                    content_type=None,
+                    created_at=None,
+                    modified_at=None,
+                    expires_at=None)
 
-    def _make_container(self, container: AzureContainer) -> Container:
-        pass
+    def _get_azure_container(self, container_name: str) -> AzureContainer:
+        try:
+            azure_container = self.service.get_container_properties(
+                container_name)
+        except AzureMissingResourceHttpError as err:
+            logger.debug(err)
+            raise NotFoundError(CONTAINER_NOT_FOUND % container_name)
 
-    def _make_blob(self, container: Container, blob: AzureBlob) -> Blob:
-        pass
+        return azure_container
+
+    def _wrap_azure_container(self,
+                              azure_container: AzureContainer) -> Container:
+        return Container(name=azure_container.name,
+                         driver=self,
+                         acl=azure_container.properties.public_access,
+                         meta_data=azure_container.metadata,
+                         created_at=azure_container.properties.last_modified)
 
     @property
     def service(self) -> BlockBlobService:
@@ -90,16 +126,37 @@ class AzureStorageDriver(Driver):
 
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
-        pass
+        meta_data = meta_data if meta_data is not None else {}
+
+        if acl == 'public-read':
+            public_access = PublicAccess.Container
+        else:
+            public_access = None
+
+        try:
+            self.service.create_container(container_name,
+                                          metadata=meta_data,
+                                          public_access=public_access,
+                                          fail_on_exist=False)
+        except AzureConflictHttpError:
+            logger.debug(CONTAINER_EXISTS, container_name)
+        except AzureHttpError as err:
+            logger.debug(err)
+            raise CloudStorageError(str(err))
+
+        azure_container = self._get_azure_container(container_name)
+        return self._wrap_azure_container(azure_container)
 
     def get_container(self, container_name: str) -> Container:
-        pass
+        azure_container = self._get_azure_container(container_name)
+        return self._wrap_azure_container(azure_container)
 
     def patch_container(self, container: Container) -> None:
-        pass
+        raise NotImplementedError
 
     def delete_container(self, container: Container) -> None:
-        pass
+        azure_container = self._get_azure_container(container.name)
+        self.service.delete_container(container.name, fail_not_exist=False)
 
     def container_cdn_url(self, container: Container) -> str:
         pass
