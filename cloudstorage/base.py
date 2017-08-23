@@ -39,11 +39,11 @@ class DocstringMeta(type):
     def __new__(mcs, name, bases, namespace):
         cls = super().__new__(mcs, name, bases, namespace)
         mro = cls.__mro__[1:]
-        for name, member in namespace.items():
+        for member_name, member in namespace.items():
             if not getattr(member, '__doc__'):
                 for base in mro:
                     try:
-                        member.__doc__ = getattr(base, name).__doc__
+                        member.__doc__ = getattr(base, member_name).__doc__
                         break
                     except AttributeError:
                         pass
