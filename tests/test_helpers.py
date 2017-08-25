@@ -13,8 +13,8 @@ def test_read_in_chunks(binary_stream):
 
 
 def test_file_checksum(text_filename):
-    checksum = file_checksum(text_filename, hash_type='md5', block_size=32)
-    assert checksum == TEXT_MD5_CHECKSUM
+    file_hash = file_checksum(text_filename, hash_type='md5', block_size=32)
+    assert file_hash.hexdigest() == TEXT_MD5_CHECKSUM
 
 
 def test_validate_file_or_path(text_filename, binary_stream):

@@ -178,7 +178,7 @@ def test_blob_download_path(binary_blob, temp_file):
     binary_blob.download(temp_file)
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
-    assert download_hash == BINARY_MD5_CHECKSUM
+    assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
 def test_blob_download_stream(binary_blob, temp_file):
@@ -187,7 +187,7 @@ def test_blob_download_stream(binary_blob, temp_file):
 
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
-    assert download_hash == BINARY_MD5_CHECKSUM
+    assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
 def test_blob_cdn_url(binary_blob):
@@ -220,7 +220,7 @@ def test_blob_generate_download_url(binary_blob, temp_file):
 
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
-    assert download_hash == BINARY_MD5_CHECKSUM
+    assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
 def test_blob_generate_download_url_expiration(binary_blob):
