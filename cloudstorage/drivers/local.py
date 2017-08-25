@@ -336,7 +336,8 @@ class LocalDriver(Driver):
 
         # TODO: QUESTION: Option to disable checksum for large files?
         # TODO: QUESTION: Save a .hash file for each file?
-        checksum = file_checksum(full_path, hash_type=self.hash_type)
+        file_hash = file_checksum(full_path, hash_type=self.hash_type)
+        checksum = file_hash.hexdigest()
 
         etag = hashlib.sha1(full_path.encode('utf-8')).hexdigest()
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
