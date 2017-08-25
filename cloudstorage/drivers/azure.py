@@ -166,8 +166,11 @@ class AzureStorageDriver(Driver):
                          meta_data: MetaData = None) -> Container:
         meta_data = meta_data if meta_data is not None else {}
 
-        if acl == 'public-read':
+        # Review options: Off, Blob, Container
+        if acl == 'container-public-access':
             public_access = PublicAccess.Container
+        elif acl == 'blob-public-access':
+            public_access = PublicAccess.Blob
         else:
             public_access = None
 
