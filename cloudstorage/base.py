@@ -19,7 +19,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 # TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union(IOBase, FileIO)   # Union[IO, BytesIO, FileIO, TextIOWrapper]
+FileLike = Union[IOBase, FileIO]   # Union[IO, BytesIO, FileIO, TextIOWrapper]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
