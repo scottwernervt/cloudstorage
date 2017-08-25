@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any, Dict, IO, Iterable, List, Optional, Union
 
 from abc import abstractmethod
-from io import BytesIO, FileIO, TextIOWrapper
+from io import BytesIO, FileIO, TextIOWrapper, IOBase
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
@@ -19,7 +19,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 # TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IO, BytesIO, FileIO, TextIOWrapper]
+FileLike = IOBase  # Union[IO, BytesIO, FileIO, TextIOWrapper]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
