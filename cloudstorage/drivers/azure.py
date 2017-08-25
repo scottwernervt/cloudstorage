@@ -1,6 +1,7 @@
 """Microsoft Azure Storage Driver."""
 
 import logging
+from datetime import datetime, timedelta, timezone
 
 import base64
 import codecs
@@ -21,6 +22,7 @@ from azure.storage.blob.models import Blob as AzureBlob
 from azure.storage.blob.models import Container as AzureContainer
 from azure.storage.blob.models import Include
 from azure.storage.blob.models import ContentSettings
+from azure.storage.blob.models import BlobPermissions
 
 from inflection import underscore
 
@@ -280,7 +282,20 @@ class AzureStorageDriver(Driver):
 
     def download_blob(self, blob: Blob,
                       destination: Union[str, FileLike]) -> None:
-        pass
+        azure_blob = self._get_azure_blob(blob.container.name, blob.name)
+
+        if isinstance(destination, str):
+            self.service.get_blob_to_path(
+                container_name=blob.container.name,
+                blob_name=azure_blob.name,
+                file_path=destination,
+            )
+        else:
+            self.service.get_blob_to_stream(
+                container_name=blob.container.name,
+                blob_name=azure_blob.name,
+                stream=destination,
+            )
 
     def patch_blob(self, blob: Blob) -> None:
         pass
@@ -308,7 +323,28 @@ class AzureStorageDriver(Driver):
                                    method: str = 'GET',
                                    content_disposition: str = None,
                                    extra: ExtraOptions = None) -> str:
-        pass
+        extra = extra if extra is not None else {}
+        params = self._normalize_parameters(extra, self._GET_OBJECT_KEYS)
+
+        azure_blob = self._get_azure_blob(blob.container.name, blob.name)
+        content_type = params.get('content_type', None)
+        expires_at = datetime.utcnow() + timedelta(seconds=expires)
+
+        sas_token = self.service.generate_blob_shared_access_signature(
+            container_name=blob.container.name,
+            blob_name=azure_blob.name,
+            permission=BlobPermissions.READ,
+            expiry=expires_at,
+            content_disposition=content_disposition,
+            content_type=content_type,
+            # **params,
+        )
+        download_url = self.service.make_blob_url(
+            container_name=blob.container.name,
+            blob_name=azure_blob.name,
+            sas_token=sas_token,
+        )
+        return download_url
 
     _OBJECT_META_PREFIX = 'x-ms-meta-'
 
