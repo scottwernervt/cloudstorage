@@ -2,6 +2,9 @@
 
 import logging
 
+import base64
+import codecs
+
 try:
     from http import HTTPStatus
 except ImportError:
@@ -17,11 +20,14 @@ from azure.storage.blob import BlockBlobService
 from azure.storage.blob.models import Blob as AzureBlob
 from azure.storage.blob.models import Container as AzureContainer
 from azure.storage.blob.models import Include
+from azure.storage.blob.models import ContentSettings
 
 from inflection import underscore
 
+from cloudstorage.helpers import validate_file_or_path
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.base import Blob
 from cloudstorage.base import Container
 from cloudstorage.base import ContentLength
@@ -30,9 +36,9 @@ from cloudstorage.base import ExtraOptions
 from cloudstorage.base import FileLike
 from cloudstorage.base import FormPost
 from cloudstorage.base import MetaData
-
 from cloudstorage.messages import CONTAINER_NOT_FOUND
 from cloudstorage.messages import CONTAINER_EXISTS
+from cloudstorage.messages import CONTAINER_NOT_EMPTY
 from cloudstorage.messages import BLOB_NOT_FOUND
 
 logger = logging.getLogger(__name__)
@@ -92,18 +98,29 @@ class AzureStorageDriver(Driver):
 
     def _wrap_azure_blob(self, container: Container,
                          azure_blob: AzureBlob) -> Blob:
+        content_settings = azure_blob.properties.content_settings
+
+        # TODO: CODE: Move to helper since google uses it too.
+        md5_bytes = base64.b64decode(content_settings.content_md5)
+
+        try:
+            checksum = md5_bytes.hex()
+        except AttributeError:
+            # Python 3.4: 'bytes' object has no attribute 'hex'
+            checksum = codecs.encode(md5_bytes, 'hex_codec').decode('ascii')
+
         return Blob(name=azure_blob.name,
-                    size=None,
-                    checksum=None,
-                    etag=None,
+                    size=azure_blob.properties.content_length,
+                    checksum=checksum,
+                    etag=azure_blob.properties.etag,
                     container=container,
                     driver=self,
                     acl=None,
                     meta_data=azure_blob.metadata,
-                    content_disposition=None,
-                    content_type=None,
+                    content_disposition=content_settings.content_disposition,
+                    content_type=content_settings.content_type,
                     created_at=None,
-                    modified_at=None,
+                    modified_at=azure_blob.properties.last_modified,
                     expires_at=None)
 
     def _get_azure_container(self, container_name: str) -> AzureContainer:
@@ -169,22 +186,27 @@ class AzureStorageDriver(Driver):
         raise NotImplementedError
 
     def delete_container(self, container: Container) -> None:
-        self._get_azure_container(container.name)
-        # TODO: Throw NotEmpty error if blobs exist
-        self.service.delete_container(container.name, fail_not_exist=False)
+        azure_container = self._get_azure_container(container.name)
+        azure_blobs = self.service.list_blobs(azure_container.name,
+                                              num_results=1)
+        if len(azure_blobs.items) > 0:
+            raise IsNotEmptyError(CONTAINER_NOT_EMPTY % azure_container.name)
+
+        self.service.delete_container(azure_container.name,
+                                      fail_not_exist=False)
 
     def container_cdn_url(self, container: Container) -> str:
         pass
 
     def enable_container_cdn(self, container: Container) -> bool:
-        self._get_azure_container(container.name)
-        self.service.set_container_acl(container.name,
+        azure_container = self._get_azure_container(container.name)
+        self.service.set_container_acl(azure_container.name,
                                        public_access=PublicAccess.Container)
         return True
 
     def disable_container_cdn(self, container: Container) -> bool:
-        self._get_azure_container(container.name)
-        self.service.set_container_acl(container.name, public_access=None)
+        azure_container = self._get_azure_container(container.name)
+        self.service.set_container_acl(azure_container.name, public_access=None)
         return True
 
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
@@ -192,15 +214,47 @@ class AzureStorageDriver(Driver):
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
-        pass
+        meta_data = {} if meta_data is None else meta_data
+        extra = extra if extra is not None else {}
+        extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
+
+        extra_args.setdefault('content_type', content_type)
+        extra_args.setdefault('content_disposition', content_disposition)
+
+        azure_container = self._get_azure_container(container.name)
+        blob_name = blob_name or validate_file_or_path(filename)
+
+        content_settings = ContentSettings(**extra_args)
+
+        if isinstance(filename, str):
+            self.service.create_blob_from_path(
+                container_name=azure_container.name,
+                blob_name=blob_name,
+                file_path=filename,
+                content_settings=content_settings,
+                metadata=meta_data,
+            )
+        else:
+            self.service.create_blob_from_stream(
+                container_name=azure_container.name,
+                blob_name=blob_name,
+                stream=filename,
+                content_settings=content_settings,
+                metadata=meta_data,
+            )
+
+        azure_blob = self._get_azure_blob(azure_container.name, blob_name)
+        return self._wrap_azure_blob(container, azure_blob)
 
     def get_blob(self, container: Container, blob_name: str) -> Blob:
-        self._get_azure_container(container.name)
+        azure_container = self._get_azure_container(container.name)
+        azure_blob = self._get_azure_blob(azure_container.name, blob_name)
+        return self._wrap_azure_blob(container, azure_blob)
 
     def get_blobs(self, container: Container) -> Iterable[Blob]:
-        self._get_azure_container(container.name)
+        azure_container = self._get_azure_container(container.name)
 
-        azure_blobs = self.service.list_blobs(container.name,
+        azure_blobs = self.service.list_blobs(azure_container.name,
                                               include=Include(metadata=True))
         for azure_blob in azure_blobs:
             yield self._wrap_azure_blob(container, azure_blob)
