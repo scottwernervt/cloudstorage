@@ -201,7 +201,13 @@ class AzureStorageDriver(Driver):
                                       fail_not_exist=False)
 
     def container_cdn_url(self, container: Container) -> str:
-        pass
+        azure_container = self._get_azure_container(container.name)
+        url = '{}://{}/{}'.format(
+            self.service.protocol,
+            self.service.primary_endpoint,
+            azure_container.name,
+        )
+        return url
 
     def enable_container_cdn(self, container: Container) -> bool:
         azure_container = self._get_azure_container(container.name)
@@ -284,7 +290,9 @@ class AzureStorageDriver(Driver):
         self.service.delete_blob(blob.container.name, azure_blob.name)
 
     def blob_cdn_url(self, blob: Blob) -> str:
-        pass
+        azure_blob = self._get_azure_blob(blob.container.name, blob.name)
+        url = self.service.make_blob_url(blob.container.name, azure_blob.name)
+        return url
 
     def generate_container_upload_url(self, container: Container,
                                       blob_name: str,
