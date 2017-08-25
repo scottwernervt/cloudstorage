@@ -22,10 +22,12 @@ BINARY_FORM_FILENAME = 'avatar-form.png'
 BINARY_STREAM_FILENAME = 'avatar-stream.png'
 BINARY_MD5_CHECKSUM = '2f907a59924ad96b7478074ed96b05f0'
 
+# Azure: Does not support dashes.
+# Rackspace: Converts underscores to dashes.
 BINARY_OPTIONS = {
     'meta_data': {
-        'owner-id': 'da17c32d-21c2-4bfe-b083-e2e78187d868',
-        'owner-email': 'user.one@startup.com'
+        'ownerid': 'da17c32d-21c2-4bfe-b083-e2e78187d868',
+        'owneremail': 'user.one@startup.com'
     },
     'content_type': 'image/png',
     'content_disposition': 'attachment; filename=avatar-attachment.png',
