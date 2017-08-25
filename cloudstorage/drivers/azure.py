@@ -40,6 +40,7 @@ from cloudstorage.messages import CONTAINER_NOT_FOUND
 from cloudstorage.messages import CONTAINER_EXISTS
 from cloudstorage.messages import CONTAINER_NOT_EMPTY
 from cloudstorage.messages import BLOB_NOT_FOUND
+from cloudstorage.helpers import file_checksum
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,10 @@ logger = logging.getLogger(__name__)
 class AzureStorageDriver(Driver):
     """Driver for interacting with Microsoft Azure Storage.
     """
+
+    # TODO: QUESTION: Do we want to just call service functions instead of check
+    # if container or blob exists? We would need to handle exceptions for each
+    # case.
 
     name = 'AZURE'
     hash_type = 'md5'
@@ -216,13 +221,19 @@ class AzureStorageDriver(Driver):
                     extra: ExtraOptions = None) -> Blob:
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}
-        extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
 
+        extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
         extra_args.setdefault('content_type', content_type)
         extra_args.setdefault('content_disposition', content_disposition)
 
         azure_container = self._get_azure_container(container.name)
         blob_name = blob_name or validate_file_or_path(filename)
+
+        # azure does not set content_md5 on backend
+        file_hash = file_checksum(filename, hash_type=self.hash_type)
+        file_digest = file_hash.digest()
+        checksum = base64.b64encode(file_digest).decode('utf-8').strip()
+        extra_args.setdefault('content_md5', checksum)
 
         content_settings = ContentSettings(**extra_args)
 
@@ -233,6 +244,7 @@ class AzureStorageDriver(Driver):
                 file_path=filename,
                 content_settings=content_settings,
                 metadata=meta_data,
+                validate_content=True,
             )
         else:
             self.service.create_blob_from_stream(
@@ -241,6 +253,7 @@ class AzureStorageDriver(Driver):
                 stream=filename,
                 content_settings=content_settings,
                 metadata=meta_data,
+                validate_content=True,
             )
 
         azure_blob = self._get_azure_blob(azure_container.name, blob_name)
@@ -267,7 +280,8 @@ class AzureStorageDriver(Driver):
         pass
 
     def delete_blob(self, blob: Blob) -> None:
-        pass
+        azure_blob = self._get_azure_blob(blob.container.name, blob.name)
+        self.service.delete_blob(blob.container.name, azure_blob.name)
 
     def blob_cdn_url(self, blob: Blob) -> str:
         pass
