@@ -104,14 +104,17 @@ def test_container_generate_upload_url(container, binary_stream):
     assert uri_validator(form_post['url'])
 
     url = form_post['url']
-    fields = form_post['fields']
+    headers = form_post['headers']
     multipart_form_data = {
         'file': (BINARY_FORM_FILENAME, binary_stream, 'image/png'),
     }
-    response = requests.post(url, data=fields, files=multipart_form_data)
-    assert response.status_code == HTTPStatus.NO_CONTENT, response.text
 
-    blob = container.get_blob('prefix_' + BINARY_FORM_FILENAME)
+    # https://blogs.msdn.microsoft.com/azureossds/2015/03/30/uploading-files-to-
+    # azure-storage-using-sasshared-access-signature/
+    response = requests.put(url, headers=headers, files=multipart_form_data)
+    assert response.status_code == HTTPStatus.CREATED, response.text
+
+    blob = container.get_blob('prefix_')
     assert blob.meta_data == BINARY_OPTIONS['meta_data']
     assert blob.content_type == BINARY_OPTIONS['content_type']
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
@@ -123,11 +126,12 @@ def test_container_generate_upload_url_expiration(container, text_stream):
     assert uri_validator(form_post['url'])
 
     url = form_post['url']
-    fields = form_post['fields']
+    headers = form_post['headers']
     multipart_form_data = {
         'file': text_stream
     }
-    response = requests.post(url, data=fields, files=multipart_form_data)
+
+    response = requests.put(url, headers=headers, files=multipart_form_data)
     assert response.status_code == HTTPStatus.BAD_REQUEST, response.text
 
 
@@ -221,4 +225,4 @@ def test_blob_generate_download_url_expiration(binary_blob):
     assert uri_validator(download_url)
 
     response = requests.get(download_url)
-    assert response.status_code == HTTPStatus.BAD_REQUEST, response.text
+    assert response.status_code == HTTPStatus.FORBIDDEN, response.text
