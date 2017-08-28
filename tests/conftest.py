@@ -1,6 +1,5 @@
-from tempfile import mkstemp
-
 import pytest
+from tempfile import mkstemp
 
 from tests.helpers import random_container_name
 from tests.settings import *
@@ -14,7 +13,7 @@ def storage():
 
 
 # noinspection PyShadowingNames
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def container(storage):
     container_name = random_container_name()
     container = storage.create_container(container_name)
