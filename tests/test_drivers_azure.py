@@ -85,7 +85,7 @@ def test_container_delete_not_empty(container, text_blob):
 
 def test_container_enable_cdn(container):
     assert not container.enable_cdn(), 'Azure Storage does not support ' \
-                                       'disabling CDN. '
+                                       'enabling CDN. '
 
 
 def test_container_disable_cdn(container):
@@ -94,7 +94,6 @@ def test_container_disable_cdn(container):
 
 
 def test_container_cdn_url(container):
-    container.enable_cdn()
     cdn_url = container.cdn_url
 
     assert uri_validator(cdn_url)
@@ -198,8 +197,7 @@ def test_blob_download_stream(binary_blob, temp_file):
     assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
-def test_blob_cdn_url(container, binary_blob):
-    container.enable_cdn()
+def test_blob_cdn_url(binary_blob):
     cdn_url = binary_blob.cdn_url
 
     assert uri_validator(cdn_url)
