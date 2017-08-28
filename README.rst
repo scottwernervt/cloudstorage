@@ -20,8 +20,9 @@ Cloud Storage
     :target: https://codeclimate.com/github/scottwernervt/cloudstorage
 
 `Cloud Storage`_ is a Python +3.4 package which creates a unified API for the
-cloud storage services: Amazon Simple Storage Service (S3), Rackspace Cloud
-Files, Google Cloud Storage, and the Local File System.
+cloud storage services: Amazon Simple Storage Service (S3),
+Microsoft Azure Storage, Rackspace Cloud Files, Google Cloud Storage, and the
+Local File System.
 
 Cloud Storage is inspired by `Apache Libcloud <https://libcloud.apache.org/>`_.
 Advantages to Apache Libcloud Storage are:
@@ -70,8 +71,9 @@ Supported Services
 
 * `Amazon S3`_
 * `Google Cloud Storage`_
-* Local File System
+* `Microsoft Azure Storage`_
 * `Rackspace CloudFiles`_
+* Local File System
 
 
 Installation
