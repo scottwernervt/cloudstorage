@@ -4,18 +4,30 @@ except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
 
+from threading import Timer
+
 import pytest
+import random
 import requests
 
 from cloudstorage.drivers.google import GoogleStorageDriver
-from cloudstorage.exceptions import (CloudStorageError, IsNotEmptyError,
-                                     NotFoundError)
+from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.exceptions import IsNotEmptyError
+from cloudstorage.exceptions import NotFoundError
 from cloudstorage.helpers import file_checksum
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 
 pytestmark = pytest.mark.skipif(not bool(GOOGLE_CREDENTIALS),
                                 reason='settings missing key and secret')
+
+
+@pytest.fixture(scope='function', autouse=True)
+def delay(request):
+    # Prevent google.api.core.exceptions.TooManyRequests
+    seconds = random.random()
+    t = Timer(seconds, request)
+    t.start()
 
 
 @pytest.fixture(scope='module')
