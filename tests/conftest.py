@@ -13,17 +13,12 @@ def storage():
 
 
 # noinspection PyShadowingNames
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def container(storage):
     container_name = random_container_name()
     container = storage.create_container(container_name)
 
     yield container
-
-    for blob in container:
-        blob.delete()
-
-    container.delete()
 
 
 @pytest.fixture(scope='session')
