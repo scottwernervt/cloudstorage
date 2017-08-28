@@ -84,11 +84,13 @@ def test_container_delete_not_empty(container, text_blob):
 
 
 def test_container_enable_cdn(container):
-    assert container.enable_cdn()
+    assert not container.enable_cdn(), 'Azure Storage does not support ' \
+                                       'disabling CDN. '
 
 
 def test_container_disable_cdn(container):
-    assert container.disable_cdn()
+    assert not container.disable_cdn(), 'Azure Storage does not support ' \
+                                        'disabling CDN. '
 
 
 def test_container_cdn_url(container):
