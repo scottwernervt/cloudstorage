@@ -402,7 +402,7 @@ class AzureStorageDriver(Driver):
             expiry=expires_at,
             content_disposition=content_disposition,
             content_type=content_type,
-            **params,
+            **params
         )
 
         headers = {
@@ -439,7 +439,7 @@ class AzureStorageDriver(Driver):
             expiry=expires_at,
             content_disposition=content_disposition,
             content_type=content_type,
-            **params,
+            **params
         )
         download_url = self.service.make_blob_url(
             container_name=blob.container.name,
