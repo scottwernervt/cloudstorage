@@ -1,5 +1,4 @@
 """Microsoft Azure Storage Driver."""
-
 import logging
 from datetime import datetime, timedelta
 
@@ -11,6 +10,7 @@ try:
 except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
+
 from typing import Dict, Iterable, List, Union
 
 from azure.common import AzureMissingResourceHttpError
@@ -67,6 +67,9 @@ class AzureStorageDriver(Driver):
       storageservices/blob-service-rest-api>`_
     * `Azure/azure-storage-python
       <https://github.com/Azure/azure-storage-python>`_
+    * `Uploading files to Azure Storage using SAS
+      <https://blogs.msdn.microsoft.com/azureossds/2015/03/30/
+      uploading-files-to-azure-storage-using-sasshared-access-signature/>`_
 
     :param account_name: Azure storage account name.
     :type account_name: str
@@ -91,7 +94,7 @@ class AzureStorageDriver(Driver):
     def __iter__(self) -> Iterable[Container]:
         azure_containers = self.service.list_containers(include_metadata=True)
         for azure_container in azure_containers:
-            yield self._wrap_azure_container(azure_container)
+            yield self._convert_azure_container(azure_container)
 
     def __len__(self) -> int:
         azure_containers = self.service.list_containers()
@@ -117,6 +120,18 @@ class AzureStorageDriver(Driver):
         return normalized
 
     def _get_azure_blob(self, container_name: str, blob_name: str) -> AzureBlob:
+        """Get Azure Storage blob by container and blob name.
+
+        :param container_name: The name of the container that containers the
+            blob.
+        :type container_name: str
+
+        :param blob_name: The name of the blob to get.
+        :type blob_name: str
+
+        :return: The blob object if it exists.
+        :rtype: :class:`azure.storage.blob.models.Blob`
+        """
         try:
             azure_blob = self.service.get_blob_properties(container_name,
                                                           blob_name)
@@ -126,8 +141,19 @@ class AzureStorageDriver(Driver):
 
         return azure_blob
 
-    def _wrap_azure_blob(self, container: Container,
-                         azure_blob: AzureBlob) -> Blob:
+    def _convert_azure_blob(self, container: Container,
+                            azure_blob: AzureBlob) -> Blob:
+        """Convert Azure Storage Blob to a Cloud Storage Blob.
+
+        :param container: Container instance.
+        :type container: :class:`.Container`
+
+        :param azure_blob: Azure Storage blob.
+        :type azure_blob: :class:`azure.storage.blob.models.Blob`
+
+        :return: Blob instance.
+        :rtype: :class:`.Blob`
+        """
         content_settings = azure_blob.properties.content_settings
 
         # TODO: CODE: Move to helper since google uses it too.
@@ -154,6 +180,14 @@ class AzureStorageDriver(Driver):
                     expires_at=None)
 
     def _get_azure_container(self, container_name: str) -> AzureContainer:
+        """Get Azure Storage container by name.
+
+        :param container_name: The name of the container to get.
+        :type container_name: str
+
+        :return: The container matching the name provided.
+        :rtype: :class:`azure.storage.blob.models.Container`
+        """
         try:
             azure_container = self.service.get_container_properties(
                 container_name)
@@ -163,8 +197,16 @@ class AzureStorageDriver(Driver):
 
         return azure_container
 
-    def _wrap_azure_container(self,
-                              azure_container: AzureContainer) -> Container:
+    def _convert_azure_container(self,
+                                 azure_container: AzureContainer) -> Container:
+        """Convert Azure Storage container to Cloud Storage Container.
+
+        :param azure_container: The container to convert.
+        :type azure_container: :class:`azure.storage.blob.models.Container`
+
+        :return: A container instance.
+        :rtype: :class:`.Container`
+        """
         return Container(name=azure_container.name,
                          driver=self,
                          acl=azure_container.properties.public_access,
@@ -209,11 +251,11 @@ class AzureStorageDriver(Driver):
             raise CloudStorageError(str(err))
 
         azure_container = self._get_azure_container(container_name)
-        return self._wrap_azure_container(azure_container)
+        return self._convert_azure_container(azure_container)
 
     def get_container(self, container_name: str) -> Container:
         azure_container = self._get_azure_container(container_name)
-        return self._wrap_azure_container(azure_container)
+        return self._convert_azure_container(azure_container)
 
     def patch_container(self, container: Container) -> None:
         raise NotImplementedError
@@ -288,12 +330,12 @@ class AzureStorageDriver(Driver):
             )
 
         azure_blob = self._get_azure_blob(azure_container.name, blob_name)
-        return self._wrap_azure_blob(container, azure_blob)
+        return self._convert_azure_blob(container, azure_blob)
 
     def get_blob(self, container: Container, blob_name: str) -> Blob:
         azure_container = self._get_azure_container(container.name)
         azure_blob = self._get_azure_blob(azure_container.name, blob_name)
-        return self._wrap_azure_blob(container, azure_blob)
+        return self._convert_azure_blob(container, azure_blob)
 
     def get_blobs(self, container: Container) -> Iterable[Blob]:
         azure_container = self._get_azure_container(container.name)
@@ -301,7 +343,7 @@ class AzureStorageDriver(Driver):
         azure_blobs = self.service.list_blobs(azure_container.name,
                                               include=Include(metadata=True))
         for azure_blob in azure_blobs:
-            yield self._wrap_azure_blob(container, azure_blob)
+            yield self._convert_azure_blob(container, azure_blob)
 
     def download_blob(self, blob: Blob,
                       destination: Union[str, FileLike]) -> None:
@@ -340,35 +382,9 @@ class AzureStorageDriver(Driver):
                                       content_length: ContentLength = None,
                                       content_type: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
-        """
-
-        Reference: <https://blogs.msdn.microsoft.com/azureossds/2015/03/30/
-          uploading-files-to-azure-storage-using-sasshared-access-signature/>
-
-        :param container:
-        :type container:
-        :param blob_name:
-        :type blob_name:
-        :param expires:
-        :type expires:
-        :param acl:
-        :type acl:
-        :param meta_data:
-        :type meta_data:
-        :param content_disposition:
-        :type content_disposition:
-        :param content_length:
-        :type content_length:
-        :param content_type:
-        :type content_type:
-        :param extra:
-        :type extra:
-        :return:
-        :rtype:
-        """
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
-        extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
+        params = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
 
         azure_container = self._get_azure_container(container.name)
         expires_at = datetime.utcnow() + timedelta(seconds=expires)
@@ -379,7 +395,7 @@ class AzureStorageDriver(Driver):
             expiry=expires_at,
             content_disposition=content_disposition,
             content_type=content_type,
-            # **params,
+            **params,
         )
 
         headers = {
@@ -416,7 +432,7 @@ class AzureStorageDriver(Driver):
             expiry=expires_at,
             content_disposition=content_disposition,
             content_type=content_type,
-            # **params,
+            **params,
         )
         download_url = self.service.make_blob_url(
             container_name=blob.container.name,
@@ -428,16 +444,17 @@ class AzureStorageDriver(Driver):
     _OBJECT_META_PREFIX = 'x-ms-meta-'
 
     #: `insert-object
-    #: <>`
+    #: <https://docs.microsoft.com/en-us/rest/api/storageservices/
+    # set-blob-properties>`
     _PUT_OBJECT_KEYS = {
     }
 
     #: `post-object
-    #: <>`_
+    #: <https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob>`_
     _POST_OBJECT_KEYS = {
     }
 
     #: `get-object
-    #: <>`_
+    #: <https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob>`_
     _GET_OBJECT_KEYS = {
     }
