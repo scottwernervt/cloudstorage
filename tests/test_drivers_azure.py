@@ -1,5 +1,3 @@
-from time import sleep
-
 try:
     from http import HTTPStatus
 except ImportError:
@@ -7,35 +5,34 @@ except ImportError:
     from httpstatus import HTTPStatus
 
 import pytest
-import random
 import requests
 
-from cloudstorage.drivers.google import GoogleStorageDriver
-from cloudstorage.exceptions import CloudStorageError
-from cloudstorage.exceptions import IsNotEmptyError
-from cloudstorage.exceptions import NotFoundError
+from cloudstorage.drivers.azure import AzureStorageDriver
+from cloudstorage.exceptions import (
+    CloudStorageError, IsNotEmptyError, NotFoundError,
+)
 from cloudstorage.helpers import file_checksum
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 
-pytestmark = pytest.mark.skipif(not bool(GOOGLE_CREDENTIALS),
-                                reason='settings missing key and secret')
+pytestmark = pytest.mark.skipif(
+    not bool(AZURE_ACCOUNT_NAME),
+    reason='settings missing account name and key.'
+)
 
 
 @pytest.fixture(scope='module')
 def storage():
-    driver = GoogleStorageDriver(key=GOOGLE_CREDENTIALS)
+    driver = AzureStorageDriver(account_name=AZURE_ACCOUNT_NAME,
+                                key=AZURE_ACCOUNT_KEY)
 
     yield driver
 
-    seconds = random.random() * 3
     for container in driver:  # cleanup
         if container.name.startswith(CONTAINER_PREFIX):
             for blob in container:
-                sleep(seconds)
                 blob.delete()
 
-            sleep(seconds)
             container.delete()
 
 
@@ -87,15 +84,16 @@ def test_container_delete_not_empty(container, text_blob):
 
 
 def test_container_enable_cdn(container):
-    assert container.enable_cdn()
+    assert not container.enable_cdn(), 'Azure Storage does not support ' \
+                                       'enabling CDN. '
 
 
 def test_container_disable_cdn(container):
-    assert container.disable_cdn()
+    assert not container.disable_cdn(), 'Azure Storage does not support ' \
+                                        'disabling CDN. '
 
 
 def test_container_cdn_url(container):
-    container.enable_cdn()
     cdn_url = container.cdn_url
 
     assert uri_validator(cdn_url)
@@ -109,14 +107,17 @@ def test_container_generate_upload_url(container, binary_stream):
     assert uri_validator(form_post['url'])
 
     url = form_post['url']
-    fields = form_post['fields']
+    headers = form_post['headers']
     multipart_form_data = {
         'file': (BINARY_FORM_FILENAME, binary_stream, 'image/png'),
     }
-    response = requests.post(url, data=fields, files=multipart_form_data)
-    assert response.status_code == HTTPStatus.NO_CONTENT, response.text
 
-    blob = container.get_blob('prefix_' + BINARY_FORM_FILENAME)
+    # https://blogs.msdn.microsoft.com/azureossds/2015/03/30/uploading-files-to-
+    # azure-storage-using-sasshared-access-signature/
+    response = requests.put(url, headers=headers, files=multipart_form_data)
+    assert response.status_code == HTTPStatus.CREATED, response.text
+
+    blob = container.get_blob('prefix_')
     assert blob.meta_data == BINARY_OPTIONS['meta_data']
     assert blob.content_type == BINARY_OPTIONS['content_type']
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
@@ -128,11 +129,12 @@ def test_container_generate_upload_url_expiration(container, text_stream):
     assert uri_validator(form_post['url'])
 
     url = form_post['url']
-    fields = form_post['fields']
+    headers = form_post['headers']
     multipart_form_data = {
         'file': text_stream
     }
-    response = requests.post(url, data=fields, files=multipart_form_data)
+
+    response = requests.put(url, headers=headers, files=multipart_form_data)
     assert response.status_code == HTTPStatus.BAD_REQUEST, response.text
 
 
@@ -195,8 +197,7 @@ def test_blob_download_stream(binary_blob, temp_file):
     assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
-def test_blob_cdn_url(container, binary_blob):
-    container.enable_cdn()
+def test_blob_cdn_url(binary_blob):
     cdn_url = binary_blob.cdn_url
 
     assert uri_validator(cdn_url)
@@ -228,4 +229,4 @@ def test_blob_generate_download_url_expiration(binary_blob):
     assert uri_validator(download_url)
 
     response = requests.get(download_url)
-    assert response.status_code == HTTPStatus.BAD_REQUEST, response.text
+    assert response.status_code == HTTPStatus.FORBIDDEN, response.text

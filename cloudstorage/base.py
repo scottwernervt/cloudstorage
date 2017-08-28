@@ -2,10 +2,10 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, IO, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from abc import abstractmethod
-from io import BytesIO, FileIO, TextIOWrapper
+from io import FileIO, IOBase
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
@@ -19,7 +19,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 # TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IO, BytesIO, FileIO, TextIOWrapper]
+FileLike = Union[IOBase, FileIO]  # Union[IO, BytesIO, FileIO, TextIOWrapper]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
@@ -1064,6 +1064,8 @@ class Driver(metaclass=DocstringMeta):
                     * bucket-owner-full-control
                     * aws-exec-read (Amazon S3)
                     * project-private (Google Cloud Storage)
+                    * container-public-access (Microsoft Azure Storage)
+                    * blob-public-access (Microsoft Azure Storage)
         :type acl: str or None
 
         :param meta_data: (optional) A map of metadata to store with the 
@@ -1184,9 +1186,7 @@ class Driver(metaclass=DocstringMeta):
                     extra: ExtraOptions = None) -> Blob:
         """Upload a filename or file like object to a container.
 
-        .. important:: This class method is called by 
-                       :param chunk_size:
-                       :type chunk_size:
+        .. important:: This class method is called by
                        :meth:`.Container.upload_blob`.
 
         :param container: The container to upload the blob to.
@@ -1371,8 +1371,8 @@ class Driver(metaclass=DocstringMeta):
         :param extra: (optional) Extra parameters for the request.
         :type extra: Dict[Any, Any] or None
 
-        :return: Dictionary with URL and form fields (includes signature or 
-                 policy).                
+        :return: Dictionary with URL and form fields (includes signature or
+          policy) or header fields.
         :rtype: Dict[Any, Any]
         """
         pass

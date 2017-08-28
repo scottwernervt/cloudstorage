@@ -75,7 +75,9 @@ def test_container_disable_cdn(container):
 
 
 def test_container_cdn_url(container):
+    container.enable_cdn()
     cdn_url = container.cdn_url
+
     assert uri_validator(cdn_url)
     assert container.name in cdn_url
 

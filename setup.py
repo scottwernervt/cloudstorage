@@ -1,13 +1,14 @@
-import os
-import re
 import sys
 
+import os
+import re
 from setuptools import find_packages, setup
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 VERSION_RE = re.compile(r'''__version__ = ['"]([0-9.]+)['"]''')
 
 install_requires = [
+    'azure',
     'boto3',  # Apache 2.0
     'filelock',  # Public Domain
     'google-cloud-storage',  # Apache 2.0
@@ -51,6 +52,7 @@ setup(
         'amazon',
         'aws',
         's3',
+        'azure',
         'rackspace',
         'cloudfiles',
         'google',

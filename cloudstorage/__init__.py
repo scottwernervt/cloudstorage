@@ -11,6 +11,7 @@ from enum import Enum, unique
 
 from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.drivers.amazon import S3Driver
+from cloudstorage.drivers.azure import AzureStorageDriver
 from cloudstorage.drivers.google import GoogleStorageDriver
 from cloudstorage.drivers.local import LocalDriver
 from cloudstorage.drivers.rackspace import CloudFilesDriver
@@ -33,29 +34,32 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 Scott Werner'
 
 Drivers = Union[
-    S3Driver,
+    AzureStorageDriver,
+    CloudFilesDriver,
     GoogleStorageDriver,
     LocalDriver,
-    CloudFilesDriver,
+    S3Driver,
 ]
 
 
 @unique
 class DriverName(Enum):
     """DriverName enumeration."""
-    LOCAL = 'LOCAL'
-    S3 = 'S3'
+    AZURE = 'AZURE'
     CLOUDFILES = 'CLOUDFILES'
     GOOGLESTORAGE = 'GOOGLESTORAGE'
+    LOCAL = 'LOCAL'
+    S3 = 'S3'
 
 
 _DRIVER_IMPORTS = {
-    DriverName.S3: ('cloudstorage.drivers.amazon', 'S3Driver'),
+    DriverName.AZURE: ('cloudstorage.drivers.azure', 'AzureStorageDriver'),
+    DriverName.CLOUDFILES: (
+        'cloudstorage.drivers.rackspace', 'CloudFilesDriver'),
     DriverName.GOOGLESTORAGE: ('cloudstorage.drivers.google',
                                'GoogleStorageDriver'),
     DriverName.LOCAL: ('cloudstorage.drivers.local', 'LocalDriver'),
-    DriverName.CLOUDFILES: (
-        'cloudstorage.drivers.rackspace', 'CloudFilesDriver'),
+    DriverName.S3: ('cloudstorage.drivers.amazon', 'S3Driver'),
 }
 
 
@@ -93,10 +97,11 @@ def get_driver_by_name(driver_name: str) -> Drivers:
 
     :param driver_name: Driver name.
 
-        * `LOCAL`
-        * `S3`
+        * `AZURE`
         * `CLOUDFILES`
         * `GOOGLESTORAGE`
+        * `S3`
+        * `LOCAL`
     :type driver_name: str
 
     :return: DriverName driver class.

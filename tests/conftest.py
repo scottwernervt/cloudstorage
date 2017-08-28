@@ -1,6 +1,5 @@
-from tempfile import mkstemp
-
 import pytest
+from tempfile import mkstemp
 
 from tests.helpers import random_container_name
 from tests.settings import *
@@ -20,11 +19,6 @@ def container(storage):
     container = storage.create_container(container_name)
 
     yield container
-
-    for blob in container:
-        blob.delete()
-
-    container.delete()
 
 
 @pytest.fixture(scope='session')

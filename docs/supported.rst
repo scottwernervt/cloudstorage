@@ -7,9 +7,9 @@ Driver                          Driver Class                   Driver Name
 `Amazon S3`_                    :class:`.S3Driver`             `S3`
 `Blackblaze B2 Cloud Storage`_  `TODO <B2TODO_>`_
 `Google Cloud Storage`_         :class:`.GoogleStorageDriver`  `GOOGLESTORAGE`
-Local                           :class:`.LocalDriver`          `LOCAL`
-`Microsoft Azure Storage`_      `TODO <MSTODO_>`_
+`Microsoft Azure Storage`_      :class:`.AzureStorageDriver`   `AZURE`
 `Rackspace CloudFiles`_         :class:`.CloudFilesDriver`     `CLOUDFILES`
+Local                           :class:`.LocalDriver`          `LOCAL`
 =============================== ============================== ================
 
 Do not see your provider? Create an issue and vote for at `cloudstorage issues

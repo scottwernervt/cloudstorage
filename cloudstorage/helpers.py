@@ -32,8 +32,8 @@ def read_in_chunks(file_object: FileLike,
         yield chunk
 
 
-def file_checksum(filename: str, hash_type: str = 'md5',
-                  block_size: int = 4096) -> str:
+def file_checksum(filename: Union[str, FileLike], hash_type: str = 'md5',
+                  block_size: int = 4096) -> object:
     """Returns checksum for file.
 
     .. code-block:: python
@@ -47,8 +47,8 @@ def file_checksum(filename: str, hash_type: str = 'md5',
     Source: `get-md5-hash-of-big-files-in-python <http://stackoverflow.com/
     questions/1131220/get-md5-hash-of-big-files-in-python>`_
 
-    :param filename: File path.
-    :type filename: str
+    :param filename: File path or stream.
+    :type filename: str or FileLike
 
     :param hash_type: Hash algorithm function name.
     :type hash_type:  str
@@ -56,22 +56,28 @@ def file_checksum(filename: str, hash_type: str = 'md5',
     :param block_size: (optional) Chunk size.
     :type block_size: int
 
-    :return: Hex digest of file.
-    :rtype: :func:`hash.hexdigest`
+    :return: Hash of file.
+    :rtype: :class:`HASH`
 
     :raise RuntimeError: If the hash algorithm is not found in :mod:`hashlib`.
+
+    .. versionchanged:: 0.4
+        Returns :class:`HASH` instead of `HASH.hexdigest()`.
     """
     try:
-        hash_method = getattr(hashlib, hash_type)()
+        file_hash = getattr(hashlib, hash_type)()
     except AttributeError:
         raise RuntimeError('Invalid or unsupported hash type: %s' % hash_type)
 
-    with open(filename, 'rb') as file_:
-        # for chunk in iter(lambda: f.read(block_size), b''):
-        for chunk in read_in_chunks(file_, block_size=block_size):
-            hash_method.update(chunk)
+    if isinstance(filename, str):
+        with open(filename, 'rb') as file_:
+            for chunk in read_in_chunks(file_, block_size=block_size):
+                file_hash.update(chunk)
+    else:
+        for chunk in read_in_chunks(filename, block_size=block_size):
+            file_hash.update(chunk)
 
-    return hash_method.hexdigest()
+    return file_hash
 
 
 def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
