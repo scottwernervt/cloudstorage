@@ -20,6 +20,7 @@ Drivers
 .. toctree::
    :maxdepth: 1
 
+   api/azure
    api/rackspace
    api/google
    api/local
