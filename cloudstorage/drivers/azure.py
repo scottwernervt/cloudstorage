@@ -1,7 +1,7 @@
 """Microsoft Azure Storage Driver."""
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import base64
 import codecs
@@ -49,6 +49,13 @@ logger = logging.getLogger(__name__)
 
 class AzureStorageDriver(Driver):
     """Driver for interacting with Microsoft Azure Storage.
+
+    References:
+
+    * `Blob Service REST API <https://docs.microsoft.com/en-us/rest/api/
+      storageservices/blob-service-rest-api>`_
+    * `Azure/azure-storage-python
+      <https://github.com/Azure/azure-storage-python>`_
     """
 
     # TODO: QUESTION: Do we want to just call service functions instead of check
@@ -320,7 +327,63 @@ class AzureStorageDriver(Driver):
                                       content_length: ContentLength = None,
                                       content_type: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
-        pass
+        """
+
+        Reference: <https://blogs.msdn.microsoft.com/azureossds/2015/03/30/
+          uploading-files-to-azure-storage-using-sasshared-access-signature/>
+
+        :param container:
+        :type container:
+        :param blob_name:
+        :type blob_name:
+        :param expires:
+        :type expires:
+        :param acl:
+        :type acl:
+        :param meta_data:
+        :type meta_data:
+        :param content_disposition:
+        :type content_disposition:
+        :param content_length:
+        :type content_length:
+        :param content_type:
+        :type content_type:
+        :param extra:
+        :type extra:
+        :return:
+        :rtype:
+        """
+        meta_data = meta_data if meta_data is not None else {}
+        extra = extra if extra is not None else {}
+        extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
+
+        azure_container = self._get_azure_container(container.name)
+        expires_at = datetime.utcnow() + timedelta(seconds=expires)
+
+        sas_token = self.service.generate_container_shared_access_signature(
+            container_name=azure_container.name,
+            permission=BlobPermissions.WRITE,
+            expiry=expires_at,
+            content_disposition=content_disposition,
+            content_type=content_type,
+            # **params,
+        )
+
+        headers = {
+            'x-ms-blob-type': 'BlockBlob',
+            'x-ms-blob-content-type': content_type,
+            'x-ms-blob-content-disposition': content_disposition
+        }
+        for meta_key, meta_value in meta_data.items():
+            key = self._OBJECT_META_PREFIX + meta_key
+            headers[key] = meta_value
+
+        upload_url = self.service.make_blob_url(
+            container_name=azure_container.name,
+            blob_name=blob_name,
+            sas_token=sas_token,
+        )
+        return {'url': upload_url, 'fields': None, 'headers': headers}
 
     def generate_blob_download_url(self, blob: Blob, expires: int = 3600,
                                    method: str = 'GET',
