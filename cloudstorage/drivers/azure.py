@@ -43,6 +43,7 @@ from cloudstorage.messages import CONTAINER_EXISTS
 from cloudstorage.messages import CONTAINER_NOT_EMPTY
 from cloudstorage.messages import BLOB_NOT_FOUND
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
+from cloudstorage.messages import OPTION_NOT_SUPPORTED
 from cloudstorage.helpers import file_checksum
 
 logger = logging.getLogger(__name__)
@@ -292,6 +293,9 @@ class AzureStorageDriver(Driver):
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
+        if acl:
+            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}
 
@@ -382,6 +386,9 @@ class AzureStorageDriver(Driver):
                                       content_length: ContentLength = None,
                                       content_type: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
+        if acl:
+            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
         params = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
