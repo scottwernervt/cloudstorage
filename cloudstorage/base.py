@@ -2,10 +2,10 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, IO, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from abc import abstractmethod
-from io import BytesIO, FileIO, TextIOWrapper, IOBase
+from io import FileIO, IOBase
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
@@ -19,7 +19,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 # TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IOBase, FileIO]   # Union[IO, BytesIO, FileIO, TextIOWrapper]
+FileLike = Union[IOBase, FileIO]  # Union[IO, BytesIO, FileIO, TextIOWrapper]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
@@ -1186,9 +1186,7 @@ class Driver(metaclass=DocstringMeta):
                     extra: ExtraOptions = None) -> Blob:
         """Upload a filename or file like object to a container.
 
-        .. important:: This class method is called by 
-                       :param chunk_size:
-                       :type chunk_size:
+        .. important:: This class method is called by
                        :meth:`.Container.upload_blob`.
 
         :param container: The container to upload the blob to.
