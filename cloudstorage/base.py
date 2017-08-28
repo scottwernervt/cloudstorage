@@ -1064,6 +1064,8 @@ class Driver(metaclass=DocstringMeta):
                     * bucket-owner-full-control
                     * aws-exec-read (Amazon S3)
                     * project-private (Google Cloud Storage)
+                    * container-public-access (Microsoft Azure Storage)
+                    * blob-public-access (Microsoft Azure Storage)
         :type acl: str or None
 
         :param meta_data: (optional) A map of metadata to store with the 
