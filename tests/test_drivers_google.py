@@ -88,7 +88,9 @@ def test_container_disable_cdn(container):
 
 
 def test_container_cdn_url(container):
+    container.enable_cdn()
     cdn_url = container.cdn_url
+
     assert uri_validator(cdn_url)
     assert container.name in cdn_url
 
@@ -186,8 +188,10 @@ def test_blob_download_stream(binary_blob, temp_file):
     assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
-def test_blob_cdn_url(binary_blob):
+def test_blob_cdn_url(container, binary_blob):
+    container.enable_cdn()
     cdn_url = binary_blob.cdn_url
+
     assert uri_validator(cdn_url)
     assert binary_blob.container.name in cdn_url
     assert binary_blob.name in cdn_url
