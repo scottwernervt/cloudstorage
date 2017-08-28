@@ -1,6 +1,7 @@
-import random
 import string
 from urllib.parse import urlparse
+
+import random
 
 from tests.settings import CONTAINER_PREFIX
 
