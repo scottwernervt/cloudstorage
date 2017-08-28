@@ -39,7 +39,9 @@ def storage():
     for container in driver:  # cleanup
         if container.name.startswith(CONTAINER_PREFIX):
             for blob in container:
-                blob.delete()
+                seconds = random.random()
+                t = Timer(seconds, blob.delete())
+                t.start()
 
             container.delete()
 
