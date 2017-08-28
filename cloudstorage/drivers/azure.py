@@ -42,6 +42,7 @@ from cloudstorage.messages import CONTAINER_NOT_FOUND
 from cloudstorage.messages import CONTAINER_EXISTS
 from cloudstorage.messages import CONTAINER_NOT_EMPTY
 from cloudstorage.messages import BLOB_NOT_FOUND
+from cloudstorage.messages import FEATURE_NOT_SUPPORTED
 from cloudstorage.helpers import file_checksum
 
 logger = logging.getLogger(__name__)
@@ -50,17 +51,32 @@ logger = logging.getLogger(__name__)
 class AzureStorageDriver(Driver):
     """Driver for interacting with Microsoft Azure Storage.
 
+    .. code-block:: python
+
+        from cloudstorage.drivers.azure import AzureStorageDriver
+
+        storage = AzureStorageDriver(account_name='<my-azure-account-name>',
+                   key='<my-azure-account-key>')
+        # <Driver: AZURE>
+
+    .. todo: Support for container or blob encryption key.
+
     References:
 
     * `Blob Service REST API <https://docs.microsoft.com/en-us/rest/api/
       storageservices/blob-service-rest-api>`_
     * `Azure/azure-storage-python
       <https://github.com/Azure/azure-storage-python>`_
-    """
 
-    # TODO: QUESTION: Do we want to just call service functions instead of check
-    # if container or blob exists? We would need to handle exceptions for each
-    # case.
+    :param account_name: Azure storage account name.
+    :type account_name: str
+
+    :param key: Azure storage account key.
+    :type key: str
+
+    :param kwargs: (optional) Catch invalid options.
+    :type kwargs: dict
+    """
 
     name = 'AZURE'
     hash_type = 'md5'
@@ -222,15 +238,12 @@ class AzureStorageDriver(Driver):
         return url
 
     def enable_container_cdn(self, container: Container) -> bool:
-        azure_container = self._get_azure_container(container.name)
-        self.service.set_container_acl(azure_container.name,
-                                       public_access=PublicAccess.Container)
-        return True
+        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        azure_container = self._get_azure_container(container.name)
-        self.service.set_container_acl(azure_container.name, public_access=None)
-        return True
+        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        return False
 
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
                     blob_name: str = None, acl: str = None,
