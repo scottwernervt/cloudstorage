@@ -9,8 +9,9 @@ import requests
 from rfc6266_parser import parse_headers
 
 from cloudstorage.drivers.rackspace import CloudFilesDriver
-from cloudstorage.exceptions import (CloudStorageError, IsNotEmptyError,
-                                     NotFoundError)
+from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.exceptions import IsNotEmptyError
+from cloudstorage.exceptions import NotFoundError
 from cloudstorage.helpers import file_checksum
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *

@@ -1,5 +1,4 @@
 """Rackspace Cloud Files Driver."""
-
 import logging
 
 import hashlib
@@ -10,34 +9,39 @@ try:
 except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
+
 from time import time
 from typing import Dict, Iterable, List, Tuple, Union, Any
 from urllib.parse import quote, urlencode, urljoin
 
-# noinspection PyPackageRequirements
 import dateutil.parser
 import requests
+
 from inflection import underscore
-from openstack.exceptions import (
-    HttpException, NotFoundException,
-    ResourceNotFound,
-)
+from openstack.exceptions import HttpException
+from openstack.exceptions import NotFoundException
+from openstack.exceptions import ResourceNotFound
 from rackspace import connection
 from rfc6266_parser import parse_headers
 
-from cloudstorage.base import (
-    Blob, Container, ContentLength, Driver,
-    ExtraOptions, FileLike, FormPost, MetaData,
-)
-from cloudstorage.exceptions import (
-    CloudStorageError, IsNotEmptyError,
-    NotFoundError,
-)
+from cloudstorage.base import Blob
+from cloudstorage.base import Container
+from cloudstorage.base import ContentLength
+from cloudstorage.base import Driver
+from cloudstorage.base import ExtraOptions
+from cloudstorage.base import FileLike
+from cloudstorage.base import FormPost
+from cloudstorage.base import MetaData
+from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.exceptions import IsNotEmptyError
+from cloudstorage.exceptions import NotFoundError
 from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.messages import (
-    BLOB_NOT_FOUND, CDN_NOT_ENABLED, CONTAINER_NOT_EMPTY, CONTAINER_NOT_FOUND,
-    OPTION_NOT_SUPPORTED, REGION_NOT_FOUND,
-)
+from cloudstorage.messages import CONTAINER_NOT_FOUND
+from cloudstorage.messages import CONTAINER_NOT_EMPTY
+from cloudstorage.messages import BLOB_NOT_FOUND
+from cloudstorage.messages import OPTION_NOT_SUPPORTED
+from cloudstorage.messages import CDN_NOT_ENABLED
+from cloudstorage.messages import REGION_NOT_FOUND
 
 logger = logging.getLogger(__name__)
 

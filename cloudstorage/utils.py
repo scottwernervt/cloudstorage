@@ -1,5 +1,4 @@
 """Utility methods for Cloud Storage."""
-
 import functools
 
 _SENTINEL = object()

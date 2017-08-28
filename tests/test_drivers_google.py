@@ -1,4 +1,4 @@
-from time import sleep
+import random
 
 try:
     from http import HTTPStatus
@@ -6,8 +6,9 @@ except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
 
+from time import sleep
+
 import pytest
-import random
 import requests
 
 from cloudstorage.drivers.google import GoogleStorageDriver

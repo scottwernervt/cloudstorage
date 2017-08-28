@@ -3,7 +3,6 @@
 :copyright: (c) 2017 by Scott Werner.
 :license: MIT, see LICENSE for more details.
 """
-
 import logging
 from typing import Union
 

@@ -1,5 +1,4 @@
 """Amazon Simple Storage Service (S3) Driver."""
-
 import logging
 from typing import Any, Dict, Iterable, List, Union
 from urllib.parse import quote, urljoin
@@ -8,20 +7,25 @@ import boto3
 from botocore.exceptions import ClientError, ParamValidationError, WaiterError
 from inflection import camelize, underscore
 
-from cloudstorage.base import (
-    Blob, Container, ContentLength, Driver,
-    ExtraOptions, FileLike, FormPost, MetaData,
-)
-from cloudstorage.exceptions import (
-    CloudStorageError, IsNotEmptyError,
-    NotFoundError,
-)
+from cloudstorage.base import Blob
+from cloudstorage.base import Container
+from cloudstorage.base import ContentLength
+from cloudstorage.base import Driver
+from cloudstorage.base import ExtraOptions
+from cloudstorage.base import FileLike
+from cloudstorage.base import FormPost
+from cloudstorage.base import MetaData
+from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.exceptions import IsNotEmptyError
+from cloudstorage.exceptions import NotFoundError
 from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.messages import (
-    BLOB_NOT_FOUND, CONTAINER_NAME_INVALID, CONTAINER_NOT_EMPTY,
-    CONTAINER_NOT_FOUND, FEATURE_NOT_SUPPORTED, OPTION_NOT_SUPPORTED,
-    REGION_NOT_FOUND,
-)
+from cloudstorage.messages import BLOB_NOT_FOUND
+from cloudstorage.messages import CONTAINER_NAME_INVALID
+from cloudstorage.messages import CONTAINER_NOT_EMPTY
+from cloudstorage.messages import CONTAINER_NOT_FOUND
+from cloudstorage.messages import FEATURE_NOT_SUPPORTED
+from cloudstorage.messages import OPTION_NOT_SUPPORTED
+from cloudstorage.messages import REGION_NOT_FOUND
 
 logger = logging.getLogger(__name__)
 

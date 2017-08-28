@@ -1,5 +1,7 @@
-from cloudstorage.helpers import (file_checksum, file_content_type,
-                                  read_in_chunks, validate_file_or_path)
+from cloudstorage.helpers import file_checksum
+from cloudstorage.helpers import file_content_type
+from cloudstorage.helpers import read_in_chunks
+from cloudstorage.helpers import validate_file_or_path
 from tests.settings import *
 
 

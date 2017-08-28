@@ -1,5 +1,4 @@
 """Standardized error messages for Cloud Storage."""
-
 BLOB_NOT_FOUND = "Blob '%s' not found in container '%s'."
 CDN_NOT_ENABLED = "CDN not enabled on container '%s'."
 CONTAINER_EXISTS = "Container '%s' already exists."

@@ -1,8 +1,9 @@
 import pytest
 
 from cloudstorage.drivers.local import LocalDriver
-from cloudstorage.exceptions import (IsNotEmptyError, NotFoundError,
-                                     SignatureExpiredError)
+from cloudstorage.exceptions import IsNotEmptyError
+from cloudstorage.exceptions import NotFoundError
+from cloudstorage.exceptions import SignatureExpiredError
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 

@@ -23,13 +23,8 @@ from azure.storage.blob.models import Container as AzureContainer
 from azure.storage.blob.models import Include
 from azure.storage.blob.models import ContentSettings
 from azure.storage.blob.models import BlobPermissions
-
 from inflection import underscore
 
-from cloudstorage.helpers import validate_file_or_path
-from cloudstorage.exceptions import NotFoundError
-from cloudstorage.exceptions import CloudStorageError
-from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.base import Blob
 from cloudstorage.base import Container
 from cloudstorage.base import ContentLength
@@ -38,13 +33,16 @@ from cloudstorage.base import ExtraOptions
 from cloudstorage.base import FileLike
 from cloudstorage.base import FormPost
 from cloudstorage.base import MetaData
+from cloudstorage.exceptions import NotFoundError
+from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.exceptions import IsNotEmptyError
+from cloudstorage.helpers import file_checksum, validate_file_or_path
 from cloudstorage.messages import CONTAINER_NOT_FOUND
 from cloudstorage.messages import CONTAINER_EXISTS
 from cloudstorage.messages import CONTAINER_NOT_EMPTY
 from cloudstorage.messages import BLOB_NOT_FOUND
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
 from cloudstorage.messages import OPTION_NOT_SUPPORTED
-from cloudstorage.helpers import file_checksum
 
 logger = logging.getLogger(__name__)
 

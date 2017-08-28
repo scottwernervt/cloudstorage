@@ -1,5 +1,4 @@
 """Provides base classes for working with storage drivers."""
-
 import logging
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Union

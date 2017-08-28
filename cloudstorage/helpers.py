@@ -1,10 +1,8 @@
 """Helper methods for Cloud Storage."""
-
 import mimetypes
 from typing import Iterator, Union
 
 import hashlib
-# noinspection PyPackageRequirements
 import magic
 import os
 
