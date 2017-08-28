@@ -1371,8 +1371,8 @@ class Driver(metaclass=DocstringMeta):
         :param extra: (optional) Extra parameters for the request.
         :type extra: Dict[Any, Any] or None
 
-        :return: Dictionary with URL and form fields (includes signature or 
-                 policy).                
+        :return: Dictionary with URL and form fields (includes signature or
+          policy) or header fields.
         :rtype: Dict[Any, Any]
         """
         pass
