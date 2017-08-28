@@ -1,10 +1,10 @@
+from time import sleep
+
 try:
     from http import HTTPStatus
 except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
-
-from threading import Timer
 
 import pytest
 import random
@@ -22,27 +22,20 @@ pytestmark = pytest.mark.skipif(not bool(GOOGLE_CREDENTIALS),
                                 reason='settings missing key and secret')
 
 
-@pytest.fixture(scope='function', autouse=True)
-def delay(request):
-    # Prevent google.api.core.exceptions.TooManyRequests
-    seconds = random.random()
-    t = Timer(seconds, request)
-    t.start()
-
-
 @pytest.fixture(scope='module')
 def storage():
     driver = GoogleStorageDriver(key=GOOGLE_CREDENTIALS)
 
     yield driver
 
+    seconds = random.random() * 2
     for container in driver:  # cleanup
         if container.name.startswith(CONTAINER_PREFIX):
             for blob in container:
-                seconds = random.random()
-                t = Timer(seconds, blob.delete())
-                t.start()
+                sleep(seconds)
+                blob.delete()
 
+            sleep(seconds)
             container.delete()
 
 
