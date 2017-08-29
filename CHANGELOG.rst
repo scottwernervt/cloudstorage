@@ -6,15 +6,15 @@ Changelog
 0.4 (2017-08-29)
 ++++++++++++++++
 
-* Implement Microsoft Azure Storage driver (#1).
-* Google upload_blob is failing for binary stream (#7 and #8).
+* Implement Microsoft Azure Storage driver (`#1 <https://github.com/scottwernervt/cloudstorage/issues/1>`_).
+* Google upload_blob is failing for binary stream (`#7 <https://github.com/scottwernervt/cloudstorage/issues/7>`_ and `#8 <https://github.com/scottwernervt/cloudstorage/issues/8>`_).
 * Fixed type annotations using mypy.
 * Formatted code using flake8 recommendations.
 
 0.3 (2017-05-24)
 ++++++++++++++++
 
-* Fixes #6: Add kwargs to each driver's init method.
+* Fixes `#6 <https://github.com/scottwernervt/cloudstorage/issues/6>`_: Add kwargs to each driver's init method.
 
 0.2 (2017-04-21)
 ++++++++++++++++
