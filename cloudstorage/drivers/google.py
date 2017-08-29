@@ -80,8 +80,8 @@ class GoogleStorageDriver(Driver):
     :type kwargs: dict
     
     :raise CloudStorageError: If `GOOGLE_APPLICATION_CREDENTIALS` environment
-                              variable is not set and/or credentials json file 
-                              is not passed to the `key` argument.
+      variable is not set and/or credentials json file is not passed to the
+      `key` argument.
     """
     name = 'GOOGLESTORAGE'
     hash_type = 'md5'  # TODO: QUESTION: Switch to crc32c?

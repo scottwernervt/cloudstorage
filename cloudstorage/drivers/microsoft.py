@@ -122,7 +122,7 @@ class AzureStorageDriver(Driver):
         """Get Azure Storage blob by container and blob name.
 
         :param container_name: The name of the container that containers the
-            blob.
+          blob.
         :type container_name: str
 
         :param blob_name: The name of the blob to get.

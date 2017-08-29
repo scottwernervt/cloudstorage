@@ -89,19 +89,19 @@ class LocalDriver(Driver):
     :type key: str
 
     :param secret: (optional) Secret key for pre-signed download and upload 
-                   URLs.
+      URLs.
     :type secret: str or None
 
     :param salt: (optional) Salt for namespacing download and upload 
-                 pre-signed URLs. For more information. see `itsdangerous 
-                 <https://pythonhosted.org/itsdangerous/>`_.
+      pre-signed URLs. For more information. see `itsdangerous
+      <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
 
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
 
     :raise NotADirectoryError: If the key storage path is invalid or does not 
-                               exist.
+      exist.
     """
     name = 'LOCAL'
     hash_type = 'md5'
@@ -215,7 +215,7 @@ class LocalDriver(Driver):
         :rtype: None
 
         :raises CloudStorageError: If the local file system does not support 
-                                   extended filesystem attributes.
+          extended filesystem attributes.
         """
         xattrs = xattr.xattr(filename)
 
@@ -262,7 +262,7 @@ class LocalDriver(Driver):
         :rtype: None
 
         :raises CloudStorageError: If folder exists and  `ignore_existing` is 
-                                   False.
+          False.
         """
         try:
             os.makedirs(path)

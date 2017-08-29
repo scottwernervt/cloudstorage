@@ -61,7 +61,7 @@ def file_checksum(filename: Union[str, FileLike], hash_type: str = 'md5',
     :raise RuntimeError: If the hash algorithm is not found in :mod:`hashlib`.
 
     .. versionchanged:: 0.4
-        Returns :class:`_hashlib.HASH` instead of `HASH.hexdigest()`.
+      Returns :class:`_hashlib.HASH` instead of `HASH.hexdigest()`.
     """
     try:
         file_hash = getattr(hashlib, hash_type)()

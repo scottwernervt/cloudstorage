@@ -14,9 +14,8 @@ def rgetattr(obj, attr, default=_SENTINEL):
         # True
 
     Source: 
-    `getattr-and-setattr-on-nested-objects 
-    <http://stackoverflow.com/questions/31174295/
-    getattr-and-setattr-on-nested-objects/31174427>`__
+    `getattr-and-setattr-on-nested-objects <http://stackoverflow.com/questions/
+    31174295/getattr-and-setattr-on-nested-objects/31174427>`__
 
     :param obj: Object.
     :type obj: object
@@ -49,10 +48,8 @@ def rsetattr(obj, attr, val):
         rsetattr(a, 'b.c', False)
         # False
 
-    Source: 
-    `getattr-and-setattr-on-nested-objects 
-    <http://stackoverflow.com/questions/31174295/
-    getattr-and-setattr-on-nested-objects/31174427>`__
+    Source: `getattr-and-setattr-on-nested-objects <http://stackoverflow.com/
+    questions/31174295/getattr-and-setattr-on-nested-objects/31174427>`__
 
     :param obj: Object.
     :type obj: object

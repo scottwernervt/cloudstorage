@@ -73,7 +73,7 @@ class Blob:
     :type checksum: str
 
     :param etag: Blob etag which can also be the checksum. The etag for 
-                 `LocalDriver` is a SHA1 hexdigest of the blob's full path. 
+      `LocalDriver` is a SHA1 hexdigest of the blob's full path.
     :type etag: str
 
     :param size: Blob size in bytes.
@@ -249,7 +249,7 @@ class Blob:
                 picture_blob.download(picture_file)
 
         :param destination: A file handle to which to write the blob’s data or
-                            a filename to be passed to `open`.
+          a filename to be passed to `open`.
         :type destination: file or str
 
         :return: NoneType
@@ -326,7 +326,7 @@ class Blob:
         :type method: str
 
         :param content_disposition: (optional) Sets the Content-Disposition 
-                                    header of the response.
+          header of the response.
         :type content_disposition: str or None
 
         :param extra: (optional) Extra parameters for the request.
@@ -347,7 +347,7 @@ class Blob:
         :type extra: Dict[str, str] or None
 
         :return: Pre-signed URL for downloading a blob. :class:`.LocalDriver` 
-                 returns urlsafe signature.
+          returns urlsafe signature.
         :rtype: str
         """
         return self.driver.generate_blob_download_url(
@@ -556,7 +556,7 @@ class Container:
         """Delete this container.
 
         .. important:: All blob objects in the container must be deleted before 
-                       the container itself can be deleted.
+          the container itself can be deleted.
 
         .. code-block:: python
 
@@ -584,10 +584,10 @@ class Container:
         that fails, Cloud Storage will leave it up to the storage backend to  
         guess it.
 
-        .. warning:: The effect of uploading to an existing blob depends on the 
-                     “versioning” and “lifecycle” policies defined on the blob’s 
-                     container. In the absence of those policies, upload will 
-                     overwrite any existing contents.
+        .. warning:: The effect of uploading to an existing blob depends on the
+          “versioning” and “lifecycle” policies defined on the blob’s
+          container. In the absence of those policies, upload will overwrite
+          any existing contents.
 
         Basic example:
 
@@ -657,23 +657,22 @@ class Container:
         :type acl: str or None
 
         :param blob_name: (optional) Override the blob's name. If not set, will
-                          default to the filename from path or filename of 
-                          iterator object.
+          default to the filename from path or filename of iterator object.
         :type blob_name: str or None
 
         :param meta_data: (optional) A map of metadata to store with the blob.
         :type meta_data: Dict[str, str] or None
 
         :param content_type: (optional) A standard MIME type describing the 
-                             format of the object data.
+          format of the object data.
         :type content_type: str or None
 
         :param content_disposition: (optional) Specifies presentational 
-                                    information for the blob.
+          information for the blob.
         :type content_disposition: str or None
 
         :param chunk_size: (optional) Optional chunk size for streaming a
-                   transfer.
+          transfer.
         :type chunk_size: int
 
         :param extra: (optional) Extra parameters for the request.
@@ -826,8 +825,8 @@ class Container:
           public-access-to-your-cloud-files-account/#formpost>`_
 
         :param blob_name: The blob's name, prefix, or `''` if a user is 
-                          providing a file name. Note, Rackspace Cloud Files 
-                          only supports prefixes.
+          providing a file name. Note, Rackspace Cloud Files only supports
+          prefixes.
         :type blob_name: str or None
 
         :param expires: (optional) Expiration in seconds.
@@ -850,16 +849,15 @@ class Container:
         :type meta_data: Dict[str, str] or None
 
         :param content_disposition: (optional) Specifies presentational 
-                                    information for the blob.
+          information for the blob.
         :type content_disposition: str or None
 
         :param content_type: (optional) A standard MIME type describing the 
-                             format of the object data.
+          format of the object data.
         :type content_type: str or None
 
         :param content_length: Specifies that uploaded files can only be 
-                               between a certain size range in bytes: 
-                               `(<min>, <max>)`.
+          between a certain size range in bytes: `(<min>, <max>)`.
         :type content_length: tuple[int, int] or None
 
         :param extra: (optional) Extra parameters for the request.
@@ -875,7 +873,7 @@ class Container:
         :type extra: Dict[str, str] or None
 
         :return: Dictionary with URL and form fields (includes signature or 
-                 policy).                
+          policy).
         :rtype: Dict[Any, Any]
         """
         return self.driver.generate_container_upload_url(
@@ -1068,14 +1066,14 @@ class Driver(metaclass=DocstringMeta):
         :type acl: str or None
 
         :param meta_data: (optional) A map of metadata to store with the 
-                          container.
+          container.
         :type meta_data: Dict[str, str] or None
 
         :return: The newly created or existing container.
         :rtype: :class:`.Container`
 
         :raises CloudStorageError: If the container name contains invalid 
-                                   characters.
+          characters.
         """
         pass
 
@@ -1138,7 +1136,7 @@ class Driver(metaclass=DocstringMeta):
         """The Content Delivery Network URL for this container.
 
         .. important:: This class method is called by 
-                       :attr:`.Container.cdn_url`.
+          :attr:`.Container.cdn_url`.
 
         :return: The CDN URL for this container.
         :rtype: str
@@ -1150,7 +1148,7 @@ class Driver(metaclass=DocstringMeta):
         """(Optional) Enable Content Delivery Network (CDN) for the container.
 
         .. important:: This class method is called by 
-                       :meth:`.Container.enable_cdn`.
+          :meth:`.Container.enable_cdn`.
 
         :param container: A container instance.
         :type container: :class:`.Container`
@@ -1166,7 +1164,7 @@ class Driver(metaclass=DocstringMeta):
         """(Optional) Disable Content Delivery Network (CDN) on the container.
 
         .. important:: This class method is called by 
-                       :meth:`.Container.disable_cdn`.
+          :meth:`.Container.disable_cdn`.
 
         :param container: A container instance.
         :type container: :class:`.Container`
@@ -1186,7 +1184,7 @@ class Driver(metaclass=DocstringMeta):
         """Upload a filename or file like object to a container.
 
         .. important:: This class method is called by
-                       :meth:`.Container.upload_blob`.
+          :meth:`.Container.upload_blob`.
 
         :param container: The container to upload the blob to.
         :type container: :class:`.Container`
@@ -1198,23 +1196,22 @@ class Driver(metaclass=DocstringMeta):
         :type acl: str or None
 
         :param blob_name: (optional) Override the blob's name. If not set, will
-                          default to the filename from path or filename of 
-                          iterator object.
+          default to the filename from path or filename of iterator object.
         :type blob_name: str or None
 
         :param meta_data: (optional) A map of metadata to store with the blob.
         :type meta_data: Dict[str, str] or None
 
         :param content_type: (optional) A standard MIME type describing the 
-                             format of the object data.
+          format of the object data.
         :type content_type: str or None
 
         :param content_disposition: (optional) Specifies presentational 
-                                    information for the blob.
+          information for the blob.
         :type content_disposition: str or None
 
         :param chunk_size: (optional) Optional chunk size for streaming a
-                           transfer.
+          transfer.
         :type chunk_size: int
 
         :param extra: (optional) Extra parameters for the request.
@@ -1270,7 +1267,7 @@ class Driver(metaclass=DocstringMeta):
         :type blob: Blob
 
         :param destination: A file handle to which to write the blob’s data or
-                            a filename to be passed to `open`.
+          a filename to be passed to `open`.
         :type destination: file or str
 
         :return: NoneType
@@ -1336,14 +1333,14 @@ class Driver(metaclass=DocstringMeta):
         container.
 
         .. important:: This class method is called by 
-                       :meth:`.Container.generate_upload_url`.
+          :meth:`.Container.generate_upload_url`.
 
         :param container: A container to upload the blob object to.
         :type container: :class:`.Container`
 
         :param blob_name: The blob's name, prefix, or `''` if a user is 
-                          providing a file name. Note, Rackspace Cloud Files 
-                          only supports prefixes.
+          providing a file name. Note, Rackspace Cloud Files only supports
+          prefixes.
         :type blob_name: str or None
 
         :param expires: (optional) Expiration in seconds.
@@ -1356,15 +1353,15 @@ class Driver(metaclass=DocstringMeta):
         :type meta_data: Dict[Any, Any] or None
 
         :param content_disposition: (optional) Specifies presentational 
-                                    information for the blob.
+          information for the blob.
         :type content_disposition: str or None
 
         :param content_type: (optional) A standard MIME type describing the 
-                             format of the object data.
+          format of the object data.
         :type content_type: str or None
 
         :param content_length: Specifies that uploaded files can only be 
-                               between a certain size range in bytes.
+          between a certain size range in bytes.
         :type content_length: tuple[int, int] or None
 
         :param extra: (optional) Extra parameters for the request.
@@ -1384,7 +1381,7 @@ class Driver(metaclass=DocstringMeta):
         """Generates a signed URL for this blob.
 
         .. important:: This class method is called by 
-                       :meth:`.Blob.generate_download_url`.
+          :meth:`.Blob.generate_download_url`.
 
         :param blob: The blob to download with a signed URL.
         :type blob: Blob
@@ -1396,7 +1393,7 @@ class Driver(metaclass=DocstringMeta):
         :type method: str
 
         :param content_disposition: (optional) Sets the Content-Disposition 
-                                    header of the response.
+          header of the response.
         :type content_disposition: str or None
 
         :param extra: (optional) Extra parameters for the request.
