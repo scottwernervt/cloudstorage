@@ -4,16 +4,10 @@
 :license: MIT, see LICENSE for more details.
 """
 import logging
-from typing import Union
 
 from enum import Enum, unique
 
 from cloudstorage.base import Blob, Container, Driver
-from cloudstorage.drivers.amazon import S3Driver
-from cloudstorage.drivers.google import GoogleStorageDriver
-from cloudstorage.drivers.local import LocalDriver
-from cloudstorage.drivers.microsoft import AzureStorageDriver
-from cloudstorage.drivers.rackspace import CloudFilesDriver
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
@@ -31,14 +25,6 @@ __version__ = '0.4'
 __author__ = 'Scott Werner'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 Scott Werner'
-
-Drivers = Union[
-    AzureStorageDriver,
-    CloudFilesDriver,
-    GoogleStorageDriver,
-    LocalDriver,
-    S3Driver,
-]
 
 
 @unique
@@ -62,7 +48,7 @@ _DRIVER_IMPORTS = {
 }
 
 
-def get_driver(driver: DriverName) -> Drivers:
+def get_driver(driver: DriverName) -> Driver:
     """Get driver class by DriverName enumeration member.
 
     .. code-block:: python
@@ -75,7 +61,8 @@ def get_driver(driver: DriverName) -> Drivers:
     :type driver: :class:`.DriverName`
 
     :return: DriverName driver class.
-    :rtype: :class:`.CloudDriver`
+    :rtype: :class:`.AzureStorageDriver`, :class:`.CloudFilesDriver`,
+      :class:`.GoogleStorageDriver`, :class:`.S3Driver`, :class:`.LocalDriver`
     """
     if driver in _DRIVER_IMPORTS:
         mod_name, driver_name = _DRIVER_IMPORTS[driver]
@@ -85,7 +72,7 @@ def get_driver(driver: DriverName) -> Drivers:
     raise CloudStorageError("Driver '%s' does not exist." % driver)
 
 
-def get_driver_by_name(driver_name: str) -> Drivers:
+def get_driver_by_name(driver_name: str) -> Driver:
     """Get driver class by driver name.
 
     .. code-block:: python
@@ -104,7 +91,8 @@ def get_driver_by_name(driver_name: str) -> Drivers:
     :type driver_name: str
 
     :return: DriverName driver class.
-    :rtype: :class:`.CloudDriver`
+    :rtype: :class:`.AzureStorageDriver`, :class:`.CloudFilesDriver`,
+      :class:`.GoogleStorageDriver`, :class:`.S3Driver`, :class:`.LocalDriver`
     """
     driver = DriverName[driver_name]
     return get_driver(driver)
