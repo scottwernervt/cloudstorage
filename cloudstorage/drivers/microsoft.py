@@ -452,14 +452,14 @@ class AzureStorageDriver(Driver):
     #: <https://docs.microsoft.com/en-us/rest/api/storageservices/
     # set-blob-properties>`
     _PUT_OBJECT_KEYS = {
-    }
+    }  # type: Dict
 
     #: `post-object
     #: <https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob>`_
     _POST_OBJECT_KEYS = {
-    }
+    }  # type: Dict
 
     #: `get-object
     #: <https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob>`_
     _GET_OBJECT_KEYS = {
-    }
+    }  # type: Dict
