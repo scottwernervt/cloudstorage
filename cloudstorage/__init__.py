@@ -4,8 +4,9 @@
 :license: MIT, see LICENSE for more details.
 """
 import logging
-from enum import Enum, unique
 from typing import Union
+
+from enum import Enum, unique
 
 from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.drivers.amazon import S3Driver
