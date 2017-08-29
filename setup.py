@@ -1,22 +1,22 @@
-import sys
-
 import os
 import re
+import sys
+
 from setuptools import find_packages, setup
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 VERSION_RE = re.compile(r'''__version__ = ['"]([0-9.]+)['"]''')
 
 install_requires = [
-    'azure',
-    'boto3',  # Apache 2.0
-    'filelock',  # Public Domain
-    'google-cloud-storage',  # Apache 2.0
+    'azure>=2.0.0',  # MIT
+    'boto3>=1.4.5',  # Apache 2.0
+    'filelock>=2.0.0',  # Public Domain
+    'google-cloud-storage>=1.4',  # Apache 2.0
     'inflection',  # MIT
-    'itsdangerous',  # BSD License
+    'itsdangerous>=0.24',  # BSD License
     'python-dateutil',  # Simplified BSD
     'python-magic',  # MIT
-    'rackspacesdk',  # Apache 2.0
+    'rackspacesdk>=0.7.4',  # Apache 2.0
     'requests',  # Apache 2.0
     'rfc6266-parser',  # GNU LGPL
     'xattr',  # MIT
