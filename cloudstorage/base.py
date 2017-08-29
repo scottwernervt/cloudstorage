@@ -1,7 +1,7 @@
 """Provides base classes for working with storage drivers."""
 import logging
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, BinaryIO, Dict, Iterable, List, Optional, Union
 
 from abc import abstractmethod
 from io import FileIO, IOBase
@@ -18,7 +18,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 # TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IOBase, FileIO]  # Union[IO, BytesIO, FileIO, TextIOWrapper]
+FileLike = Union[IOBase, FileIO, BinaryIO]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
