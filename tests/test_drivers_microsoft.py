@@ -7,7 +7,7 @@ except ImportError:
 import pytest
 import requests
 
-from cloudstorage.drivers.azure import AzureStorageDriver
+from cloudstorage.drivers.microsoft import AzureStorageDriver
 from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError

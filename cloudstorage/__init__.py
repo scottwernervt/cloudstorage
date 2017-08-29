@@ -4,15 +4,14 @@
 :license: MIT, see LICENSE for more details.
 """
 import logging
-from typing import Union
-
 from enum import Enum, unique
+from typing import Union
 
 from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.drivers.amazon import S3Driver
-from cloudstorage.drivers.azure import AzureStorageDriver
 from cloudstorage.drivers.google import GoogleStorageDriver
 from cloudstorage.drivers.local import LocalDriver
+from cloudstorage.drivers.microsoft import AzureStorageDriver
 from cloudstorage.drivers.rackspace import CloudFilesDriver
 from cloudstorage.exceptions import CloudStorageError
 
@@ -52,7 +51,7 @@ class DriverName(Enum):
 
 
 _DRIVER_IMPORTS = {
-    DriverName.AZURE: ('cloudstorage.drivers.azure', 'AzureStorageDriver'),
+    DriverName.AZURE: ('cloudstorage.drivers.microsoft', 'AzureStorageDriver'),
     DriverName.CLOUDFILES: (
         'cloudstorage.drivers.rackspace', 'CloudFilesDriver'),
     DriverName.GOOGLESTORAGE: ('cloudstorage.drivers.google',

@@ -52,7 +52,7 @@ class AzureStorageDriver(Driver):
 
     .. code-block:: python
 
-        from cloudstorage.drivers.azure import AzureStorageDriver
+        from cloudstorage.drivers.microsoft import AzureStorageDriver
 
         storage = AzureStorageDriver(account_name='<my-azure-account-name>',
                    key='<my-azure-account-key>')
