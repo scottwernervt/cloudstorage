@@ -1,5 +1,6 @@
 """Helper methods for Cloud Storage."""
 import mimetypes
+from _hashlib import HASH
 from typing import Iterator, Union
 
 import hashlib
@@ -31,7 +32,7 @@ def read_in_chunks(file_object: FileLike,
 
 
 def file_checksum(filename: Union[str, FileLike], hash_type: str = 'md5',
-                  block_size: int = 4096) -> object:
+                  block_size: int = 4096) -> HASH:
     """Returns checksum for file.
 
     .. code-block:: python
@@ -55,12 +56,12 @@ def file_checksum(filename: Union[str, FileLike], hash_type: str = 'md5',
     :type block_size: int
 
     :return: Hash of file.
-    :rtype: :class:`HASH`
+    :rtype: :class:`_hashlib.HASH`
 
     :raise RuntimeError: If the hash algorithm is not found in :mod:`hashlib`.
 
     .. versionchanged:: 0.4
-        Returns :class:`HASH` instead of `HASH.hexdigest()`.
+        Returns :class:`_hashlib.HASH` instead of `HASH.hexdigest()`.
     """
     try:
         file_hash = getattr(hashlib, hash_type)()
