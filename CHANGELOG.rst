@@ -3,6 +3,14 @@
 Changelog
 ---------
 
+0.4 (2017-08-29)
+++++++++++++++++
+
+* Implement Microsoft Azure Storage driver (#1).
+* Google upload_blob is failing for binary stream (#7 and #8).
+* Fixed type annotations using mypy.
+* Formatted code using flake8 recommendations.
+
 0.3 (2017-05-24)
 ++++++++++++++++
 
