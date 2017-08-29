@@ -13,6 +13,6 @@ For more examples and usage, check out the API documentation for
 
    advanced/amazon
    advanced/google
-   advanced/azure
+   advanced/microsoft
    advanced/rackspace
    advanced/local
