@@ -3,10 +3,10 @@
 Changelog
 ---------
 
-0.5 (2017-02-26)
+0.5 (2018-02-26)
 ++++++++++++++++
 
-* Update rackspacesdk to 0.7.5 and fix broken API calls (`#14 <https://github.com/scottwernervt/cloudstorage/issues/14>`_.
+* Update rackspacesdk to 0.7.5 and fix broken API calls (`#14 <https://github.com/scottwernervt/cloudstorage/issues/14>`_).
 
 0.4 (2017-08-29)
 ++++++++++++++++
