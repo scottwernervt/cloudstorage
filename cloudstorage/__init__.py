@@ -13,7 +13,6 @@ from cloudstorage.exceptions import CloudStorageError
 __all__ = [
     'Blob',
     'Driver',
-    'Drivers',
     'DriverName',
     'Container',
     'get_driver',
@@ -21,10 +20,10 @@ __all__ = [
 ]
 
 __title__ = 'Cloud Storage'
-__version__ = '0.4'
+__version__ = '0.5'
 __author__ = 'Scott Werner'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2017 Scott Werner'
+__copyright__ = 'Copyright 2017-2018 Scott Werner'
 
 
 @unique
