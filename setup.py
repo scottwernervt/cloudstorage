@@ -16,7 +16,7 @@ install_requires = [
     'itsdangerous>=0.24',  # BSD License
     'python-dateutil',  # Simplified BSD
     'python-magic',  # MIT
-    'rackspacesdk>=0.7.4',  # Apache 2.0
+    'rackspacesdk>=0.7.5',  # Apache 2.0
     'requests',  # Apache 2.0
     'rfc6266-parser',  # GNU LGPL
     'xattr',  # MIT

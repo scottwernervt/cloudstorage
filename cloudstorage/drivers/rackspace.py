@@ -1,8 +1,7 @@
 """Rackspace Cloud Files Driver."""
-import logging
-
 import hashlib
 import hmac
+import logging
 
 try:
     from http import HTTPStatus
@@ -184,8 +183,8 @@ class CloudFilesDriver(Driver):
 
         :raises CloudStorageError: If service name is not found in catalog.
         """
-        service_catalog = self.conn.authenticator.auth_ref. \
-            service_catalog.catalog
+        service_catalog = self.conn.session.auth.auth_ref.service_catalog. \
+            catalog
 
         for service in service_catalog:
             if service['name'] == service_name:
@@ -253,44 +252,20 @@ class CloudFilesDriver(Driver):
           storage-api-reference/object-services-operations/
           #create-or-update-object-metadata>`_
 
-        .. todo:: Use conn.object_store.set_object_metadata when OpenStack SDK
-                  fixes meta dictionary usage of `iteritems()` to `items()`. 
-
         :param obj: Openstack object instance.
         :type obj: :class:`openstack.object_store.v1.obj.Object`
 
         :param meta_data: A map of metadata to store with the object.
         :type meta_data: dict
 
-        :return: NoneType
-        :rtype: None
+        :return: Openstack object instance.
+        :rtype: :class:`openstack.object_store.v1.obj.Object`
 
         :raises CloudStorageError: If setting the metadata failed. 
         """
-        # TODO: BUG: Throws error due to legacy iteritems().
-        # self.object_store.set_object_metadata(
-        #     obj=obj, container=container.name, **meta_data)
-        object_url = self._get_server_public_url('cloudFiles')
-        object_url += '/' + quote(obj.container) + '/' + quote(obj.name)
-
-        headers = {
-            'X-Auth-Token': self._token
-        }
-
-        # Add header prefix to user meta data, X-Object-Meta-
-        for meta_key, meta_value in meta_data.items():
-            headers[self._OBJECT_META_PREFIX + meta_key] = meta_value
-
-        # Include extra header params or they get deleted
-        headers['X-Delete-At'] = obj.delete_at
-        headers['X-Delete-After'] = obj.delete_after
-        headers['Content-Type'] = obj.content_type
-        headers['Content-Disposition'] = obj.content_disposition
-        headers['Content-Encoding'] = obj.content_encoding
-
-        response = requests.post(object_url, headers=headers)
-        if response.status_code != HTTPStatus.ACCEPTED:
-            raise CloudStorageError(response.text)
+        return self.object_store.set_object_metadata(obj=obj,
+                                                     container=obj.container,
+                                                     **meta_data)
 
     def _set_container_meta(self, container: Container,
                             meta_data: MetaData) -> None:
@@ -308,7 +283,7 @@ class CloudFilesDriver(Driver):
         :raises CloudStorageError: If setting the metadata failed. 
         """
         object_url = self._get_server_public_url('cloudFiles')
-        object_url += '/' + quote(container.name)
+        object_url += '/' + quote(container.id)
 
         headers = {
             'X-Auth-Token': self._token
@@ -331,7 +306,7 @@ class CloudFilesDriver(Driver):
         :return: A container instance.
         :rtype: :class:`.Container`
         """
-        return Container(name=cont.name, driver=self, acl=None,
+        return Container(name=cont.id, driver=self, acl=None,
                          meta_data=cont.metadata, created_at=None)
 
     def _make_blob(self, container, obj) -> Blob:
@@ -346,7 +321,7 @@ class CloudFilesDriver(Driver):
         :return: Blob instance.
         :rtype: :class:`.Blob`
         """
-        size = obj.bytes or int(obj.content_length)
+        size = int(obj.content_length)
 
         if obj.last_modified_at:
             modified_at = dateutil.parser.parse(obj.last_modified_at)
@@ -360,9 +335,9 @@ class CloudFilesDriver(Driver):
         else:
             delete_at = None
 
-        return Blob(name=obj.name, checksum=obj.hash or obj.etag, etag=obj.etag,
-                    size=size, container=container, driver=self, acl=None,
-                    meta_data=obj.metadata,
+        return Blob(name=obj.id, checksum=obj._hash or obj.etag,
+                    etag=obj.etag, size=size, container=container, driver=self,
+                    acl=None, meta_data=obj.metadata,
                     content_disposition=obj.content_disposition,
                     content_type=obj.content_type, created_at=None,
                     modified_at=modified_at, expires_at=delete_at)
@@ -375,7 +350,7 @@ class CloudFilesDriver(Driver):
         :rtype: str 
         """
         # noinspection PyProtectedMember
-        return self.conn.authenticator.auth_ref._token['id']
+        return self._conn.session.auth.auth_ref._token['id']
 
     @property
     def conn(self):
@@ -444,7 +419,7 @@ class CloudFilesDriver(Driver):
         except ResourceNotFound:
             raise NotFoundError(CONTAINER_NOT_FOUND % container.name)
         except HttpException as err:
-            if err.http_status == HTTPStatus.CONFLICT:
+            if err.status_code == HTTPStatus.CONFLICT:
                 raise IsNotEmptyError(CONTAINER_NOT_EMPTY % container.name)
             raise CloudStorageError(err.details)
 
@@ -518,19 +493,20 @@ class CloudFilesDriver(Driver):
             file_obj = filename
 
         with file_obj as data:
-            # returns an obj but bytes and content-length are empty
-            self.object_store.upload_object(**dict(
-                container=container.name, name=blob_name, data=data,
-                content_type=content_type,
-                content_disposition=content_disposition,
-                content_encoding=extra_norm['content_encoding'],
-                delete_after=extra_norm['delete_after'],
-                delete_at=extra_norm['delete_at']))
+            obj = self.object_store.create_object(
+                container=container.name, name=blob_name, **dict(
+                    data=data,
+                    content_type=content_type,
+                    content_disposition=content_disposition,
+                    content_encoding=extra_norm['content_encoding'],
+                    # TODO: BUG: Bad request exception
+                    # delete_after=extra_norm['delete_after'],
+                    # delete_at=extra_norm['delete_at']
+                )
+            )
 
         # Manually set meta data after object upload
-        obj = self._get_object(container.name, blob_name)
         self._set_object_meta(obj, meta_data)
-
         obj = self._get_object(container.name, blob_name)
         return self._make_blob(container, obj)
 
@@ -545,7 +521,7 @@ class CloudFilesDriver(Driver):
     def download_blob(self, blob: Blob,
                       destination: Union[str, FileLike]) -> None:
         try:
-            data = self.object_store.get_object(
+            data = self.object_store.download_object(
                 obj=blob.name, container=blob.container.name)
 
             if isinstance(destination, str):
@@ -765,7 +741,7 @@ class CloudFilesDriver(Driver):
         'content_encoding': 'content_encoding',
         'content_disposition': 'content_disposition',
         'delete_after': 'delete_after',
-        'delete_ae': 'delete_at',
+        'delete_at': 'delete_at',
         'is_content_type_detected': 'is_content_type_detected',
     }
 
