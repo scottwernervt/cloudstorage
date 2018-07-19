@@ -29,7 +29,7 @@ def storage():
 
     yield driver
 
-    seconds = random.random() * 3
+    seconds = random.random() * 6
     for container in driver:  # cleanup
         if container.name.startswith(CONTAINER_PREFIX):
             for blob in container:
