@@ -8,18 +8,18 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 VERSION_RE = re.compile(r'''__version__ = ['"]([0-9.]+)['"]''')
 
 install_requires = [
-    'azure>=2.0.0',  # MIT
-    'boto3>=1.4.5',  # Apache 2.0
-    'filelock>=2.0.0',  # Public Domain
-    'google-cloud-storage>=1.4',  # Apache 2.0
-    'inflection',  # MIT
+    'azure>=3.0.0',  # MIT
+    'boto3>=1.7.60',  # Apache 2.0
+    'filelock>=3.0.0',  # Public Domain
+    'google-cloud-storage>=1.10.0',  # Apache 2.0
+    'inflection>=0.3.1',  # MIT
     'itsdangerous>=0.24',  # BSD License
-    'python-dateutil',  # Simplified BSD
-    'python-magic',  # MIT
+    'python-dateutil>=2.7.3',  # Simplified BSD
+    'python-magic>=0.4.15',  # MIT
     'rackspacesdk>=0.7.5',  # Apache 2.0
-    'requests',  # Apache 2.0
-    'rfc6266-parser',  # GNU LGPL
-    'xattr',  # MIT
+    'requests>=2.19.1',  # Apache 2.0
+    'rfc6266-parser>=0.0.5',  # GNU LGPL
+    'xattr>=0.9.3',  # MIT
 ]
 
 # Python 3.4 needs backports
