@@ -1,4 +1,5 @@
 import pytest
+import os
 from tempfile import mkstemp
 
 from tests.helpers import random_container_name
