@@ -1,3 +1,4 @@
+import shutil
 import pytest
 
 from cloudstorage.drivers.local import LocalDriver
@@ -24,7 +25,7 @@ def storage():
 
             container.delete()
 
-    os.rmdir(LOCAL_KEY)
+    shutil.rmtree(LOCAL_KEY)
 
 
 # noinspection PyShadowingNames
