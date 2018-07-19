@@ -81,18 +81,18 @@ class LocalDriver(Driver):
         storage = LocalDriver(key=path, secret='<my-secret>', salt='<my-salt>')
         # <Driver: LOCAL>
 
-    Modified Source: 
+    Modified Source:
     `libcloud.storage.drivers.local.LocalCloudDriver <https://github.com/apache
     /libcloud/blob/trunk/libcloud/storage/drivers/local.py>`_
 
     :param key: Storage path directory: `/home/user/webapp/storage`.
     :type key: str
 
-    :param secret: (optional) Secret key for pre-signed download and upload 
+    :param secret: (optional) Secret key for pre-signed download and upload
       URLs.
     :type secret: str or None
 
-    :param salt: (optional) Salt for namespacing download and upload 
+    :param salt: (optional) Salt for namespacing download and upload
       pre-signed URLs. For more information. see `itsdangerous
       <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
@@ -100,7 +100,7 @@ class LocalDriver(Driver):
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
 
-    :raise NotADirectoryError: If the key storage path is invalid or does not 
+    :raise NotADirectoryError: If the key storage path is invalid or does not
       exist.
     """
     name = 'LOCAL'
@@ -164,8 +164,8 @@ class LocalDriver(Driver):
     def _get_folders(self) -> Iterable[str]:
         """Iterate over first level folders found in base path.
 
-        :yield: Iterable[str] 
-        :yield type: str 
+        :yield: Iterable[str]
+        :yield type: str
         """
         for container_name in os.listdir(self.base_path):
             full_path = os.path.join(self.base_path, container_name)
@@ -178,14 +178,14 @@ class LocalDriver(Driver):
                          validate: bool = True) -> str:
         """Get the container's full folder path.
 
-        :param container: A container instance. 
+        :param container: A container instance.
         :type container: :class:`.Container`
 
         :param validate: If True, verify that folder exists.
         :type validate: bool
 
         :return: Full folder path to the container.
-        :rtype: str 
+        :rtype: str
 
         :raises NotFoundError: If the container doesn't exist.
         """
@@ -198,7 +198,7 @@ class LocalDriver(Driver):
     def _set_file_attributes(self, filename: str, attributes: Dict) -> None:
         """Set extended filesystem attributes to a file.
 
-        Metadata is set to `user.metadata.<attr-name>` and remaining attributes 
+        Metadata is set to `user.metadata.<attr-name>` and remaining attributes
         are set to `user.<attr-name>`.
 
         References:
@@ -206,15 +206,15 @@ class LocalDriver(Driver):
         * `xattr <https://github.com/xattr/xattr>`_
 
         :param filename: Filename path.
-        :type filename: str 
+        :type filename: str
 
         :param attributes: Dictionary of `meta_data`, `content_<name>`, etc.
         :type attributes: dict
 
-        :return: NoneType 
+        :return: NoneType
         :rtype: None
 
-        :raises CloudStorageError: If the local file system does not support 
+        :raises CloudStorageError: If the local file system does not support
           extended filesystem attributes.
         """
         xattrs = xattr.xattr(filename)
@@ -240,11 +240,11 @@ class LocalDriver(Driver):
     def _get_file_path(self, blob: Blob) -> str:
         """Get the blob's full folder path.
 
-        :param blob: A blob instance. 
+        :param blob: A blob instance.
         :type blob: :class:`.Blob`
 
         :return: Full folder path to the blob.
-        :rtype: str 
+        :rtype: str
         """
         return os.path.join(self.base_path, blob.container.name, blob.name)
 
@@ -261,7 +261,7 @@ class LocalDriver(Driver):
         :return: NoneType
         :rtype: None
 
-        :raises CloudStorageError: If folder exists and  `ignore_existing` is 
+        :raises CloudStorageError: If folder exists and  `ignore_existing` is
           False.
         """
         try:
@@ -568,7 +568,7 @@ class LocalDriver(Driver):
         """Validate signed signature and return payload if valid.
 
         :param signature: Signature.
-        :type signature: str 
+        :type signature: str
 
         :return: Deserialized signature payload.
         :rtype: dict

@@ -13,7 +13,7 @@ def rgetattr(obj, attr, default=_SENTINEL):
         a = type('A', (), {'b': b})()
         # True
 
-    Source: 
+    Source:
     `getattr-and-setattr-on-nested-objects <http://stackoverflow.com/questions/
     31174295/getattr-and-setattr-on-nested-objects/31174427>`__
 
@@ -38,7 +38,7 @@ def rgetattr(obj, attr, default=_SENTINEL):
 
 
 def rsetattr(obj, attr, val):
-    """Sets the nested named attribute on the given object to the specified 
+    """Sets the nested named attribute on the given object to the specified
     value.
 
     Example: ::

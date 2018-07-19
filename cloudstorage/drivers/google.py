@@ -47,38 +47,38 @@ logger = logging.getLogger(__name__)
 
 class GoogleStorageDriver(Driver):
     """Driver for interacting with Google Cloud Storage.
-    
-    The driver will check for `GOOGLE_APPLICATION_CREDENTIALS` environment 
-    variable before connecting. If not found, the driver will use service 
+
+    The driver will check for `GOOGLE_APPLICATION_CREDENTIALS` environment
+    variable before connecting. If not found, the driver will use service
     worker credentials json file path passed to `key` argument.
-    
+
     .. code-block:: python
-        
+
         from cloudstorage.drivers.google import GoogleStorageDriver
-        
+
         credentials_json_file = '/path/cloud-storage-service-account.json'
         storage = GoogleStorageDriver(key=credentials_json_file)
         # <Driver: GOOGLESTORAGE>
 
     .. todo: Support for container or blob encryption key.
     .. todo: Support for buckets with more than 256 objects on iteration.
-    
+
     References:
 
-    * `Google Cloud Storage Documentation 
+    * `Google Cloud Storage Documentation
       <https://cloud.google.com/storage/docs>`_
     * `Storage Client <https://googlecloudplatform.github.io/
       google-cloud-python/latest/storage/client.html>`_
-    * `snippets.py 
+    * `snippets.py
       <https://github.com/GoogleCloudPlatform/python-docs-samples/blob/
       master/storage/cloud-client/snippets.py>`_
-    
+
     :param key: (optional) File path to service worker credentials json file.
     :type key: str or None
-    
+
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
-    
+
     :raise CloudStorageError: If `GOOGLE_APPLICATION_CREDENTIALS` environment
       variable is not set and/or credentials json file is not passed to the
       `key` argument.
@@ -133,13 +133,13 @@ class GoogleStorageDriver(Driver):
 
     def _get_blob(self, bucket_name: str, blob_name: str) -> GoogleBlob:
         """Get a blob object by name.
-        
+
         :param bucket_name: The name of the container that containers the blob.
-        :type bucket_name: 
-        
+        :type bucket_name:
+
         :param blob_name: The name of the blob to get.
-        :type blob_name: str 
-        
+        :type blob_name: str
+
         :return: The blob object if it exists.
         :rtype: :class:`google.client.storage.blob.Blob`
         """
@@ -153,11 +153,11 @@ class GoogleStorageDriver(Driver):
 
     def _get_bucket(self, bucket_name: str) -> Bucket:
         """Get a bucket by name.
-        
+
         :param bucket_name: The name of the bucket to get.
         :type bucket_name: str
-         
-        :return: The bucket matching the name provided. 
+
+        :return: The bucket matching the name provided.
         :rtype: :class:`google.cloud.storage.bucket.Bucket`
         """
         try:
@@ -169,7 +169,7 @@ class GoogleStorageDriver(Driver):
         """Convert Google Storage Bucket to Cloud Storage Container.
 
         :param bucket: The bucket to convert.
-        :type bucket: :class:`google.client.storage.bucket.Bucket` 
+        :type bucket: :class:`google.client.storage.bucket.Bucket`
 
         :return: A container instance.
         :rtype: :class:`.Container`
@@ -181,17 +181,17 @@ class GoogleStorageDriver(Driver):
 
     def _make_blob(self, container: Container, blob: GoogleBlob) -> Blob:
         """Convert Google Storage Blob to a Cloud Storage Blob.
-        
+
         References:
-        
+
         * `Objects <https://cloud.google.com/storage/docs/json_api/v1/objects>`_
-        
+
         :param container: Container instance.
         :type container: :class:`.Container`
-        
+
         :param blob: Google Storage blob.
         :type blob: :class:`google.cloud.storage.blob.Blob`
-        
+
         :return: Blob instance.
         :rtype: :class:`.Blob`
         """
@@ -222,7 +222,7 @@ class GoogleStorageDriver(Driver):
     @property
     def client(self) -> storage.client.Client:
         """The client bound to this driver.
-        
+
         :return: Client for interacting with the Google Cloud Storage API.
         :rtype: :class:`google.cloud.storage.client.Client`
         """

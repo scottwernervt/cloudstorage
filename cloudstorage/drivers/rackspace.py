@@ -69,7 +69,7 @@ class CloudFilesDriver(Driver):
       object_store.html>`_
     * `Working with Container Metadata <https://developer.openstack.org
       /sdks/python/openstacksdk/users/guides/object_store.html>`_
-    * `CDN API reference - Rackspace Developer Portal 
+    * `CDN API reference - Rackspace Developer Portal
       <https://developer.rackspace.com/docs/cloud-files/v1/
       cdn-api-reference/>`_
 
@@ -124,7 +124,7 @@ class CloudFilesDriver(Driver):
         :param params: Dictionary of parameters for method.
         :type params: dict
 
-        :param normalizers: Dictionary mapping of key names.            
+        :param normalizers: Dictionary mapping of key names.
         :type normalizers: dict
 
         :return: Dictionary of transformed key names.
@@ -236,18 +236,18 @@ class CloudFilesDriver(Driver):
     def _set_object_meta(self, obj, meta_data: MetaData) -> None:
         """Set object meta data.
 
-        .. note:: The POST request to set metadata deletes all metadata that is 
-                  not explicitly set in the request. In other words, ALL the 
-                  object metadata is set at the time of the POST request. If 
-                  you want to edit or remove one header, include all other 
-                  headers in the POST request and leave out the header that 
-                  you want to remove. This means that if you delete one entry 
-                  without posting the others, the others will also be deleted 
+        .. note:: The POST request to set metadata deletes all metadata that is
+                  not explicitly set in the request. In other words, ALL the
+                  object metadata is set at the time of the POST request. If
+                  you want to edit or remove one header, include all other
+                  headers in the POST request and leave out the header that
+                  you want to remove. This means that if you delete one entry
+                  without posting the others, the others will also be deleted
                   at that time.
 
         References:
 
-        * `Create or update object metadata 
+        * `Create or update object metadata
           <https://developer.rackspace.com/docs/cloud-files/v1/
           storage-api-reference/object-services-operations/
           #create-or-update-object-metadata>`_
@@ -261,7 +261,7 @@ class CloudFilesDriver(Driver):
         :return: Openstack object instance.
         :rtype: :class:`openstack.object_store.v1.obj.Object`
 
-        :raises CloudStorageError: If setting the metadata failed. 
+        :raises CloudStorageError: If setting the metadata failed.
         """
         return self.object_store.set_object_metadata(obj=obj,
                                                      container=obj.container,
@@ -280,7 +280,7 @@ class CloudFilesDriver(Driver):
         :return: NoneType
         :rtype: None
 
-        :raises CloudStorageError: If setting the metadata failed. 
+        :raises CloudStorageError: If setting the metadata failed.
         """
         object_url = self._get_server_public_url('cloudFiles')
         object_url += '/' + quote(container.id)
@@ -347,7 +347,7 @@ class CloudFilesDriver(Driver):
         """Rackspace authentication token for manual requests.
 
         :return: Session token id.
-        :rtype: str 
+        :rtype: str
         """
         # noinspection PyProtectedMember
         return self._conn.session.auth.auth_ref._token['id']
@@ -671,7 +671,7 @@ class CloudFilesDriver(Driver):
 
         References:
 
-        * `Public access to your Cloud Files account 
+        * `Public access to your Cloud Files account
           <https://developer.rackspace.com/docs/cloud-files/v1/use-cases/
           public-access-to-your-cloud-files-account/>`_
 

@@ -108,7 +108,7 @@ class S3Driver(Driver):
         """Get a S3 bucket.
 
         :param bucket_name: The Bucket's name identifier.
-        :type bucket_name: str 
+        :type bucket_name: str
 
         :param validate: If True, verify that the bucket exists.
         :type validate: bool
@@ -151,7 +151,7 @@ class S3Driver(Driver):
         :type object_summary: :class:`boto3.s3.ObjectSummary`
 
         :return: A blob object.
-        :rtype: :class:`.Blob` 
+        :rtype: :class:`.Blob`
 
         :raise NotFoundError: If the blob object doesn't exist.
         """

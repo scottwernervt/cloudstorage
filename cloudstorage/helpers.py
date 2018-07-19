@@ -14,7 +14,7 @@ def read_in_chunks(file_object: FileLike,
                    block_size: int = 4096) -> Iterator[bytes]:
     """Return a generator which yields data in chunks.
 
-    Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file 
+    Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file
     <http://stackoverflow.com/questions/17056382/
     read-file-in-chunks-ram-usage-read-strings-from-binary-files>`_
 
@@ -111,7 +111,7 @@ def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
     """Guess content type for file path or file like object.
 
     :param filename: File path or file like object.
-    :type filename: str or file 
+    :type filename: str or file
 
     :return: Content type.
     :rtype: str
