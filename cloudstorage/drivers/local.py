@@ -324,7 +324,10 @@ class LocalDriver(Driver):
             attributes = xattr.xattr(full_path)
 
             for attr_key, attr_value in attributes.items():
-                value_str = attr_value.decode('utf-8')
+                try:
+                    value_str = attr_value.decode('utf-8')
+                except UnicodeDecodeError:
+                    pass
 
                 if attr_key.startswith(self._OBJECT_META_PREFIX + 'metadata'):
                     meta_key = attr_key.split('.')[-1]
