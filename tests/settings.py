@@ -40,7 +40,8 @@ AMAZON_REGION = config('AMAZON_REGION', default='us-east-1')
 AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME', default=None)
 AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY', default=None)
 
-GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None)
+GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None,
+                            cast=lambda path: os.path.abspath(path))
 
 RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)
 RACKSPACE_SECRET = config('RACKSPACE_SECRET', default=None)
