@@ -16,7 +16,7 @@ from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.helpers import file_checksum
-from tests.helpers import random_container_name, uri_validator
+from tests.helpers import random_container_name, uri_validator, rate_limited
 from tests.settings import *
 
 pytestmark = pytest.mark.skipif(not bool(GOOGLE_CREDENTIALS),
@@ -72,6 +72,7 @@ def test_driver_get_container_invalid(storage):
 
 
 # noinspection PyShadowingNames
+@rate_limited()
 def test_container_delete(storage):
     container_name = random_container_name()
     container = storage.create_container(container_name)
@@ -79,6 +80,7 @@ def test_container_delete(storage):
     assert container.name not in storage
 
 
+@rate_limited()
 def test_container_delete_not_empty(container, text_blob):
     assert text_blob in container
 
@@ -103,6 +105,7 @@ def test_container_cdn_url(container):
     assert container.name in cdn_url
 
 
+@rate_limited()
 def test_container_generate_upload_url(container, binary_stream):
     form_post = container.generate_upload_url(blob_name='prefix_',
                                               **BINARY_OPTIONS)
@@ -123,6 +126,7 @@ def test_container_generate_upload_url(container, binary_stream):
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
 
 
+@rate_limited()
 def test_container_generate_upload_url_expiration(container, text_stream):
     form_post = container.generate_upload_url(blob_name='', expires=-10)
     assert 'url' in form_post and 'fields' in form_post
@@ -175,6 +179,7 @@ def test_blob_upload_options(container, binary_stream):
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
 
 
+@rate_limited()
 def test_blob_delete(container, text_blob):
     text_blob.delete()
     assert text_blob not in container
@@ -205,6 +210,7 @@ def test_blob_cdn_url(container, binary_blob):
     assert binary_blob.name in cdn_url
 
 
+@rate_limited()
 def test_blob_generate_download_url(binary_blob, temp_file):
     content_disposition = BINARY_OPTIONS.get('content_disposition')
     download_url = binary_blob.generate_download_url(
@@ -224,6 +230,7 @@ def test_blob_generate_download_url(binary_blob, temp_file):
     assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
+@rate_limited()
 def test_blob_generate_download_url_expiration(binary_blob):
     download_url = binary_blob.generate_download_url(expires=-10)
     assert uri_validator(download_url)
