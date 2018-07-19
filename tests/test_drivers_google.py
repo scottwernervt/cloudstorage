@@ -41,6 +41,7 @@ def storage():
 
 
 # noinspection PyShadowingNames
+@rate_limited()
 def test_driver_create_container(storage):
     container_name = random_container_name()
     container = storage.create_container(container_name)
@@ -49,6 +50,7 @@ def test_driver_create_container(storage):
 
 
 # noinspection PyShadowingNames
+@rate_limited()
 def test_driver_create_container_invalid_name(storage):
     # noinspection PyTypeChecker
     with pytest.raises(CloudStorageError):
@@ -56,6 +58,7 @@ def test_driver_create_container_invalid_name(storage):
 
 
 # noinspection PyShadowingNames
+@rate_limited()
 def test_driver_get_container(storage, container):
     container_existing = storage.get_container(container.name)
     assert container_existing.name in storage
@@ -63,6 +66,7 @@ def test_driver_get_container(storage, container):
 
 
 # noinspection PyShadowingNames
+@rate_limited()
 def test_driver_get_container_invalid(storage):
     container_name = random_container_name()
 
@@ -89,14 +93,17 @@ def test_container_delete_not_empty(container, text_blob):
         container.delete()
 
 
+@rate_limited()
 def test_container_enable_cdn(container):
     assert container.enable_cdn()
 
 
+@rate_limited()
 def test_container_disable_cdn(container):
     assert container.disable_cdn()
 
 
+@rate_limited()
 def test_container_cdn_url(container):
     container.enable_cdn()
     cdn_url = container.cdn_url
@@ -141,11 +148,13 @@ def test_container_generate_upload_url_expiration(container, text_stream):
     assert response.status_code == HTTPStatus.BAD_REQUEST, response.text
 
 
+@rate_limited()
 def test_container_get_blob(container, text_blob):
     blob = container.get_blob(text_blob.name)
     assert blob == text_blob
 
 
+@rate_limited()
 def test_container_get_blob_invalid(container):
     blob_name = random_container_name()
 
@@ -154,12 +163,14 @@ def test_container_get_blob_invalid(container):
         container.get_blob(blob_name)
 
 
+@rate_limited()
 def test_blob_upload_path(container, text_filename):
     blob = container.upload_blob(text_filename)
     assert blob.name == TEXT_FILENAME
     assert blob.checksum == TEXT_MD5_CHECKSUM
 
 
+@rate_limited()
 def test_blob_upload_stream(container, binary_stream):
     blob = container.upload_blob(binary_stream,
                                  blob_name=BINARY_STREAM_FILENAME,
@@ -168,6 +179,7 @@ def test_blob_upload_stream(container, binary_stream):
     assert blob.checksum == BINARY_MD5_CHECKSUM
 
 
+@rate_limited()
 def test_blob_upload_options(container, binary_stream):
     blob = container.upload_blob(binary_stream,
                                  blob_name=BINARY_STREAM_FILENAME,
@@ -185,6 +197,7 @@ def test_blob_delete(container, text_blob):
     assert text_blob not in container
 
 
+@rate_limited()
 def test_blob_download_path(binary_blob, temp_file):
     binary_blob.download(temp_file)
     hash_type = binary_blob.driver.hash_type
@@ -192,6 +205,7 @@ def test_blob_download_path(binary_blob, temp_file):
     assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
+@rate_limited()
 def test_blob_download_stream(binary_blob, temp_file):
     with open(temp_file, 'wb') as download_file:
         binary_blob.download(download_file)
@@ -201,6 +215,7 @@ def test_blob_download_stream(binary_blob, temp_file):
     assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
 
 
+@rate_limited()
 def test_blob_cdn_url(container, binary_blob):
     container.enable_cdn()
     cdn_url = binary_blob.cdn_url
