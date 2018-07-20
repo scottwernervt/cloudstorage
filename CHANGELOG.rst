@@ -3,6 +3,14 @@
 Changelog
 ---------
 
+0.6 (2018-07-20)
+++++++++++++++++
+
+* Copy metadata from `setup.py` to `setup.cfg`
+* Add rate limit timeout when calling google cloud storage backend during tests.
+* Catch `UnicodeDecodeError` when decoding local file attribute values.
+* Upgrade dependencies and include `requirements.txt` and `dev-requirements.txt`.
+
 0.5 (2018-02-26)
 ++++++++++++++++
 
