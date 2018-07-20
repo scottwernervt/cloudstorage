@@ -1,6 +1,5 @@
 import os
 import re
-import sys
 
 from setuptools import find_packages, setup
 
@@ -20,14 +19,10 @@ install_requires = [
     'requests>=2.19.1',  # Apache 2.0
     'rfc6266-parser>=0.0.5',  # GNU LGPL
     'xattr>=0.9.3',  # MIT
+    # Python 3.4 needs backports
+    'typing;python_version<"3.5"',  # PSF
+    'httpstatus35;python_version<"3.5"',  # PSF
 ]
-
-# Python 3.4 needs backports
-if sys.version_info < (3, 5):
-    install_requires.extend([
-        'typing',  # PSF
-        'httpstatus35',  # MIT
-    ])
 
 
 def get_version():
