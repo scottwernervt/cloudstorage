@@ -60,6 +60,11 @@ setup(
         'gcs',
     ]),
     url='https://github.com/scottwernervt/cloudstorage',
+    project_urls={
+        'Bug Tracker': 'https://github.com/scottwernervt/cloudstorage/issues',
+        'Documentation': 'https://cloudstorage.readthedocs.io',
+        'Source Code': 'https://github.com/scottwernervt/cloudstorage',
+    },
     download_url=download_url,
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -79,7 +84,6 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=install_requires,
     extras_require={
-        'tests': 'pytest',  # MIT
         'docs': [
             'sphinx',  # BSD
             'sphinx_rtd_theme',  # MIT
