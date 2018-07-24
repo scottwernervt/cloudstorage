@@ -3,7 +3,7 @@
 Changelog
 ---------
 
-0.6 (2018-07-20)
+0.6 (2018-07-24)
 ++++++++++++++++
 
 * Copy metadata from `setup.py` to `setup.cfg`
