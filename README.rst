@@ -16,7 +16,7 @@ Cloud Storage
 .. image:: https://travis-ci.org/scottwernervt/cloudstorage.svg?branch=master
     :target: https://travis-ci.org/scottwernervt/cloudstorage
 
-.. image:: https://img.shields.io/codeclimate/github/scottwernervt/cloudstorage.svg
+.. image:: https://codeclimate.com/github/scottwernervt/cloudstorage/badges/gpa.svg
     :target: https://codeclimate.com/github/scottwernervt/cloudstorage
 
 `Cloud Storage`_ is a Python +3.4 package which creates a unified API for the
