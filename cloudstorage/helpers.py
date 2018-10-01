@@ -129,14 +129,23 @@ def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
 
 
 def parse_content_disposition(data):
-    """
+    """Parse Content-Disposition header.
 
-    Source: https://github.com/pyrates/multifruits
+    Example: ::
 
-    :param data:
-    :type data:
-    :return:
-    :rtype:
+        >>> parse_content_disposition('inline')
+        ('inline', {})
+
+        >>> parse_content_disposition('attachment; filename="foo.html"')
+        ('attachment', {'filename': 'foo.html'})
+
+    Source: `pyrates/multifruits<https://github.com/pyrates/multifruits>`__
+
+    :param data: Content-Disposition header value.
+    :type data: str
+
+    :return: Disposition type and fields.
+    :rtype: tuple
     """
     dtype = None
     params = {}
