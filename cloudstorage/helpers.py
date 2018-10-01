@@ -3,7 +3,7 @@ import hashlib
 import mimetypes
 import os
 from _hashlib import HASH
-from typing import Iterator, Union
+from typing import Iterator, Union, Tuple, Dict
 
 import magic
 
@@ -128,7 +128,7 @@ def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
     return content_type
 
 
-def parse_content_disposition(data):
+def parse_content_disposition(data: str) -> Tuple[Union[str, None], Dict]:
     """Parse Content-Disposition header.
 
     Example: ::
