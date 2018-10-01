@@ -1,11 +1,11 @@
 """Helper methods for Cloud Storage."""
+import hashlib
 import mimetypes
+import os
 from _hashlib import HASH
 from typing import Iterator, Union
 
-import hashlib
 import magic
-import os
 
 from cloudstorage.base import FileLike
 
@@ -126,3 +126,64 @@ def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
         content_type = mimetypes.guess_type(name)[0]
 
     return content_type
+
+
+def parse_content_disposition(data):
+    """
+
+    Source: https://github.com/pyrates/multifruits
+
+    :param data:
+    :type data:
+    :return:
+    :rtype:
+    """
+    dtype = None
+    params = {}
+    length = len(data)
+    start = 0
+    end = 0
+    i = 0
+    quoted = False
+    previous = ''
+    field = None
+
+    while i < length:
+        c = data[i]
+        if not quoted and c == ';':
+            if dtype is None:
+                dtype = data[start:end]
+            elif field is not None:
+                params[field.lower()] = data[start:end].replace('\\', '')
+                field = None
+            i += 1
+            start = end = i
+        elif c == '"':
+            i += 1
+            if not previous or previous != '\\':
+                if not quoted:
+                    start = i
+                quoted = not quoted
+            else:
+                end = i
+        elif c == '=':
+            field = data[start:end]
+            i += 1
+            start = end = i
+        elif c == ' ':
+            i += 1
+            if not quoted and start == end:  # Leading spaces.
+                start = end = i
+        else:
+            i += 1
+            end = i
+
+        previous = c
+
+    if i:
+        if dtype is None:
+            dtype = data[start:end].lower()
+        elif field is not None:
+            params[field.lower()] = data[start:end].replace('\\', '')
+
+    return dtype, params
