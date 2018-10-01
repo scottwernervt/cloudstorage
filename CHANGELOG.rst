@@ -3,6 +3,11 @@
 Changelog
 ---------
 
+Unreleased (2018-10-01)
++++++++++++++++++++++++
+
+* Each driver's package dependencies are now optional (`#4 <https://github.com/scottwernervt/cloudstorage/issues/4>`_).
+
 0.6 (2018-07-24)
 ++++++++++++++++
 

@@ -2,14 +2,24 @@
 Installation
 ************
 
-Installation
-============
+Install
+=======
 
 You can install the latest stable version of Cloud Storage using pip:
 
 .. code-block:: bash
 
     pip install cloudstorage
+
+Also install the storage driver(s) you will be using:
+
+.. code-block:: bash
+
+    pip install cloudstorage[amazon]
+    pip install cloudstorage[google]
+    pip install cloudstorage[local]
+    pip install cloudstorage[microsoft]
+    pip install cloudstorage[rackspace]
 
 If you don't have `pip <https://pip.pypa.io>`_ installed,
 `this Python installation guide <http://docs.python-guide.org/en/latest/
