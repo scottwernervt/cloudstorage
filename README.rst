@@ -85,6 +85,16 @@ To install Cloud Storage:
 
     pip install cloudstorage
 
+Also install the storage driver(s) you will be using:
+
+.. code-block:: bash
+
+    pip install cloudstorage[amazon]
+    pip install cloudstorage[google]
+    pip install cloudstorage[local]
+    pip install cloudstorage[microsoft]
+    pip install cloudstorage[rackspace]
+
 .. _`Amazon S3`: http://aws.amazon.com/s3/
 .. _`Blackblaze B2 Cloud Storage`: https://www.backblaze.com/b2/Cloud-Storage.html
 .. _`Google Cloud Storage`: https://cloud.google.com/storage/

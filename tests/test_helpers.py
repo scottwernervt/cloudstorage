@@ -1,7 +1,12 @@
-from cloudstorage.helpers import file_checksum
-from cloudstorage.helpers import file_content_type
-from cloudstorage.helpers import read_in_chunks
-from cloudstorage.helpers import validate_file_or_path
+import pytest
+
+from cloudstorage.helpers import (
+    file_checksum,
+    file_content_type,
+    parse_content_disposition,
+    read_in_chunks,
+    validate_file_or_path,
+)
 from tests.settings import *
 
 
@@ -27,3 +32,27 @@ def test_validate_file_or_path(text_filename, binary_stream):
 def test_file_content_type(text_filename, binary_stream):
     assert file_content_type(text_filename) == 'text/plain'
     assert file_content_type(binary_stream) == 'image/png'
+
+
+@pytest.mark.parametrize("value,expected", [
+    ('', (None, {})),
+    ('inline', ('inline', {})),
+    ('"inline"', ('inline', {})),
+    ('inline; filename="foo.html"', ('inline', {'filename': 'foo.html'})),
+    ('attachment', ('attachment', {})),
+    ('"attachment"', ('attachment', {})),
+    ('attachment; filename="foo.html"',
+     ('attachment', {'filename': 'foo.html'})),
+], ids=[
+    'empty',
+    'inline',
+    'inline quoted',
+    'inline with filename',
+    'attachment',
+    'attachment quoted',
+    'attachment with filename',
+])
+def test_parse_content_disposition(value, expected):
+    disposition, params = parse_content_disposition(value)
+    assert disposition == expected[0]
+    assert params == expected[1]
