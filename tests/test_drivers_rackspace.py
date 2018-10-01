@@ -6,13 +6,12 @@ except ImportError:
 
 import pytest
 import requests
-from rfc6266_parser import parse_headers
 
 from cloudstorage.drivers.rackspace import CloudFilesDriver
 from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError
-from cloudstorage.helpers import file_checksum
+from cloudstorage.helpers import file_checksum, parse_content_disposition
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 
@@ -214,10 +213,10 @@ def test_blob_generate_download_url(binary_blob, temp_file):
     # Rackspace adds extra garbage to the header
     # 'attachment; filename=avatar-attachment.png;
     #  filename*=UTF-8\\'\\'avatar-attachment.png'
-    parsed_disposition = parse_headers(response.headers['content-disposition'])
-    response_disposition = '{}; filename={}'.format(
-        parsed_disposition.disposition,
-        parsed_disposition.filename_unsafe)
+    disposition, params = parse_content_disposition(
+        response.headers['content-disposition'])
+    response_disposition = '{}; filename={}'.format(disposition,
+                                                    params['filename'])
     assert response_disposition == content_disposition
 
     with open(temp_file, 'wb') as f:

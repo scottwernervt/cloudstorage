@@ -21,7 +21,6 @@ from openstack.exceptions import HttpException
 from openstack.exceptions import NotFoundException
 from openstack.exceptions import ResourceNotFound
 from rackspace import connection
-from rfc6266_parser import parse_headers
 
 from cloudstorage.base import Blob
 from cloudstorage.base import Container
@@ -35,6 +34,7 @@ from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.helpers import file_content_type, validate_file_or_path
+from cloudstorage.helpers import parse_content_disposition
 from cloudstorage.messages import CONTAINER_NOT_FOUND
 from cloudstorage.messages import CONTAINER_NOT_EMPTY
 from cloudstorage.messages import BLOB_NOT_FOUND
@@ -647,15 +647,11 @@ class CloudFilesDriver(Driver):
 
         # Rackspace uses query params: filename (attachment) and inline
         if content_disposition:
-            disposition_parsed = parse_headers(content_disposition)
-
-            if disposition_parsed.filename_unsafe:
-                parameters['filename'] = disposition_parsed.filename_unsafe
-            else:
-                parameters['filename'] = blob.name
-
-            if disposition_parsed.disposition == 'inline':
+            disposition, params = parse_content_disposition(content_disposition)
+            if disposition == 'inline':
                 parameters['inline'] = ''
+
+            parameters['filename'] = params.get('filename', blob.name)
 
         return '%s%s?%s' % (base_url, object_path, urlencode(parameters))
 

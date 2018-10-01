@@ -88,7 +88,6 @@ setup(
         ],
         'rackspace': [
             'rackspacesdk>=0.7.5',  # Apache 2.0
-            'rfc6266-parser>=0.0.5',  # GNU LGPL
         ],
         'docs': [
             'sphinx',  # BSD
