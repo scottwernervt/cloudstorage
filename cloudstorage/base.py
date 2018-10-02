@@ -1,10 +1,10 @@
 """Provides base classes for working with storage drivers."""
+import abc
 import logging
-from datetime import datetime
-from typing import Any, BinaryIO, Dict, Iterable, List, Optional, Union
-
 from abc import abstractmethod
+from datetime import datetime
 from io import FileIO, IOBase
+from typing import Any, BinaryIO, Dict, Iterable, List, Optional, Union
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
@@ -24,31 +24,6 @@ MetaData = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
 ExtraOptions = Optional[Dict[Any, Any]]
 FormPost = Dict[str, Union[str, Dict]]
-
-
-class DocstringMeta(type):
-    """Metaclass that allows docstring 'inheritance'.
-
-    Dirty hack for sphinx...
-
-    Source: `Use method docstring from abstract base class if derived class
-    has none #3140 <https://github.com/sphinx-doc/sphinx/issues/3140>`_
-    """
-
-    # noinspection PyInitNewSignature
-    # noinspection PyMethodParameters
-    def __new__(mcs, name, bases, namespace):
-        cls = super().__new__(mcs, name, bases, namespace)
-        mro = cls.__mro__[1:]
-        for member_name, member in namespace.items():
-            if not getattr(member, '__doc__'):
-                for base in mro:
-                    try:
-                        member.__doc__ = getattr(base, member_name).__doc__
-                        break
-                    except AttributeError:
-                        pass
-        return cls
 
 
 class Blob:
@@ -146,7 +121,7 @@ class Blob:
             else:
                 self._attr[key] = value
 
-    def __eq__(self, other: 'Blob') -> bool:  # type: ignore
+    def __eq__(self, other: 'Blob') -> bool:
         """Override the default equals behavior.
 
         :param other: The other Blob.
@@ -176,7 +151,7 @@ class Blob:
         """
         return self.size
 
-    def __ne__(self, other: 'Blob') -> bool:  # type: ignore
+    def __ne__(self, other: 'Blob') -> bool:
         """Override the default not equals behavior.
 
         :param other: The other blob.
@@ -471,8 +446,7 @@ class Container:
         except NotFoundError:
             return False
 
-    def __eq__(self, other: Blob,  # type: ignore
-               implemented=NotImplemented) -> bool:  # type: ignore
+    def __eq__(self, other: Blob, implemented=NotImplemented) -> bool:
         """Override the default equals behavior.
 
         :param other: The other container.
@@ -518,7 +492,7 @@ class Container:
         blobs = self.driver.get_blobs(container=self)
         return len(list(blobs))
 
-    def __ne__(self, other: Blob) -> bool:  # type: ignore
+    def __ne__(self, other: Blob) -> bool:
         """Override the default not equals behavior.
 
         :param other: The other container.
@@ -906,7 +880,7 @@ class Container:
         return '<Container %s %s>' % (self.name, self.driver.name)
 
 
-class Driver(metaclass=DocstringMeta):
+class Driver(metaclass=abc.ABCMeta):
     """Abstract Base Driver Class (:class:`abc.ABCMeta`) to derive from.
 
     .. todo::
