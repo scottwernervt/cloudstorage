@@ -26,6 +26,7 @@ from openstack.object_store.v1.obj import Object as OpenStackObject
 from openstack.object_store.v1.container import Container as OpenStackContainer
 from rackspace import connection
 
+from cloudstorage import messages
 from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.typed import (
     FileLike,
@@ -39,10 +40,11 @@ from cloudstorage.exceptions import (
     IsNotEmptyError,
     NotFoundError,
 )
-
-from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.helpers import parse_content_disposition
-from cloudstorage import messages
+from cloudstorage.helpers import (
+    file_content_type,
+    validate_file_or_path,
+    parse_content_disposition,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -507,7 +509,7 @@ class CloudFilesDriver(Driver):
                     # delete_after=extra_norm['delete_after'],
                     # delete_at=extra_norm['delete_at']
                 )
-            )   # type: OpenStackObject
+            )  # type: OpenStackObject
 
         # Manually set meta data after object upload
         self._set_object_meta(obj, meta_data)
