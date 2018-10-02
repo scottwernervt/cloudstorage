@@ -2,11 +2,6 @@ language: python
 sudo: false
 cache: pip
 
-python:
-  - '3.4'
-  - '3.5'
-  - '3.6'
-
 before_install:
   - openssl aes-256-cbc -K $encrypted_12e75a453f27_key -iv $encrypted_12e75a453f27_iv -in gcs-service-account.json.enc -out gcs-service-account.json -d
 
@@ -22,5 +17,9 @@ matrix:
       env: TOXENV=py35
     - python: 3.6
       env: TOXENV=py36
+    - python: 3.4
+      env: TOXENV=flake8
+    - python: 3.4
+      env: TOXENV=docs
 
 script: tox
