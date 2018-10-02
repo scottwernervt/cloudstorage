@@ -97,9 +97,9 @@ setup(
     },
     setup_requires=[
         'pytest-runner',  # MIT
-        # 'flake8',   # MIT
     ],
     tests_require=[
+        'flake8',   # MIT
         'pytest',  # MIT
         'prettyconf',  # MIT
         'tox',  # MIT
