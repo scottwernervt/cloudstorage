@@ -10,7 +10,7 @@ except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus  # noqa: F401
 
-from typing import Dict, Iterable, List  # noqa: F401
+from typing import Dict, Iterable, List
 
 from azure.common import AzureMissingResourceHttpError
 from azure.common import AzureHttpError
