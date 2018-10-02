@@ -3,11 +3,11 @@ import hashlib
 import mimetypes
 import os
 from _hashlib import HASH
-from typing import Iterator, Union, Tuple, Dict
+from typing import Dict, Iterator, Tuple, Union
 
 import magic
 
-from cloudstorage.base import FileLike
+from cloudstorage.typed import FileLike
 
 
 def read_in_chunks(file_object: FileLike,

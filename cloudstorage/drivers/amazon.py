@@ -9,12 +9,14 @@ from inflection import camelize, underscore
 
 from cloudstorage.base import Blob
 from cloudstorage.base import Container
-from cloudstorage.base import ContentLength
 from cloudstorage.base import Driver
-from cloudstorage.base import ExtraOptions
-from cloudstorage.base import FileLike
-from cloudstorage.base import FormPost
-from cloudstorage.base import MetaData
+from cloudstorage.typed import (
+    FileLike,
+    MetaData,
+    ContentLength,
+    ExtraOptions,
+    FormPost,
+)
 from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError

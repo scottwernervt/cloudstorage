@@ -3,11 +3,18 @@ import abc
 import logging
 from abc import abstractmethod
 from datetime import datetime
-from io import FileIO, IOBase
-from typing import Any, BinaryIO, Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
+from cloudstorage.typed import (
+    Acl,
+    ContentLength,
+    ExtraOptions,
+    FileLike,
+    FormPost,
+    MetaData,
+)
 
 __all__ = [
     'Blob',
@@ -16,14 +23,6 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
-
-# TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IOBase, FileIO, BinaryIO]
-Acl = Optional[Dict[Any, Any]]
-MetaData = Optional[Dict[Any, Any]]
-ContentLength = Dict[int, int]
-ExtraOptions = Optional[Dict[Any, Any]]
-FormPost = Dict[str, Union[str, Dict]]
 
 
 class Blob:
