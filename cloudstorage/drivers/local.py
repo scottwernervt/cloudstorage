@@ -15,7 +15,7 @@ import itsdangerous
 import xattr
 from inflection import underscore
 
-from cloudstorage.base import Blob, Container, Driver
+from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.exceptions import (
     CloudStorageError,
     IsNotEmptyError,
@@ -27,16 +27,6 @@ from cloudstorage.helpers import (
     file_content_type,
     read_in_chunks,
     validate_file_or_path,
-)
-from cloudstorage.messages import (
-    BLOB_NOT_FOUND,
-    CONTAINER_EXISTS,
-    CONTAINER_NAME_INVALID,
-    CONTAINER_NOT_EMPTY,
-    CONTAINER_NOT_FOUND,
-    FEATURE_NOT_SUPPORTED,
-    LOCAL_NO_ATTRIBUTES,
-    OPTION_NOT_SUPPORTED,
 )
 from cloudstorage.typed import (
     ContentLength,
@@ -105,9 +95,6 @@ class LocalDriver(Driver):
       <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
 
-    :param kwargs: (optional) Catch invalid options.
-    :type kwargs: dict
-
     :raise NotADirectoryError: If the key storage path is invalid or does not
       exist.
     """
@@ -115,8 +102,7 @@ class LocalDriver(Driver):
     hash_type = 'md5'
     url = ''
 
-    def __init__(self, key: str, secret: str = None, salt: str = None,
-                 **kwargs: Dict) -> None:
+    def __init__(self, key: str, secret: str = None, salt: str = None) -> None:
         super().__init__(key, secret)
 
         self.base_path = key
@@ -200,7 +186,7 @@ class LocalDriver(Driver):
         """
         full_path = os.path.join(self.base_path, container.name)
         if validate and not os.path.isdir(full_path):
-            raise NotFoundError(CONTAINER_NOT_FOUND % container.name)
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % container.name)
 
         return full_path
 
@@ -244,7 +230,7 @@ class LocalDriver(Driver):
                     attr_name = self._OBJECT_META_PREFIX + key
                     xattrs[attr_name] = value.encode('utf-8')
             except OSError:
-                logger.warning(LOCAL_NO_ATTRIBUTES)
+                logger.warning(messages.LOCAL_NO_ATTRIBUTES)
 
     def _get_file_path(self, blob: Blob) -> str:
         """Get the blob's full folder path.
@@ -276,7 +262,7 @@ class LocalDriver(Driver):
         try:
             os.makedirs(path)
         except OSError:
-            logger.debug(CONTAINER_EXISTS, path)
+            logger.debug(messages.CONTAINER_EXISTS, path)
             exp = sys.exc_info()[1]
             if exp.errno == errno.EEXIST and not ignore_existing:
                 raise CloudStorageError(exp.strerror)
@@ -297,7 +283,7 @@ class LocalDriver(Driver):
         try:
             stat = os.stat(full_path)
         except FileNotFoundError:
-            raise NotFoundError(CONTAINER_NOT_FOUND % folder_name)
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % folder_name)
 
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
 
@@ -323,7 +309,8 @@ class LocalDriver(Driver):
         try:
             stat = os.stat(str(object_path))
         except FileNotFoundError:
-            raise NotFoundError(BLOB_NOT_FOUND % (object_name, container.name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name,
+                                                           container.name))
 
         meta_data = {}
         content_type = None
@@ -333,6 +320,8 @@ class LocalDriver(Driver):
             attributes = xattr.xattr(full_path)
 
             for attr_key, attr_value in attributes.items():
+                value_str = None
+
                 try:
                     value_str = attr_value.decode('utf-8')
                 except UnicodeDecodeError:
@@ -348,7 +337,7 @@ class LocalDriver(Driver):
                 else:
                     logger.warning("Unknown file attribute '%s'", attr_key)
         except OSError:
-            logger.warning(LOCAL_NO_ATTRIBUTES)
+            logger.warning(messages.LOCAL_NO_ATTRIBUTES)
 
         # TODO: QUESTION: Option to disable checksum for large files?
         # TODO: QUESTION: Save a .hash file for each file?
@@ -372,10 +361,10 @@ class LocalDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         if meta_data:
-            logger.info(OPTION_NOT_SUPPORTED, 'meta_data')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'meta_data')
 
         full_path = os.path.join(self.base_path, container_name)
 
@@ -384,7 +373,7 @@ class LocalDriver(Driver):
             with lock_local_file(full_path):
                 self._make_path(full_path, ignore_existing=True)
         except FileNotFoundError:
-            raise CloudStorageError(CONTAINER_NAME_INVALID)
+            raise CloudStorageError(messages.CONTAINER_NAME_INVALID)
 
         return self._make_container(container_name)
 
@@ -396,7 +385,7 @@ class LocalDriver(Driver):
 
     def delete_container(self, container: Container) -> None:
         for _ in self.get_blobs(container):
-            raise IsNotEmptyError(CONTAINER_NOT_EMPTY % container.name)
+            raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY % container.name)
 
         path = self._get_folder_path(container, validate=True)
 
@@ -410,11 +399,11 @@ class LocalDriver(Driver):
         return self._get_folder_path(container)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     def upload_blob(self, container: Container, filename: FileLike,
@@ -423,7 +412,7 @@ class LocalDriver(Driver):
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}

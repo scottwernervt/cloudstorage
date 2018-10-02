@@ -1,12 +1,11 @@
-"""Provides base classes for working with storage drivers."""
 import abc
 import logging
 from abc import abstractmethod
 from datetime import datetime
-from typing import Dict, Iterable, List, Optional, Union  # noqa: F401
+from typing import Any, Dict, Iterable, List, Optional, Union  # noqa: F401
 
+from cloudstorage import messages
 from cloudstorage.exceptions import NotFoundError
-from cloudstorage.messages import FEATURE_NOT_SUPPORTED
 from cloudstorage.typed import (
     Acl,
     ContentLength,
@@ -15,12 +14,6 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
-
-__all__ = [
-    'Blob',
-    'Container',
-    'Driver',
-]
 
 logger = logging.getLogger(__name__)
 
@@ -403,9 +396,9 @@ class Container:
         self.meta_data = meta_data
         self.created_at = created_at
 
-        self._attr = {}  # type: Dict
+        self._attr = {}  # type: Dict[Any, Any]
         self._acl = acl  # type: Optional[str]
-        self._meta_data = {}  # type: Dict
+        self._meta_data = {}  # type: Dict[Any, Any]
 
         # Track attributes for object PUT
         for key, value in locals().items():
@@ -549,7 +542,8 @@ class Container:
     def upload_blob(self, filename: FileLike, blob_name: str = None,
                     acl: str = None, meta_data: MetaData = None,
                     content_type: str = None, content_disposition: str = None,
-                    chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
+                    chunk_size: int = 1024,
+                    extra: ExtraOptions = None) -> Blob:
         """Upload a filename or file like object to a container.
 
         If `content_type` is `None`, Cloud Storage will attempt to guess the
@@ -934,7 +928,7 @@ class Driver(metaclass=abc.ABCMeta):
             # True
 
         :param container: Container or container name.
-        :type container: Container or str
+        :type container: cloudstorage.Container or str
 
         :return: True if the container exists.
         :rtype: bool
@@ -951,7 +945,7 @@ class Driver(metaclass=abc.ABCMeta):
             return False
 
     @abstractmethod
-    def __iter__(self) -> Iterable[Container]:
+    def __iter__(self) -> Iterable['Container']:
         """Get all containers associated to the driver.
 
         .. code-block:: python
@@ -1011,7 +1005,7 @@ class Driver(metaclass=abc.ABCMeta):
 
     @abstractmethod
     def create_container(self, container_name: str, acl: str = None,
-                         meta_data: MetaData = None) -> Container:
+                         meta_data: MetaData = None) -> 'Container':
         """Create a new container.
 
         For example:
@@ -1052,7 +1046,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def get_container(self, container_name: str) -> Container:
+    def get_container(self, container_name: str) -> 'Container':
         """Get a container by name.
 
         For example:
@@ -1073,7 +1067,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def patch_container(self, container: Container) -> None:
+    def patch_container(self, container: 'Container') -> None:
         """Saves all changed attributes for the container.
 
         .. important:: This class method is called by :meth:`.Container.save`.
@@ -1089,7 +1083,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def delete_container(self, container: Container) -> None:
+    def delete_container(self, container: 'Container') -> None:
         """Delete this container.
 
         .. important:: This class method is called by :meth:`.Container.delete`.
@@ -1106,7 +1100,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def container_cdn_url(self, container: Container) -> str:
+    def container_cdn_url(self, container: 'Container') -> str:
         """The Content Delivery Network URL for this container.
 
         .. important:: This class method is called by
@@ -1118,7 +1112,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def enable_container_cdn(self, container: Container) -> bool:
+    def enable_container_cdn(self, container: 'Container') -> bool:
         """(Optional) Enable Content Delivery Network (CDN) for the container.
 
         .. important:: This class method is called by
@@ -1130,11 +1124,11 @@ class Driver(metaclass=abc.ABCMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     @abstractmethod
-    def disable_container_cdn(self, container: Container) -> bool:
+    def disable_container_cdn(self, container: 'Container') -> bool:
         """(Optional) Disable Content Delivery Network (CDN) on the container.
 
         .. important:: This class method is called by
@@ -1146,15 +1140,15 @@ class Driver(metaclass=abc.ABCMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     @abstractmethod
-    def upload_blob(self, container: Container, filename: FileLike,
+    def upload_blob(self, container: 'Container', filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size=1024,
-                    extra: ExtraOptions = None) -> Blob:
+                    extra: ExtraOptions = None) -> 'Blob':
         """Upload a filename or file like object to a container.
 
         .. important:: This class method is called by
@@ -1197,7 +1191,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def get_blob(self, container: Container, blob_name: str) -> Blob:
+    def get_blob(self, container: 'Container', blob_name: str) -> 'Blob':
         """Get a blob object by name.
 
         .. important:: This class method is called by :meth:`.Blob.get_blob`.
@@ -1216,7 +1210,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def get_blobs(self, container: Container) -> Iterable[Blob]:
+    def get_blobs(self, container: 'Container') -> Iterable['Blob']:
         """Get all blobs associated to the container.
 
         .. important:: This class method is called by :meth:`.Blob.__iter__`.
@@ -1230,7 +1224,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def download_blob(self, blob: Blob,
+    def download_blob(self, blob: 'Blob',
                       destination: FileLike) -> None:
         """Download the contents of this blob into a file-like object or into
         a named file.
@@ -1252,7 +1246,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def patch_blob(self, blob: Blob) -> None:
+    def patch_blob(self, blob: 'Blob') -> None:
         """Saves all changed attributes for this blob.
 
         .. important:: This class method is called by :meth:`.Blob.update`.
@@ -1265,7 +1259,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def delete_blob(self, blob: Blob) -> None:
+    def delete_blob(self, blob: 'Blob') -> None:
         """Deletes a blob from storage.
 
         .. important:: This class method is called by :meth:`.Blob.delete`.
@@ -1281,7 +1275,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def blob_cdn_url(self, blob: Blob) -> str:
+    def blob_cdn_url(self, blob: 'Blob') -> str:
         """The Content Delivery Network URL for the blob.
 
         .. important:: This class method is called by :attr:`.Blob.cdn_url`.
@@ -1295,7 +1289,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def generate_container_upload_url(self, container: Container,
+    def generate_container_upload_url(self, container: 'Container',
                                       blob_name: str,
                                       expires: int = 3600, acl: str = None,
                                       meta_data: MetaData = None,
@@ -1348,7 +1342,7 @@ class Driver(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def generate_blob_download_url(self, blob: Blob, expires: int = 3600,
+    def generate_blob_download_url(self, blob: 'Blob', expires: int = 3600,
                                    method: str = 'GET',
                                    content_disposition: str = None,
                                    extra: ExtraOptions = None) -> str:

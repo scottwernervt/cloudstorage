@@ -23,9 +23,13 @@ from google.cloud.storage.blob import Blob as GoogleBlob
 from google.cloud.storage.bucket import Bucket
 from inflection import underscore
 
-from cloudstorage.base import Blob
-from cloudstorage.base import Container
-from cloudstorage.base import Driver
+from cloudstorage import Blob, Container, Driver, messages
+from cloudstorage.exceptions import (
+    CloudStorageError,
+    IsNotEmptyError,
+    NotFoundError,
+)
+from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.typed import (
     FileLike,
     MetaData,
@@ -33,15 +37,6 @@ from cloudstorage.typed import (
     ExtraOptions,
     FormPost,
 )
-from cloudstorage.exceptions import NotFoundError
-from cloudstorage.exceptions import CloudStorageError
-from cloudstorage.exceptions import IsNotEmptyError
-from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.messages import CONTAINER_NOT_FOUND
-from cloudstorage.messages import CONTAINER_EXISTS
-from cloudstorage.messages import CONTAINER_NOT_EMPTY
-from cloudstorage.messages import BLOB_NOT_FOUND
-from cloudstorage.messages import OPTION_NOT_SUPPORTED
 
 logger = logging.getLogger(__name__)
 
@@ -76,9 +71,6 @@ class GoogleStorageDriver(Driver):
 
     :param key: (optional) File path to service worker credentials json file.
     :type key: str or None
-
-    :param kwargs: (optional) Catch invalid options.
-    :type kwargs: dict
 
     :raise CloudStorageError: If `GOOGLE_APPLICATION_CREDENTIALS` environment
       variable is not set and/or credentials json file is not passed to the
@@ -148,7 +140,8 @@ class GoogleStorageDriver(Driver):
 
         blob = bucket.get_blob(blob_name)
         if not blob:
-            raise NotFoundError(BLOB_NOT_FOUND % (blob_name, bucket_name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (blob_name,
+                                                           bucket_name))
 
         return blob
 
@@ -164,7 +157,7 @@ class GoogleStorageDriver(Driver):
         try:
             return self.client.get_bucket(bucket_name)
         except NotFound:
-            raise NotFoundError(CONTAINER_NOT_FOUND % bucket_name)
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % bucket_name)
 
     def _make_container(self, bucket: Bucket) -> Container:
         """Convert Google Storage Bucket to Cloud Storage Container.
@@ -237,12 +230,12 @@ class GoogleStorageDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if meta_data:
-            logger.warning(OPTION_NOT_SUPPORTED, 'meta_data')
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'meta_data')
 
         try:
             bucket = self.client.create_bucket(container_name)
         except Conflict:
-            logger.debug(CONTAINER_EXISTS, container_name)
+            logger.debug(messages.CONTAINER_EXISTS, container_name)
             bucket = self._get_bucket(container_name)
         except ValueError as err:
             raise CloudStorageError(str(err))
@@ -266,7 +259,8 @@ class GoogleStorageDriver(Driver):
             bucket.delete()
         except Conflict as err:
             if err.code == HTTPStatus.CONFLICT:
-                raise IsNotEmptyError(CONTAINER_NOT_EMPTY % bucket.name)
+                raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY %
+                                      bucket.name)
             raise
 
     def container_cdn_url(self, container: Container) -> str:

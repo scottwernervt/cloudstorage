@@ -24,9 +24,13 @@ from azure.storage.blob.models import ContentSettings
 from azure.storage.blob.models import BlobPermissions
 from inflection import underscore
 
-from cloudstorage.base import Blob
-from cloudstorage.base import Container
-from cloudstorage.base import Driver
+from cloudstorage import Blob, Container, Driver, messages
+from cloudstorage.exceptions import (
+    NotFoundError,
+    CloudStorageError,
+    IsNotEmptyError,
+)
+from cloudstorage.helpers import file_checksum, validate_file_or_path
 from cloudstorage.typed import (
     FileLike,
     MetaData,
@@ -34,16 +38,6 @@ from cloudstorage.typed import (
     ExtraOptions,
     FormPost,
 )
-from cloudstorage.exceptions import NotFoundError
-from cloudstorage.exceptions import CloudStorageError
-from cloudstorage.exceptions import IsNotEmptyError
-from cloudstorage.helpers import file_checksum, validate_file_or_path
-from cloudstorage.messages import CONTAINER_NOT_FOUND
-from cloudstorage.messages import CONTAINER_EXISTS
-from cloudstorage.messages import CONTAINER_NOT_EMPTY
-from cloudstorage.messages import BLOB_NOT_FOUND
-from cloudstorage.messages import FEATURE_NOT_SUPPORTED
-from cloudstorage.messages import OPTION_NOT_SUPPORTED
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +74,6 @@ class AzureStorageDriver(Driver):
     :param kwargs: (optional) Catch invalid options.
     :type kwargs: dict
     """
-
     name = 'AZURE'
     hash_type = 'md5'
     url = 'https://azure.microsoft.com/en-us/services/storage/'
@@ -136,7 +129,8 @@ class AzureStorageDriver(Driver):
                                                           blob_name)
         except AzureMissingResourceHttpError as err:
             logger.debug(err)
-            raise NotFoundError(BLOB_NOT_FOUND % (blob_name, container_name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (blob_name,
+                                                           container_name))
 
         return azure_blob
 
@@ -192,7 +186,7 @@ class AzureStorageDriver(Driver):
                 container_name)
         except AzureMissingResourceHttpError as err:
             logger.debug(err)
-            raise NotFoundError(CONTAINER_NOT_FOUND % container_name)
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % container_name)
 
         return azure_container
 
@@ -244,7 +238,7 @@ class AzureStorageDriver(Driver):
                                           public_access=public_access,
                                           fail_on_exist=False)
         except AzureConflictHttpError:
-            logger.debug(CONTAINER_EXISTS, container_name)
+            logger.debug(messages.CONTAINER_EXISTS, container_name)
         except AzureHttpError as err:
             logger.debug(err)
             raise CloudStorageError(str(err))
@@ -264,7 +258,8 @@ class AzureStorageDriver(Driver):
         azure_blobs = self.service.list_blobs(azure_container.name,
                                               num_results=1)
         if len(azure_blobs.items) > 0:
-            raise IsNotEmptyError(CONTAINER_NOT_EMPTY % azure_container.name)
+            raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY %
+                                  azure_container.name)
 
         self.service.delete_container(azure_container.name,
                                       fail_not_exist=False)
@@ -279,11 +274,11 @@ class AzureStorageDriver(Driver):
         return url
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     def upload_blob(self, container: Container, filename: FileLike,
@@ -292,7 +287,7 @@ class AzureStorageDriver(Driver):
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}
@@ -385,7 +380,7 @@ class AzureStorageDriver(Driver):
                                       content_type: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
