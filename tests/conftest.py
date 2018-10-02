@@ -1,6 +1,6 @@
-import pytest
-import os
 from tempfile import mkstemp
+
+import pytest
 
 from tests.helpers import random_container_name
 from tests.settings import *
