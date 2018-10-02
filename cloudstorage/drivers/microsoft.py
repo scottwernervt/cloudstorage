@@ -10,7 +10,7 @@ except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus  # noqa: F401
 
-from typing import Dict, Iterable, List, Union  # noqa: F401
+from typing import Dict, Iterable, List  # noqa: F401
 
 from azure.common import AzureMissingResourceHttpError
 from azure.common import AzureHttpError
@@ -85,8 +85,7 @@ class AzureStorageDriver(Driver):
     hash_type = 'md5'
     url = 'https://azure.microsoft.com/en-us/services/storage/'
 
-    def __init__(self, account_name: str = None, key: str = None,
-                 **kwargs: Dict) -> None:
+    def __init__(self, account_name: str, key: str, **kwargs: Dict) -> None:
         super().__init__(key=key)
         self._service = BlockBlobService(account_name=account_name,
                                          account_key=key, **kwargs)
@@ -287,7 +286,7 @@ class AzureStorageDriver(Driver):
         logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
@@ -349,7 +348,7 @@ class AzureStorageDriver(Driver):
             yield self._convert_azure_blob(container, azure_blob)
 
     def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+                      destination: FileLike) -> None:
         azure_blob = self._get_azure_blob(blob.container.name, blob.name)
 
         if isinstance(destination, str):

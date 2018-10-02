@@ -8,7 +8,7 @@ import shutil
 import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List
 
 import filelock
 import itsdangerous
@@ -163,6 +163,7 @@ class LocalDriver(Driver):
         :return: Serializer for dumping and loading into a URL safe string.
         :rtype: :class:`itsdangerous.URLSafeTimedSerializer`
         """
+        # TODO: Throw exception if secret / salt not set.
         return itsdangerous.URLSafeTimedSerializer(
             secret_key=self.secret, salt=self.salt, signer_kwargs={
                 'key_derivation': 'hmac',
@@ -416,7 +417,7 @@ class LocalDriver(Driver):
         logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
@@ -478,7 +479,7 @@ class LocalDriver(Driver):
                 yield self._make_blob(container, object_name)
 
     def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+                      destination: FileLike) -> None:
         blob_path = self._get_file_path(blob)
 
         if isinstance(destination, str):

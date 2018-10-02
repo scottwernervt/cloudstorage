@@ -11,7 +11,7 @@ try:
 except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
-from typing import Dict, Iterable, List, Union, Any  # noqa: F401
+from typing import Dict, Iterable, List, Any  # noqa: F401
 
 # noinspection PyPackageRequirements
 from google.cloud import storage
@@ -88,14 +88,14 @@ class GoogleStorageDriver(Driver):
     hash_type = 'md5'  # TODO: QUESTION: Switch to crc32c?
     url = 'https://cloud.google.com/storage'
 
-    def __init__(self, key: str = None, **kwargs: Dict) -> None:
+    def __init__(self, key: str = None) -> None:
         super().__init__(key=key)
 
         google_application_credentials = os.getenv(self._CREDENTIALS_ENV_NAME)
 
         # Set environment variable using credentials json file path.
         if not google_application_credentials:
-            if not os.path.isfile(key):
+            if not key or not os.path.isfile(key):
                 raise CloudStorageError(
                     "Please set environment variable "
                     "'GOOGLE_APPLICATION_CREDENTIALS' or provider file path "
@@ -283,7 +283,7 @@ class GoogleStorageDriver(Driver):
         bucket.acl.save()
         return True
 
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
@@ -331,7 +331,7 @@ class GoogleStorageDriver(Driver):
             yield self._make_blob(container, blob)
 
     def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+                      destination: FileLike) -> None:
         g_blob = self._get_blob(blob.container.name, blob.name)
 
         if isinstance(destination, str):

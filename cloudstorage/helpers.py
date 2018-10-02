@@ -3,7 +3,7 @@ import hashlib
 import mimetypes
 import os
 from _hashlib import HASH
-from typing import Dict, Iterator, Tuple, Union
+from typing import Dict, Generator, Optional, Tuple
 
 import magic
 
@@ -11,7 +11,7 @@ from cloudstorage.typed import FileLike
 
 
 def read_in_chunks(file_object: FileLike,
-                   block_size: int = 4096) -> Iterator[bytes]:
+                   block_size: int = 4096) -> Generator[bytes, None, None]:
     """Return a generator which yields data in chunks.
 
     Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file
@@ -31,7 +31,7 @@ def read_in_chunks(file_object: FileLike,
         yield chunk
 
 
-def file_checksum(filename: Union[str, FileLike], hash_type: str = 'md5',
+def file_checksum(filename: FileLike, hash_type: str = 'md5',
                   block_size: int = 4096) -> HASH:
     """Returns checksum for file.
 
@@ -79,7 +79,7 @@ def file_checksum(filename: Union[str, FileLike], hash_type: str = 'md5',
     return file_hash
 
 
-def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
+def validate_file_or_path(filename: FileLike) -> Optional[str]:
     """Return filename from file path or from file like object.
 
     Source: `rackspace/pyrax/object_storage.py <https://github.com/rackspace/
@@ -89,7 +89,7 @@ def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
     :type filename: str or file
 
     :return: Filename.
-    :rtype: str
+    :rtype: str or None
 
     :raise FileNotFoundError: If the file path is invalid.
     """
@@ -107,14 +107,14 @@ def validate_file_or_path(filename: Union[str, FileLike]) -> Union[str, None]:
     return name
 
 
-def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
+def file_content_type(filename: FileLike) -> Optional[str]:
     """Guess content type for file path or file like object.
 
     :param filename: File path or file like object.
     :type filename: str or file
 
     :return: Content type.
-    :rtype: str
+    :rtype: str or None
     """
     if isinstance(filename, str):
         if os.path.isfile(filename):
@@ -128,7 +128,7 @@ def file_content_type(filename: Union[str, FileLike]) -> Union[str, None]:
     return content_type
 
 
-def parse_content_disposition(data: str) -> Tuple[Union[str, None], Dict]:
+def parse_content_disposition(data: str) -> Tuple[Optional[str], Dict]:
     """Parse Content-Disposition header.
 
     Example: ::

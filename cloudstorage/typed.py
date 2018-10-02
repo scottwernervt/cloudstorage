@@ -1,10 +1,9 @@
 """Custom typed annotations."""
-from io import FileIO, IOBase
-from typing import Any, BinaryIO, Dict, Optional, Union
+from typing import Any, AnyStr, Dict, IO, Optional, Union
 
-FileLike = Union[IOBase, FileIO, BinaryIO]
+FileLike = Union[IO[AnyStr], str]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional[Dict[Any, Any]]
-ContentLength = Dict[int, int]
 ExtraOptions = Optional[Dict[Any, Any]]
-FormPost = Dict[str, Union[str, Dict]]
+ContentLength = Dict[int, int]
+FormPost = Union[str, Dict[Any, Any]]
