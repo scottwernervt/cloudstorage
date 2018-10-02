@@ -1,17 +1,16 @@
 """Microsoft Azure Storage Driver."""
-import logging
-from datetime import datetime, timedelta
-
 import base64
 import codecs
+import logging
+from datetime import datetime, timedelta
 
 try:
     from http import HTTPStatus
 except ImportError:
     # noinspection PyUnresolvedReferences
-    from httpstatus import HTTPStatus
+    from httpstatus import HTTPStatus  # noqa: F401
 
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List, Union  # noqa: F401
 
 from azure.common import AzureMissingResourceHttpError
 from azure.common import AzureHttpError

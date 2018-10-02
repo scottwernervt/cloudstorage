@@ -3,7 +3,7 @@ import abc
 import logging
 from abc import abstractmethod
 from datetime import datetime
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union  # noqa: F401
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
@@ -456,7 +456,7 @@ class Container:
         """
         if isinstance(other, self.__class__):
             return self.name == other.name and \
-                   self.driver.name == other.driver.name
+                   self.driver.name == other.driver.name  # noqa: E126
         return implemented
 
     def __hash__(self) -> int:

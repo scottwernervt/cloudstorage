@@ -10,7 +10,7 @@ except ImportError:
     from httpstatus import HTTPStatus
 
 from time import time
-from typing import Dict, Iterable, List, Tuple, Union, Any
+from typing import Dict, Iterable, List, Tuple, Union, Any  # noqa: F401
 from urllib.parse import quote, urlencode, urljoin
 
 import dateutil.parser

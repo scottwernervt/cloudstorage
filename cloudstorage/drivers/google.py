@@ -1,18 +1,17 @@
 """Google Cloud Storage Driver."""
-import logging
-import pathlib
-from datetime import datetime, timedelta
-
 import base64
 import codecs
+import logging
 import os
+import pathlib
+from datetime import datetime, timedelta
 
 try:
     from http import HTTPStatus
 except ImportError:
     # noinspection PyUnresolvedReferences
     from httpstatus import HTTPStatus
-from typing import Dict, Iterable, List, Union, Any
+from typing import Dict, Iterable, List, Union, Any  # noqa: F401
 
 # noinspection PyPackageRequirements
 from google.cloud import storage
