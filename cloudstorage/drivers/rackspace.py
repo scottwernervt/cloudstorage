@@ -10,7 +10,7 @@ except ImportError:
     from httpstatus import HTTPStatus
 
 from time import time
-from typing import Dict, Iterable, List, Tuple, Union, Any
+from typing import Dict, Iterable, List, Tuple, Union, Any  # noqa: F401
 from urllib.parse import quote, urlencode, urljoin
 
 import dateutil.parser
@@ -20,16 +20,19 @@ from inflection import underscore
 from openstack.exceptions import HttpException
 from openstack.exceptions import NotFoundException
 from openstack.exceptions import ResourceNotFound
+from openstack.object_store.v1.obj import Object as OpenStackObject
 from rackspace import connection
 
 from cloudstorage.base import Blob
 from cloudstorage.base import Container
-from cloudstorage.base import ContentLength
 from cloudstorage.base import Driver
-from cloudstorage.base import ExtraOptions
-from cloudstorage.base import FileLike
-from cloudstorage.base import FormPost
-from cloudstorage.base import MetaData
+from cloudstorage.typed import (
+    FileLike,
+    MetaData,
+    ContentLength,
+    ExtraOptions,
+    FormPost,
+)
 from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError
@@ -211,7 +214,8 @@ class CloudFilesDriver(Driver):
         except NotFoundException:
             raise NotFoundError(CONTAINER_NOT_FOUND % container_name)
 
-    def _get_object(self, container_name: str, object_name: str):
+    def _get_object(self, container_name: str,
+                    object_name: str) -> OpenStackObject:
         """Get Rackspace container by name.
 
         :param container_name: Container name that contains the object.
@@ -463,7 +467,7 @@ class CloudFilesDriver(Driver):
         return response.status_code in (
             HTTPStatus.CREATED, HTTPStatus.ACCEPTED, HTTPStatus.NO_CONTENT)
 
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
@@ -519,7 +523,7 @@ class CloudFilesDriver(Driver):
             yield self._make_blob(container, obj)
 
     def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+                      destination: FileLike) -> None:
         try:
             data = self.object_store.download_object(
                 obj=blob.name, container=blob.container.name)

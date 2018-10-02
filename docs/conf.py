@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# flake8: noqa
 # -*- coding: utf-8 -*-
 #
 # Cloud Storage documentation build configuration file, created by

@@ -3,11 +3,18 @@ import abc
 import logging
 from abc import abstractmethod
 from datetime import datetime
-from io import FileIO, IOBase
-from typing import Any, BinaryIO, Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union  # noqa: F401
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.messages import FEATURE_NOT_SUPPORTED
+from cloudstorage.typed import (
+    Acl,
+    ContentLength,
+    ExtraOptions,
+    FileLike,
+    FormPost,
+    MetaData,
+)
 
 __all__ = [
     'Blob',
@@ -16,14 +23,6 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
-
-# TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IOBase, FileIO, BinaryIO]
-Acl = Optional[Dict[Any, Any]]
-MetaData = Optional[Dict[Any, Any]]
-ContentLength = Dict[int, int]
-ExtraOptions = Optional[Dict[Any, Any]]
-FormPost = Dict[str, Union[str, Dict]]
 
 
 class Blob:
@@ -121,7 +120,7 @@ class Blob:
             else:
                 self._attr[key] = value
 
-    def __eq__(self, other: 'Blob') -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override the default equals behavior.
 
         :param other: The other Blob.
@@ -151,7 +150,7 @@ class Blob:
         """
         return self.size
 
-    def __ne__(self, other: 'Blob') -> bool:
+    def __ne__(self, other: object) -> bool:
         """Override the default not equals behavior.
 
         :param other: The other blob.
@@ -201,7 +200,7 @@ class Blob:
         """
         self.driver.delete_blob(blob=self)
 
-    def download(self, destination: Union[str, FileLike]) -> None:
+    def download(self, destination: FileLike) -> None:
         """Download the contents of this blob into a file-like object or into
         a named file.
 
@@ -405,7 +404,7 @@ class Container:
         self.created_at = created_at
 
         self._attr = {}  # type: Dict
-        self._acl = acl  # type: str
+        self._acl = acl  # type: Optional[str]
         self._meta_data = {}  # type: Dict
 
         # Track attributes for object PUT
@@ -446,7 +445,7 @@ class Container:
         except NotFoundError:
             return False
 
-    def __eq__(self, other: Blob, implemented=NotImplemented) -> bool:
+    def __eq__(self, other: object, implemented=NotImplemented) -> bool:
         """Override the default equals behavior.
 
         :param other: The other container.
@@ -457,7 +456,7 @@ class Container:
         """
         if isinstance(other, self.__class__):
             return self.name == other.name and \
-                   self.driver.name == other.driver.name
+                   self.driver.name == other.driver.name  # noqa: E126
         return implemented
 
     def __hash__(self) -> int:
@@ -492,7 +491,7 @@ class Container:
         blobs = self.driver.get_blobs(container=self)
         return len(list(blobs))
 
-    def __ne__(self, other: Blob) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Override the default not equals behavior.
 
         :param other: The other container.
@@ -547,7 +546,7 @@ class Container:
         """
         self.driver.delete_container(container=self)
 
-    def upload_blob(self, filename: Union[str, FileLike], blob_name: str = None,
+    def upload_blob(self, filename: FileLike, blob_name: str = None,
                     acl: str = None, meta_data: MetaData = None,
                     content_type: str = None, content_disposition: str = None,
                     chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
@@ -892,8 +891,9 @@ class Driver(metaclass=abc.ABCMeta):
         * Support for CORS.
         * Support for container / blob expiration (delete_at).
 
-    :param key: API key, username, credentials file, or local directory.
-    :type key: str
+    :param key: (optional) API key, username, credentials file, or local
+     directory.
+    :type key: str or None
 
     :param secret: (optional) API secret key.
     :type secret: str
@@ -914,7 +914,7 @@ class Driver(metaclass=abc.ABCMeta):
     #: Unique `str` driver URL.
     url = None  # type: Optional[str]
 
-    def __init__(self, key: str, secret: str = None, region: str = None,
+    def __init__(self, key: str = None, secret: str = None, region: str = None,
                  **kwargs: Dict) -> None:
         self.key = key
         self.secret = secret
@@ -1150,7 +1150,7 @@ class Driver(metaclass=abc.ABCMeta):
         return False
 
     @abstractmethod
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size=1024,
@@ -1231,7 +1231,7 @@ class Driver(metaclass=abc.ABCMeta):
 
     @abstractmethod
     def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+                      destination: FileLike) -> None:
         """Download the contents of this blob into a file-like object or into
         a named file.
 

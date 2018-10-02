@@ -1,42 +1,50 @@
 """Local File System Driver."""
 import errno
+import hashlib
 import logging
+import os
 import pathlib
+import shutil
 import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List
 
 import filelock
-import hashlib
 import itsdangerous
-import os
-import shutil
 import xattr
 from inflection import underscore
 
-from cloudstorage.base import Blob
-from cloudstorage.base import Container
-from cloudstorage.base import ContentLength
-from cloudstorage.base import Driver
-from cloudstorage.base import ExtraOptions
-from cloudstorage.base import FileLike
-from cloudstorage.base import FormPost
-from cloudstorage.base import MetaData
-from cloudstorage.exceptions import CloudStorageError
-from cloudstorage.exceptions import IsNotEmptyError
-from cloudstorage.exceptions import NotFoundError
-from cloudstorage.exceptions import SignatureExpiredError
-from cloudstorage.helpers import file_checksum, read_in_chunks
-from cloudstorage.helpers import file_content_type, validate_file_or_path
-from cloudstorage.messages import BLOB_NOT_FOUND
-from cloudstorage.messages import CONTAINER_EXISTS
-from cloudstorage.messages import CONTAINER_NAME_INVALID
-from cloudstorage.messages import CONTAINER_NOT_EMPTY
-from cloudstorage.messages import CONTAINER_NOT_FOUND
-from cloudstorage.messages import FEATURE_NOT_SUPPORTED
-from cloudstorage.messages import LOCAL_NO_ATTRIBUTES
-from cloudstorage.messages import OPTION_NOT_SUPPORTED
+from cloudstorage.base import Blob, Container, Driver
+from cloudstorage.exceptions import (
+    CloudStorageError,
+    IsNotEmptyError,
+    NotFoundError,
+    SignatureExpiredError,
+)
+from cloudstorage.helpers import (
+    file_checksum,
+    file_content_type,
+    read_in_chunks,
+    validate_file_or_path,
+)
+from cloudstorage.messages import (
+    BLOB_NOT_FOUND,
+    CONTAINER_EXISTS,
+    CONTAINER_NAME_INVALID,
+    CONTAINER_NOT_EMPTY,
+    CONTAINER_NOT_FOUND,
+    FEATURE_NOT_SUPPORTED,
+    LOCAL_NO_ATTRIBUTES,
+    OPTION_NOT_SUPPORTED,
+)
+from cloudstorage.typed import (
+    ContentLength,
+    ExtraOptions,
+    FileLike,
+    FormPost,
+    MetaData,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +163,7 @@ class LocalDriver(Driver):
         :return: Serializer for dumping and loading into a URL safe string.
         :rtype: :class:`itsdangerous.URLSafeTimedSerializer`
         """
+        # TODO: Throw exception if secret / salt not set.
         return itsdangerous.URLSafeTimedSerializer(
             secret_key=self.secret, salt=self.salt, signer_kwargs={
                 'key_derivation': 'hmac',
@@ -228,7 +237,7 @@ class LocalDriver(Driver):
                     for meta_key, meta_value in value.items():
                         # user.metadata.name
                         attr_name = self._OBJECT_META_PREFIX + 'metadata.' + \
-                                    meta_key
+                                    meta_key  # noqa: E126
                         xattrs[attr_name] = meta_value.encode('utf-8')
                 else:
                     # user.name
@@ -408,7 +417,7 @@ class LocalDriver(Driver):
         logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, chunk_size: int = 1024,
@@ -470,7 +479,7 @@ class LocalDriver(Driver):
                 yield self._make_blob(container, object_name)
 
     def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+                      destination: FileLike) -> None:
         blob_path = self._get_file_path(blob)
 
         if isinstance(destination, str):
