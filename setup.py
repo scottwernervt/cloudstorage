@@ -92,6 +92,7 @@ setup(
         'docs': [
             'sphinx',  # BSD
             'sphinx_rtd_theme',  # MIT
+            'sphinx_autodoc_typehints',  # MIT
             'Pygments',  # BSD
         ],
     },
@@ -99,7 +100,7 @@ setup(
         'pytest-runner',  # MIT
     ],
     tests_require=[
-        'flake8',   # MIT
+        'flake8',  # MIT
         'pytest',  # MIT
         'prettyconf',  # MIT
         'tox',  # MIT
