@@ -7,14 +7,13 @@ import logging
 
 from enum import Enum, unique
 
-from cloudstorage.base import Blob, Container, Driver
+from cloudstorage.driver import Driver
+from cloudstorage.container import Container
+from cloudstorage.blob import Blob
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
-    'Blob',
-    'Driver',
     'DriverName',
-    'Container',
     'get_driver',
     'get_driver_by_name',
 ]

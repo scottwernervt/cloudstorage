@@ -8,7 +8,9 @@ from botocore.exceptions import ClientError, ParamValidationError, WaiterError
 from inflection import camelize, underscore
 
 from cloudstorage import messages
-from cloudstorage.base import Blob, Container, Driver
+from cloudstorage.blob import Blob
+from cloudstorage.container import Container
+from cloudstorage.driver import Driver
 from cloudstorage.exceptions import (
     CloudStorageError,
     IsNotEmptyError,

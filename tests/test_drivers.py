@@ -1,5 +1,5 @@
 from cloudstorage import DriverName, get_driver, get_driver_by_name
-from cloudstorage.base import Driver
+from cloudstorage.driver import Driver
 
 
 def test_get_driver():

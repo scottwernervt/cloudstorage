@@ -25,7 +25,9 @@ from azure.storage.blob.models import BlobPermissions
 from inflection import underscore
 
 from cloudstorage import messages
-from cloudstorage.base import Blob, Container, Driver
+from cloudstorage.blob import Blob
+from cloudstorage.container import Container
+from cloudstorage.driver import Driver
 from cloudstorage.exceptions import (
     NotFoundError,
     CloudStorageError,
