@@ -139,7 +139,7 @@ def parse_content_disposition(data: str) -> Tuple[Union[str, None], Dict]:
         >>> parse_content_disposition('attachment; filename="foo.html"')
         ('attachment', {'filename': 'foo.html'})
 
-    Source: `pyrates/multifruits<https://github.com/pyrates/multifruits>`__
+    Source: `pyrates/multifruits <https://github.com/pyrates/multifruits>`_
 
     :param data: Content-Disposition header value.
     :type data: str
