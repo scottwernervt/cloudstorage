@@ -1,7 +1,7 @@
 Container
 ---------
 
-.. autoclass:: cloudstorage.base.Container
+.. autoclass:: cloudstorage.container.Container
     :members:
     :special-members: __iter__, __contains__, __len__
     :member-order: bysource
