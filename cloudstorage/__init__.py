@@ -4,15 +4,17 @@
 :license: MIT, see LICENSE for more details.
 """
 import logging
-
 from enum import Enum, unique
 
-from cloudstorage.driver import Driver
-from cloudstorage.container import Container
 from cloudstorage.blob import Blob
+from cloudstorage.container import Container
+from cloudstorage.driver import Driver
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
+    'Blob',
+    'Container',
+    'Driver',
     'DriverName',
     'get_driver',
     'get_driver_by_name',

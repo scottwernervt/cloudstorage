@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict
+from typing import Dict  # noqa: F401
 
 from cloudstorage.typed import Acl, ExtraOptions, FileLike, MetaData
 

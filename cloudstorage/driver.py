@@ -1,7 +1,7 @@
 import abc
 import logging
 from abc import abstractmethod
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional  # noqa: F401
 
 from cloudstorage.blob import Blob
 from cloudstorage.container import Container

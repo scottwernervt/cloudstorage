@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Iterable, Optional, Union
+from typing import Any, Dict, Iterable, Optional, Union  # noqa: F401
 
 from cloudstorage.exceptions import NotFoundError
 from cloudstorage.typed import (
@@ -66,9 +66,9 @@ class Container:
         self.meta_data = meta_data
         self.created_at = created_at
 
-        self._attr = {}  # type: Dict
+        self._attr = {}  # type: Dict[Any, Any]
         self._acl = acl  # type: Optional[str]
-        self._meta_data = {}  # type: Dict
+        self._meta_data = {}  # type: Dict[Any, Any]
 
         # Track attributes for object PUT
         for key, value in locals().items():
