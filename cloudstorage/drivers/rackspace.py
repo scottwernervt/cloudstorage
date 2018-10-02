@@ -17,15 +17,16 @@ import dateutil.parser
 import requests
 
 from inflection import underscore
-from openstack.exceptions import HttpException
-from openstack.exceptions import NotFoundException
-from openstack.exceptions import ResourceNotFound
+from openstack.exceptions import (
+    HttpException,
+    NotFoundException,
+    ResourceNotFound,
+)
 from openstack.object_store.v1.obj import Object as OpenStackObject
+from openstack.object_store.v1.container import Container as OpenStackContainer
 from rackspace import connection
 
-from cloudstorage.base import Blob
-from cloudstorage.base import Container
-from cloudstorage.base import Driver
+from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.typed import (
     FileLike,
     MetaData,
@@ -33,17 +34,15 @@ from cloudstorage.typed import (
     ExtraOptions,
     FormPost,
 )
-from cloudstorage.exceptions import CloudStorageError
-from cloudstorage.exceptions import IsNotEmptyError
-from cloudstorage.exceptions import NotFoundError
+from cloudstorage.exceptions import (
+    CloudStorageError,
+    IsNotEmptyError,
+    NotFoundError,
+)
+
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.helpers import parse_content_disposition
-from cloudstorage.messages import CONTAINER_NOT_FOUND
-from cloudstorage.messages import CONTAINER_NOT_EMPTY
-from cloudstorage.messages import BLOB_NOT_FOUND
-from cloudstorage.messages import OPTION_NOT_SUPPORTED
-from cloudstorage.messages import CDN_NOT_ENABLED
-from cloudstorage.messages import REGION_NOT_FOUND
+from cloudstorage import messages
 
 logger = logging.getLogger(__name__)
 
@@ -93,19 +92,16 @@ class CloudFilesDriver(Driver):
         * Sydney (`SYD`)
         * Hong Kong (`HKG`)
     :type region: str
-
-    :param kwargs: (optional) Catch invalid options.
-    :type kwargs: dict
     """
     name = 'CLOUDFILES'
     hash_type = 'md5'
     url = 'https://www.rackspace.com/cloud/files'
 
-    def __init__(self, key: str, secret: str = None, region: str = 'IAD',
-                 **kwargs: Dict) -> None:
+    def __init__(self, key: str, secret: str = None,
+                 region: str = 'IAD') -> None:
         region = region.upper()
         if region not in self.regions:
-            raise CloudStorageError(REGION_NOT_FOUND % region)
+            raise CloudStorageError(messages.REGION_NOT_FOUND % region)
 
         super().__init__(key=key, secret=secret, region=region)
         self._conn = connection.Connection(username=key, api_key=secret,
@@ -212,7 +208,7 @@ class CloudFilesDriver(Driver):
         try:
             return self.object_store.get_container_metadata(container_name)
         except NotFoundException:
-            raise NotFoundError(CONTAINER_NOT_FOUND % container_name)
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % container_name)
 
     def _get_object(self, container_name: str,
                     object_name: str) -> OpenStackObject:
@@ -233,11 +229,13 @@ class CloudFilesDriver(Driver):
             obj = self.object_store.get_object_metadata(
                 obj=object_name, container=container_name)
         except (ResourceNotFound, NotFoundException):
-            raise NotFoundError(BLOB_NOT_FOUND % (object_name, container_name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name,
+                                                           container_name))
 
         return obj
 
-    def _set_object_meta(self, obj, meta_data: MetaData) -> None:
+    def _set_object_meta(self, obj: OpenStackObject,
+                         meta_data: MetaData) -> OpenStackObject:
         """Set object meta data.
 
         .. note:: The POST request to set metadata deletes all metadata that is
@@ -271,12 +269,12 @@ class CloudFilesDriver(Driver):
                                                      container=obj.container,
                                                      **meta_data)
 
-    def _set_container_meta(self, container: Container,
+    def _set_container_meta(self, container: OpenStackContainer,
                             meta_data: MetaData) -> None:
         """Set metadata on container.
 
         :param container: Container to set metadata to.
-        :type container: :class:`.Container`
+        :type container: :class:`openstack.object_store.v1.container.Container`
 
         :param meta_data: A map of metadata to store with the container.
         :type meta_data: dict
@@ -301,17 +299,17 @@ class CloudFilesDriver(Driver):
         if response.status_code != HTTPStatus.NO_CONTENT:
             raise CloudStorageError(response.text)
 
-    def _make_container(self, cont) -> Container:
+    def _make_container(self, container) -> Container:
         """Convert Rackspace Container to Cloud Storage Container.
 
-        :param cont: Openstack container to convert.
-        :type cont: :class:`openstack.object_store.v1.container.Container`
+        :param container: Openstack container to convert.
+        :type container: :class:`openstack.object_store.v1.container.Container`
 
         :return: A container instance.
         :rtype: :class:`.Container`
         """
-        return Container(name=cont.id, driver=self, acl=None,
-                         meta_data=cont.metadata, created_at=None)
+        return Container(name=container.id, driver=self, acl=None,
+                         meta_data=container.metadata, created_at=None)
 
     def _make_blob(self, container, obj) -> Blob:
         """Convert Rackspace Object to a Cloud Storage Blob.
@@ -339,6 +337,7 @@ class CloudFilesDriver(Driver):
         else:
             delete_at = None
 
+        # noinspection PyProtectedMember
         return Blob(name=obj.id, checksum=obj._hash or obj.etag,
                     etag=obj.etag, size=size, container=container, driver=self,
                     acl=None, meta_data=obj.metadata,
@@ -382,7 +381,7 @@ class CloudFilesDriver(Driver):
     def create_container(self, container_name: str, acl: str = None,
                          meta_data: MetaData = None) -> Container:
         if acl:
-            logger.info(OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         try:
             cont = self.object_store.create_container(
@@ -421,10 +420,11 @@ class CloudFilesDriver(Driver):
         try:
             self.object_store.delete_container(container.name)
         except ResourceNotFound:
-            raise NotFoundError(CONTAINER_NOT_FOUND % container.name)
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % container.name)
         except HttpException as err:
             if err.status_code == HTTPStatus.CONFLICT:
-                raise IsNotEmptyError(CONTAINER_NOT_EMPTY % container.name)
+                raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY %
+                                      container.name)
             raise CloudStorageError(err.details)
 
     def container_cdn_url(self, container: Container) -> str:
@@ -437,7 +437,7 @@ class CloudFilesDriver(Driver):
 
         uri = response.headers.get('x-cdn-ssl-uri')
         if not uri:
-            raise CloudStorageError(CDN_NOT_ENABLED % container.name)
+            raise CloudStorageError(messages.CDN_NOT_ENABLED % container.name)
 
         return uri
 
@@ -473,7 +473,7 @@ class CloudFilesDriver(Driver):
                     content_disposition: str = None, chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
-            logger.warning(OPTION_NOT_SUPPORTED, 'acl')
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
@@ -507,7 +507,7 @@ class CloudFilesDriver(Driver):
                     # delete_after=extra_norm['delete_after'],
                     # delete_at=extra_norm['delete_at']
                 )
-            )
+            )   # type: OpenStackObject
 
         # Manually set meta data after object upload
         self._set_object_meta(obj, meta_data)
@@ -534,8 +534,8 @@ class CloudFilesDriver(Driver):
             else:
                 destination.write(data)
         except ResourceNotFound:
-            raise NotFoundError(BLOB_NOT_FOUND % (blob.name,
-                                                  blob.container.name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (blob.name,
+                                                           blob.container.name))
 
     def patch_blob(self, blob: Blob) -> None:
         obj = self._get_object(blob.container.name, blob.name)
@@ -553,8 +553,8 @@ class CloudFilesDriver(Driver):
             self.object_store.delete_object(obj=blob.name, ignore_missing=False,
                                             container=blob.container.name)
         except ResourceNotFound:
-            raise NotFoundError(BLOB_NOT_FOUND % (blob.name,
-                                                  blob.container.name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (blob.name,
+                                                           blob.container.name))
 
     def blob_cdn_url(self, blob: Blob) -> str:
         container_cdn_url = self.container_cdn_url(blob.container)
@@ -570,16 +570,16 @@ class CloudFilesDriver(Driver):
                                       content_type: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         if acl:
-            logger.warning(OPTION_NOT_SUPPORTED, 'acl')
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'acl')
 
         if meta_data:
-            logger.warning(OPTION_NOT_SUPPORTED, 'meta_data')
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'meta_data')
 
         if content_disposition:
-            logger.warning(OPTION_NOT_SUPPORTED, 'content_disposition')
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'content_disposition')
 
         if content_type:
-            logger.warning(OPTION_NOT_SUPPORTED, 'content_type')
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'content_type')
 
         extra = extra if extra is not None else {}
         extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
@@ -628,7 +628,7 @@ class CloudFilesDriver(Driver):
                                    content_disposition: str = None,
                                    extra: ExtraOptions = None) -> str:
         if extra:
-            logger.info(OPTION_NOT_SUPPORTED, 'extra')
+            logger.info(messages.OPTION_NOT_SUPPORTED, 'extra')
 
         key = self._get_temp_url_key()
         storage_public_url = self._get_server_public_url('cloudFiles')

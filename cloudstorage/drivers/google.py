@@ -77,9 +77,6 @@ class GoogleStorageDriver(Driver):
     :param key: (optional) File path to service worker credentials json file.
     :type key: str or None
 
-    :param kwargs: (optional) Catch invalid options.
-    :type kwargs: dict
-
     :raise CloudStorageError: If `GOOGLE_APPLICATION_CREDENTIALS` environment
       variable is not set and/or credentials json file is not passed to the
       `key` argument.

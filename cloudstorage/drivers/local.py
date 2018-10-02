@@ -105,9 +105,6 @@ class LocalDriver(Driver):
       <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
 
-    :param kwargs: (optional) Catch invalid options.
-    :type kwargs: dict
-
     :raise NotADirectoryError: If the key storage path is invalid or does not
       exist.
     """
@@ -115,8 +112,7 @@ class LocalDriver(Driver):
     hash_type = 'md5'
     url = ''
 
-    def __init__(self, key: str, secret: str = None, salt: str = None,
-                 **kwargs: Dict) -> None:
+    def __init__(self, key: str, secret: str = None, salt: str = None) -> None:
         super().__init__(key, secret)
 
         self.base_path = key
@@ -333,6 +329,8 @@ class LocalDriver(Driver):
             attributes = xattr.xattr(full_path)
 
             for attr_key, attr_value in attributes.items():
+                value_str = None
+
                 try:
                     value_str = attr_value.decode('utf-8')
                 except UnicodeDecodeError:
