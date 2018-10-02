@@ -26,10 +26,7 @@ from openstack.object_store.v1.obj import Object as OpenStackObject
 from openstack.object_store.v1.container import Container as OpenStackContainer
 from rackspace import connection
 
-from cloudstorage import messages
-from cloudstorage.blob import Blob
-from cloudstorage.container import Container
-from cloudstorage.driver import Driver
+from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.typed import (
     FileLike,
     MetaData,

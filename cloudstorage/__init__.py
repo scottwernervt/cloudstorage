@@ -6,9 +6,7 @@
 import logging
 from enum import Enum, unique
 
-from cloudstorage.blob import Blob
-from cloudstorage.container import Container
-from cloudstorage.driver import Driver
+from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
