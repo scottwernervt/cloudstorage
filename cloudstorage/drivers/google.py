@@ -72,6 +72,9 @@ class GoogleStorageDriver(Driver):
     :param key: (optional) File path to service worker credentials json file.
     :type key: str or None
 
+    :param kwargs: (optional) Extra driver options.
+    :type kwargs: dict
+
     :raise CloudStorageError: If `GOOGLE_APPLICATION_CREDENTIALS` environment
       variable is not set and/or credentials json file is not passed to the
       `key` argument.
@@ -80,8 +83,8 @@ class GoogleStorageDriver(Driver):
     hash_type = 'md5'  # TODO: QUESTION: Switch to crc32c?
     url = 'https://cloud.google.com/storage'
 
-    def __init__(self, key: str = None) -> None:
-        super().__init__(key=key)
+    def __init__(self, key: str = None, **kwargs: Dict) -> None:
+        super().__init__(key=key, **kwargs)
 
         google_application_credentials = os.getenv(self._CREDENTIALS_ENV_NAME)
 

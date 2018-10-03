@@ -95,6 +95,9 @@ class LocalDriver(Driver):
       <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
 
+    :param kwargs: (optional) Extra driver options.
+    :type kwargs: dict
+
     :raise NotADirectoryError: If the key storage path is invalid or does not
       exist.
     """
@@ -102,8 +105,9 @@ class LocalDriver(Driver):
     hash_type = 'md5'
     url = ''
 
-    def __init__(self, key: str, secret: str = None, salt: str = None) -> None:
-        super().__init__(key, secret)
+    def __init__(self, key: str, secret: str = None, salt: str = None,
+                 **kwargs: Dict) -> None:
+        super().__init__(key, secret, **kwargs)
 
         self.base_path = key
         self.salt = salt
