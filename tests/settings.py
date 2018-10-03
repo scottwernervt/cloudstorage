@@ -31,6 +31,7 @@ BINARY_OPTIONS = {
     },
     'content_type': 'image/png',
     'content_disposition': 'attachment; filename=avatar-attachment.png',
+    'cache_control': 'max-age=84600',
 }
 
 AMAZON_KEY = config('AMAZON_KEY', default=None)
