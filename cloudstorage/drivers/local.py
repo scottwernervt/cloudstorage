@@ -315,6 +315,7 @@ class LocalDriver(Driver):
         meta_data = {}
         content_type = None
         content_disposition = None
+        cache_control = None
 
         try:
             attributes = xattr.xattr(full_path)
@@ -334,6 +335,8 @@ class LocalDriver(Driver):
                     content_type = value_str
                 elif attr_key.endswith('content-disposition'):
                     content_disposition = value_str
+                elif attr_key.endswith('cache-control'):
+                    cache_control = value_str
                 else:
                     logger.warning("Unknown file attribute '%s'", attr_key)
         except OSError:
@@ -351,8 +354,8 @@ class LocalDriver(Driver):
                     size=stat.st_size, container=container, driver=self,
                     acl=None, meta_data=meta_data,
                     content_disposition=content_disposition,
-                    content_type=content_type, created_at=created_at,
-                    modified_at=modified_at)
+                    content_type=content_type, cache_control=cache_control,
+                    created_at=created_at, modified_at=modified_at)
 
     @property
     def regions(self) -> List[str]:
@@ -409,8 +412,8 @@ class LocalDriver(Driver):
     def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, chunk_size: int = 1024,
-                    extra: ExtraOptions = None) -> Blob:
+                    content_disposition: str = None, cache_control: str = None,
+                    chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
         if acl:
             logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
@@ -420,6 +423,7 @@ class LocalDriver(Driver):
         attributes = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
         attributes.setdefault('meta-data', meta_data)
         attributes.setdefault('content-disposition', content_disposition)
+        attributes.setdefault('cache-control', cache_control)
 
         path = self._get_folder_path(container, validate=True)
 
@@ -509,6 +513,7 @@ class LocalDriver(Driver):
                                       content_disposition: str = None,
                                       content_length: ContentLength = None,
                                       content_type: str = None,
+                                      cache_control: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
@@ -528,6 +533,7 @@ class LocalDriver(Driver):
             'content_disposition': content_disposition,
             'content_length': content_length,
             'content_type': content_type,
+            'cache_control': cache_control,
             'max_age': int(expires),
         }
         payload.update(**fields)
