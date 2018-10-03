@@ -36,6 +36,8 @@ from cloudstorage.typed import (
     MetaData,
 )
 
+__all__ = ['LocalDriver']
+
 logger = logging.getLogger(__name__)
 
 IGNORE_FOLDERS = ['.lock', '.hash', '.DS_STORE']
@@ -95,6 +97,9 @@ class LocalDriver(Driver):
       <https://pythonhosted.org/itsdangerous/>`_.
     :type salt: str or None
 
+    :param kwargs: (optional) Extra driver options.
+    :type kwargs: dict
+
     :raise NotADirectoryError: If the key storage path is invalid or does not
       exist.
     """
@@ -102,8 +107,9 @@ class LocalDriver(Driver):
     hash_type = 'md5'
     url = ''
 
-    def __init__(self, key: str, secret: str = None, salt: str = None) -> None:
-        super().__init__(key, secret)
+    def __init__(self, key: str, secret: str = None, salt: str = None,
+                 **kwargs: Dict) -> None:
+        super().__init__(key, secret, **kwargs)
 
         self.base_path = key
         self.salt = salt
@@ -219,7 +225,7 @@ class LocalDriver(Driver):
                 continue
 
             try:
-                if key == 'meta-data':
+                if key == 'meta_data':
                     for meta_key, meta_value in value.items():
                         # user.metadata.name
                         attr_name = self._OBJECT_META_PREFIX + 'metadata.' + \
@@ -331,11 +337,11 @@ class LocalDriver(Driver):
                 if attr_key.startswith(self._OBJECT_META_PREFIX + 'metadata'):
                     meta_key = attr_key.split('.')[-1]
                     meta_data[meta_key] = value_str
-                elif attr_key.endswith('content-type'):
+                elif attr_key.endswith('content_type'):
                     content_type = value_str
-                elif attr_key.endswith('content-disposition'):
+                elif attr_key.endswith('content_disposition'):
                     content_disposition = value_str
-                elif attr_key.endswith('cache-control'):
+                elif attr_key.endswith('cache_control'):
                     cache_control = value_str
                 else:
                     logger.warning("Unknown file attribute '%s'", attr_key)
@@ -350,6 +356,7 @@ class LocalDriver(Driver):
         etag = hashlib.sha1(full_path.encode('utf-8')).hexdigest()
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
         modified_at = datetime.fromtimestamp(stat.st_mtime, timezone.utc)
+
         return Blob(name=object_path.name, checksum=checksum, etag=etag,
                     size=stat.st_size, container=container, driver=self,
                     acl=None, meta_data=meta_data,
@@ -421,9 +428,9 @@ class LocalDriver(Driver):
         extra = extra if extra is not None else {}
 
         attributes = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
-        attributes.setdefault('meta-data', meta_data)
-        attributes.setdefault('content-disposition', content_disposition)
-        attributes.setdefault('cache-control', cache_control)
+        attributes.setdefault('meta_data', meta_data)
+        attributes.setdefault('content_disposition', content_disposition)
+        attributes.setdefault('cache_control', cache_control)
 
         path = self._get_folder_path(container, validate=True)
 
@@ -445,9 +452,9 @@ class LocalDriver(Driver):
         os.chmod(blob_path, int('664', 8))
 
         if not content_type:
-            attributes['content-type'] = file_content_type(blob_path)
+            attributes['content_type'] = file_content_type(blob_path)
         else:
-            attributes['content-type'] = content_type
+            attributes['content_type'] = content_type
 
         # Set meta data and other attributes
         self._set_file_attributes(blob_path, attributes)
@@ -592,8 +599,5 @@ class LocalDriver(Driver):
     _OBJECT_META_PREFIX = 'user.'
 
     _PUT_OBJECT_KEYS = {
-        'content_type': 'content-type',
-        'content_disposition': 'content-disposition',
-        'metadata': 'meta-data',
-        'meta_data': 'meta-data',
+        'metadata': 'meta_data',
     }

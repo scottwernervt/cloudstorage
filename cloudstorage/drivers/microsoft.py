@@ -39,6 +39,8 @@ from cloudstorage.typed import (
     FormPost,
 )
 
+__all__ = ['AzureStorageDriver']
+
 logger = logging.getLogger(__name__)
 
 
@@ -71,7 +73,7 @@ class AzureStorageDriver(Driver):
     :param key: Azure storage account key.
     :type key: str
 
-    :param kwargs: (optional) Catch invalid options.
+    :param kwargs: (optional) Extra driver options.
     :type kwargs: dict
     """
     name = 'AZURE'
@@ -79,7 +81,7 @@ class AzureStorageDriver(Driver):
     url = 'https://azure.microsoft.com/en-us/services/storage/'
 
     def __init__(self, account_name: str, key: str, **kwargs: Dict) -> None:
-        super().__init__(key=key)
+        super().__init__(key=key, **kwargs)
         self._service = BlockBlobService(account_name=account_name,
                                          account_key=key, **kwargs)
 

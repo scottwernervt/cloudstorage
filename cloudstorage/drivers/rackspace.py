@@ -45,6 +45,8 @@ from cloudstorage.helpers import (
     parse_content_disposition,
 )
 
+__all__ = ['CloudFilesDriver']
+
 logger = logging.getLogger(__name__)
 
 MetaTempKey = Tuple[Union[str, None], Union[str, None]]
@@ -94,18 +96,23 @@ class CloudFilesDriver(Driver):
         * Sydney (`SYD`)
         * Hong Kong (`HKG`)
     :type region: str
+
+    :param kwargs: (optional) Extra driver options.
+    :type kwargs: dict
+
+    :raise CloudStorageError: If region name is not supported.
     """
     name = 'CLOUDFILES'
     hash_type = 'md5'
     url = 'https://www.rackspace.com/cloud/files'
 
-    def __init__(self, key: str, secret: str = None,
-                 region: str = 'IAD') -> None:
+    def __init__(self, key: str, secret: str = None, region: str = 'IAD',
+                 **kwargs: Dict) -> None:
         region = region.upper()
         if region not in self.regions:
             raise CloudStorageError(messages.REGION_NOT_FOUND % region)
 
-        super().__init__(key=key, secret=secret, region=region)
+        super().__init__(key=key, secret=secret, region=region, **kwargs)
         self._conn = connection.Connection(username=key, api_key=secret,
                                            region=region)
 
