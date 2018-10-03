@@ -210,6 +210,7 @@ class GoogleStorageDriver(Driver):
                     acl=blob.acl, meta_data=blob.metadata,
                     content_disposition=blob.content_disposition,
                     content_type=blob.content_type,
+                    cache_control=blob.cache_control,
                     created_at=blob.time_created,
                     modified_at=blob.updated)
 
@@ -280,7 +281,8 @@ class GoogleStorageDriver(Driver):
     def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, chunk_size: int = 1024,
+                    content_disposition: str = None, cache_control: str = None,
+                    chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         extra = extra if extra is not None else {}
         extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
@@ -288,6 +290,7 @@ class GoogleStorageDriver(Driver):
         extra_args.setdefault('metadata', meta_data)
         extra_args.setdefault('content_type', content_type)
         extra_args.setdefault('content_disposition', content_disposition)
+        extra_args.setdefault('cache_control', cache_control)
 
         bucket = self._get_bucket(container.name)
 
@@ -350,6 +353,7 @@ class GoogleStorageDriver(Driver):
                                       content_disposition: str = None,
                                       content_length: ContentLength = None,
                                       content_type: str = None,
+                                      cache_control: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
@@ -370,6 +374,7 @@ class GoogleStorageDriver(Driver):
         headers = {
             'Content-Disposition': content_disposition,
             'Content-Type': content_type,
+            'Cache-Control': cache_control,
         }
         for header_name, header_value in headers.items():
             if not header_value:
