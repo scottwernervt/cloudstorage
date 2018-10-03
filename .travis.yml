@@ -11,15 +11,20 @@ install:
 
 matrix:
   include:
-    - python: 3.4
+    - name: "py34"
+      python: "3.4"
       env: TOXENV=py34
-    - python: 3.5
+    - name: "py35"
+      python: "3.5"
       env: TOXENV=py35
-    - python: 3.6
+    - name: "py36"
+      python: "3.6"
       env: TOXENV=py36
-    - python: 3.4
+    - name: "flake8"
+      python: "3.4"
       env: TOXENV=flake8
-    - python: 3.4
+    - name: "docs"
+      python: "3.4"
       env: TOXENV=docs
 
 script: tox
