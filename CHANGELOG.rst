@@ -3,19 +3,26 @@
 Changelog
 ---------
 
-Unreleased (2018-10-01)
+Unreleased (2018-10-03)
 +++++++++++++++++++++++
 
-* Remove rackspace package dependency `rfc6266_parser`.
+Features
+
+* ``Cache-Control`` supported for Amazon, Google, Local, and Microsoft (`#11 <https://github.com/scottwernervt/cloudstorage/issues/11>`_).
 * Each driver's package dependencies are now optional (`#4 <https://github.com/scottwernervt/cloudstorage/issues/4>`_).
+
+Other
+
+* Remove rackspace package dependency ``rfc6266_parser``.
+* Add ``flake8`` linting and ``sphinx`` doc building to tox and travis.
 
 0.6 (2018-07-24)
 ++++++++++++++++
 
-* Copy metadata from `setup.py` to `setup.cfg`
+* Copy metadata from ``setup.py`` to ``setup.cfg``
 * Add rate limit timeout when calling google cloud storage backend during tests.
-* Catch `UnicodeDecodeError` when decoding local file attribute values.
-* Upgrade dependencies and include `requirements.txt` and `dev-requirements.txt`.
+* Catch ``UnicodeDecodeError`` when decoding local file attribute values.
+* Upgrade dependencies and include ``requirements.txt`` and ``dev-requirements.txt``.
 
 0.5 (2018-02-26)
 ++++++++++++++++
