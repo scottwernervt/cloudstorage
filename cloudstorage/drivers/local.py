@@ -36,6 +36,8 @@ from cloudstorage.typed import (
     MetaData,
 )
 
+__all__ = ['LocalDriver']
+
 logger = logging.getLogger(__name__)
 
 IGNORE_FOLDERS = ['.lock', '.hash', '.DS_STORE']

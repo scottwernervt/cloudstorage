@@ -22,6 +22,8 @@ from cloudstorage.typed import (
     MetaData,
 )
 
+__all__ = ['S3Driver']
+
 logger = logging.getLogger(__name__)
 
 

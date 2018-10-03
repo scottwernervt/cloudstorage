@@ -39,6 +39,8 @@ from cloudstorage.typed import (
     FormPost,
 )
 
+__all__ = ['AzureStorageDriver']
+
 logger = logging.getLogger(__name__)
 
 

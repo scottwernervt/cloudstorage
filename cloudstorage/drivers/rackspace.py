@@ -45,6 +45,8 @@ from cloudstorage.helpers import (
     parse_content_disposition,
 )
 
+__all__ = ['CloudFilesDriver']
+
 logger = logging.getLogger(__name__)
 
 MetaTempKey = Tuple[Union[str, None], Union[str, None]]
