@@ -168,6 +168,7 @@ class AzureStorageDriver(Driver):
                     meta_data=azure_blob.metadata,
                     content_disposition=content_settings.content_disposition,
                     content_type=content_settings.content_type,
+                    cache_control=content_settings.cache_control,
                     created_at=None,
                     modified_at=azure_blob.properties.last_modified,
                     expires_at=None)
@@ -284,8 +285,8 @@ class AzureStorageDriver(Driver):
     def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, chunk_size: int = 1024,
-                    extra: ExtraOptions = None) -> Blob:
+                    content_disposition: str = None, cache_control: str = None,
+                    chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
         if acl:
             logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
 
@@ -295,6 +296,7 @@ class AzureStorageDriver(Driver):
         extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
         extra_args.setdefault('content_type', content_type)
         extra_args.setdefault('content_disposition', content_disposition)
+        extra_args.setdefault('cache_control', cache_control)
 
         azure_container = self._get_azure_container(container.name)
         blob_name = blob_name or validate_file_or_path(filename)
@@ -378,6 +380,7 @@ class AzureStorageDriver(Driver):
                                       content_disposition: str = None,
                                       content_length: ContentLength = None,
                                       content_type: str = None,
+                                      cache_control: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         if acl:
             logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
@@ -401,7 +404,8 @@ class AzureStorageDriver(Driver):
         headers = {
             'x-ms-blob-type': 'BlockBlob',
             'x-ms-blob-content-type': content_type,
-            'x-ms-blob-content-disposition': content_disposition
+            'x-ms-blob-content-disposition': content_disposition,
+            'x-ms-blob-cache-control': cache_control,
         }
         for meta_key, meta_value in meta_data.items():
             key = self._OBJECT_META_PREFIX + meta_key
