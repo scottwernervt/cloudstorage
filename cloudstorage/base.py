@@ -1,54 +1,21 @@
-"""Provides base classes for working with storage drivers."""
+import abc
 import logging
-from datetime import datetime
-from typing import Any, BinaryIO, Dict, Iterable, List, Optional, Union
-
 from abc import abstractmethod
-from io import FileIO, IOBase
+from datetime import datetime
+from typing import Any, Dict, Iterable, List, Optional, Union  # noqa: F401
 
+from cloudstorage import messages
 from cloudstorage.exceptions import NotFoundError
-from cloudstorage.messages import FEATURE_NOT_SUPPORTED
-
-__all__ = [
-    'Blob',
-    'Container',
-    'Driver',
-]
+from cloudstorage.typed import (
+    Acl,
+    ContentLength,
+    ExtraOptions,
+    FileLike,
+    FormPost,
+    MetaData,
+)
 
 logger = logging.getLogger(__name__)
-
-# TODO: QUESTIONS: Move to typing_.py module?
-FileLike = Union[IOBase, FileIO, BinaryIO]
-Acl = Optional[Dict[Any, Any]]
-MetaData = Optional[Dict[Any, Any]]
-ContentLength = Dict[int, int]
-ExtraOptions = Optional[Dict[Any, Any]]
-FormPost = Dict[str, Union[str, Dict]]
-
-
-class DocstringMeta(type):
-    """Metaclass that allows docstring 'inheritance'.
-
-    Dirty hack for sphinx...
-
-    Source: `Use method docstring from abstract base class if derived class
-    has none #3140 <https://github.com/sphinx-doc/sphinx/issues/3140>`_
-    """
-
-    # noinspection PyInitNewSignature
-    # noinspection PyMethodParameters
-    def __new__(mcs, name, bases, namespace):
-        cls = super().__new__(mcs, name, bases, namespace)
-        mro = cls.__mro__[1:]
-        for member_name, member in namespace.items():
-            if not getattr(member, '__doc__'):
-                for base in mro:
-                    try:
-                        member.__doc__ = getattr(base, member_name).__doc__
-                        break
-                    except AttributeError:
-                        pass
-        return cls
 
 
 class Blob:
@@ -147,7 +114,7 @@ class Blob:
             else:
                 self._attr[key] = value
 
-    def __eq__(self, other: 'Blob') -> bool:  # type: ignore
+    def __eq__(self, other: object) -> bool:
         """Override the default equals behavior.
 
         :param other: The other Blob.
@@ -177,7 +144,7 @@ class Blob:
         """
         return self.size
 
-    def __ne__(self, other: 'Blob') -> bool:  # type: ignore
+    def __ne__(self, other: object) -> bool:
         """Override the default not equals behavior.
 
         :param other: The other blob.
@@ -227,7 +194,7 @@ class Blob:
         """
         self.driver.delete_blob(blob=self)
 
-    def download(self, destination: Union[str, FileLike]) -> None:
+    def download(self, destination: FileLike) -> None:
         """Download the contents of this blob into a file-like object or into
         a named file.
 
@@ -430,9 +397,9 @@ class Container:
         self.meta_data = meta_data
         self.created_at = created_at
 
-        self._attr = {}  # type: Dict
-        self._acl = acl  # type: str
-        self._meta_data = {}  # type: Dict
+        self._attr = {}  # type: Dict[Any, Any]
+        self._acl = acl  # type: Optional[str]
+        self._meta_data = {}  # type: Dict[Any, Any]
 
         # Track attributes for object PUT
         for key, value in locals().items():
@@ -472,8 +439,7 @@ class Container:
         except NotFoundError:
             return False
 
-    def __eq__(self, other: Blob,  # type: ignore
-               implemented=NotImplemented) -> bool:  # type: ignore
+    def __eq__(self, other: object, implemented=NotImplemented) -> bool:
         """Override the default equals behavior.
 
         :param other: The other container.
@@ -484,7 +450,7 @@ class Container:
         """
         if isinstance(other, self.__class__):
             return self.name == other.name and \
-                   self.driver.name == other.driver.name
+                   self.driver.name == other.driver.name  # noqa: E126
         return implemented
 
     def __hash__(self) -> int:
@@ -519,7 +485,7 @@ class Container:
         blobs = self.driver.get_blobs(container=self)
         return len(list(blobs))
 
-    def __ne__(self, other: Blob) -> bool:  # type: ignore
+    def __ne__(self, other: object) -> bool:
         """Override the default not equals behavior.
 
         :param other: The other container.
@@ -574,7 +540,7 @@ class Container:
         """
         self.driver.delete_container(container=self)
 
-    def upload_blob(self, filename: Union[str, FileLike], blob_name: str = None,
+    def upload_blob(self, filename: FileLike, blob_name: str = None,
                     acl: str = None, meta_data: MetaData = None,
                     content_type: str = None, content_disposition: str = None,
                     cache_control: str = None, chunk_size: int = 1024,
@@ -915,7 +881,7 @@ class Container:
         return '<Container %s %s>' % (self.name, self.driver.name)
 
 
-class Driver(metaclass=DocstringMeta):
+class Driver(metaclass=abc.ABCMeta):
     """Abstract Base Driver Class (:class:`abc.ABCMeta`) to derive from.
 
     .. todo::
@@ -927,8 +893,9 @@ class Driver(metaclass=DocstringMeta):
         * Support for CORS.
         * Support for container / blob expiration (delete_at).
 
-    :param key: API key, username, credentials file, or local directory.
-    :type key: str
+    :param key: (optional) API key, username, credentials file, or local
+     directory.
+    :type key: str or None
 
     :param secret: (optional) API secret key.
     :type secret: str
@@ -949,7 +916,7 @@ class Driver(metaclass=DocstringMeta):
     #: Unique `str` driver URL.
     url = None  # type: Optional[str]
 
-    def __init__(self, key: str, secret: str = None, region: str = None,
+    def __init__(self, key: str = None, secret: str = None, region: str = None,
                  **kwargs: Dict) -> None:
         self.key = key
         self.secret = secret
@@ -969,7 +936,7 @@ class Driver(metaclass=DocstringMeta):
             # True
 
         :param container: Container or container name.
-        :type container: Container or str
+        :type container: cloudstorage.Container or str
 
         :return: True if the container exists.
         :rtype: bool
@@ -986,7 +953,7 @@ class Driver(metaclass=DocstringMeta):
             return False
 
     @abstractmethod
-    def __iter__(self) -> Iterable[Container]:
+    def __iter__(self) -> Iterable['Container']:
         """Get all containers associated to the driver.
 
         .. code-block:: python
@@ -1046,7 +1013,7 @@ class Driver(metaclass=DocstringMeta):
 
     @abstractmethod
     def create_container(self, container_name: str, acl: str = None,
-                         meta_data: MetaData = None) -> Container:
+                         meta_data: MetaData = None) -> 'Container':
         """Create a new container.
 
         For example:
@@ -1087,7 +1054,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def get_container(self, container_name: str) -> Container:
+    def get_container(self, container_name: str) -> 'Container':
         """Get a container by name.
 
         For example:
@@ -1108,7 +1075,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def patch_container(self, container: Container) -> None:
+    def patch_container(self, container: 'Container') -> None:
         """Saves all changed attributes for the container.
 
         .. important:: This class method is called by :meth:`.Container.save`.
@@ -1124,7 +1091,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def delete_container(self, container: Container) -> None:
+    def delete_container(self, container: 'Container') -> None:
         """Delete this container.
 
         .. important:: This class method is called by :meth:`.Container.delete`.
@@ -1141,7 +1108,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def container_cdn_url(self, container: Container) -> str:
+    def container_cdn_url(self, container: 'Container') -> str:
         """The Content Delivery Network URL for this container.
 
         .. important:: This class method is called by
@@ -1153,7 +1120,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def enable_container_cdn(self, container: Container) -> bool:
+    def enable_container_cdn(self, container: 'Container') -> bool:
         """(Optional) Enable Content Delivery Network (CDN) for the container.
 
         .. important:: This class method is called by
@@ -1165,11 +1132,11 @@ class Driver(metaclass=DocstringMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
         return False
 
     @abstractmethod
-    def disable_container_cdn(self, container: Container) -> bool:
+    def disable_container_cdn(self, container: 'Container') -> bool:
         """(Optional) Disable Content Delivery Network (CDN) on the container.
 
         .. important:: This class method is called by
@@ -1181,11 +1148,11 @@ class Driver(metaclass=DocstringMeta):
         :return: True if successful or false if not supported.
         :rtype: bool
         """
-        logger.warning(FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
         return False
 
     @abstractmethod
-    def upload_blob(self, container: Container, filename: Union[str, FileLike],
+    def upload_blob(self, container: 'Container', filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
                     content_disposition: str = None, cache_control: str = None,
@@ -1236,7 +1203,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def get_blob(self, container: Container, blob_name: str) -> Blob:
+    def get_blob(self, container: 'Container', blob_name: str) -> 'Blob':
         """Get a blob object by name.
 
         .. important:: This class method is called by :meth:`.Blob.get_blob`.
@@ -1255,7 +1222,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def get_blobs(self, container: Container) -> Iterable[Blob]:
+    def get_blobs(self, container: 'Container') -> Iterable['Blob']:
         """Get all blobs associated to the container.
 
         .. important:: This class method is called by :meth:`.Blob.__iter__`.
@@ -1269,8 +1236,8 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def download_blob(self, blob: Blob,
-                      destination: Union[str, FileLike]) -> None:
+    def download_blob(self, blob: 'Blob',
+                      destination: FileLike) -> None:
         """Download the contents of this blob into a file-like object or into
         a named file.
 
@@ -1291,7 +1258,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def patch_blob(self, blob: Blob) -> None:
+    def patch_blob(self, blob: 'Blob') -> None:
         """Saves all changed attributes for this blob.
 
         .. important:: This class method is called by :meth:`.Blob.update`.
@@ -1304,7 +1271,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def delete_blob(self, blob: Blob) -> None:
+    def delete_blob(self, blob: 'Blob') -> None:
         """Deletes a blob from storage.
 
         .. important:: This class method is called by :meth:`.Blob.delete`.
@@ -1320,7 +1287,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def blob_cdn_url(self, blob: Blob) -> str:
+    def blob_cdn_url(self, blob: 'Blob') -> str:
         """The Content Delivery Network URL for the blob.
 
         .. important:: This class method is called by :attr:`.Blob.cdn_url`.
@@ -1334,7 +1301,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def generate_container_upload_url(self, container: Container,
+    def generate_container_upload_url(self, container: 'Container',
                                       blob_name: str,
                                       expires: int = 3600, acl: str = None,
                                       meta_data: MetaData = None,
@@ -1392,7 +1359,7 @@ class Driver(metaclass=DocstringMeta):
         pass
 
     @abstractmethod
-    def generate_blob_download_url(self, blob: Blob, expires: int = 3600,
+    def generate_blob_download_url(self, blob: 'Blob', expires: int = 3600,
                                    method: str = 'GET',
                                    content_disposition: str = None,
                                    extra: ExtraOptions = None) -> str:

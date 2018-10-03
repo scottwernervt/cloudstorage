@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# flake8: noqa
 # -*- coding: utf-8 -*-
 #
 # Cloud Storage documentation build configuration file, created by
@@ -42,7 +43,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinx_autodoc_typehints',
 ]
 
 primary_domain = 'py'
@@ -118,7 +120,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 # -- Options for HTMLHelp output ------------------------------------------
 

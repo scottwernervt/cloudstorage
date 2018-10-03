@@ -1,9 +1,9 @@
-from time import time
-
 import hashlib
 import os
-from prettyconf.configuration import Configuration
 from tempfile import mkdtemp
+from time import time
+
+from prettyconf import Configuration
 
 config = Configuration()
 

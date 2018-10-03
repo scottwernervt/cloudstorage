@@ -2,16 +2,29 @@ language: python
 sudo: false
 cache: pip
 
-python:
-  - '3.4'
-  - '3.5'
-  - '3.6'
-
 before_install:
   - openssl aes-256-cbc -K $encrypted_12e75a453f27_key -iv $encrypted_12e75a453f27_iv -in gcs-service-account.json.enc -out gcs-service-account.json -d
 
 install:
   - pip install --upgrade setuptools
   - pip install tox-travis
+
+matrix:
+  include:
+    - name: "py34"
+      python: "3.4"
+      env: TOXENV=py34
+    - name: "py35"
+      python: "3.5"
+      env: TOXENV=py35
+    - name: "py36"
+      python: "3.6"
+      env: TOXENV=py36
+    - name: "flake8"
+      python: "3.4"
+      env: TOXENV=flake8
+    - name: "docs"
+      python: "3.4"
+      env: TOXENV=docs
 
 script: tox
