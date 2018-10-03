@@ -159,6 +159,7 @@ class S3Driver(Driver):
             content_disposition = object_summary.meta.data.get(
                 'ContentDisposition', None)
             content_type = object_summary.meta.data.get('ContentType', None)
+            cache_control = object_summary.meta.data.get('CacheControl', None)
             modified_at = object_summary.last_modified
             created_at = None
             expires_at = None  # TODO: FEATURE: Delete at / expires at
@@ -176,8 +177,9 @@ class S3Driver(Driver):
                     container=container, driver=self, acl=acl,
                     meta_data=meta_data,
                     content_disposition=content_disposition,
-                    content_type=content_type, created_at=created_at,
-                    modified_at=modified_at, expires_at=expires_at)
+                    content_type=content_type, cache_control=cache_control,
+                    created_at=created_at, modified_at=modified_at,
+                    expires_at=expires_at)
 
     def _make_container(self, bucket) -> Container:
         """Convert S3 Bucket to Container.
@@ -286,7 +288,8 @@ class S3Driver(Driver):
     def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, chunk_size: int = 1024,
+                    content_disposition: str = None, cache_control: str = None,
+                    chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         meta_data = {} if meta_data is None else meta_data
         extra = {} if extra is None else extra
@@ -296,10 +299,14 @@ class S3Driver(Driver):
         config = boto3.s3.transfer.TransferConfig(io_chunksize=chunk_size)
 
         # Default arguments
-        if acl:
-            extra_args.setdefault('ACL', acl.lower())
         extra_args.setdefault('Metadata', meta_data)
         extra_args.setdefault('StorageClass', 'STANDARD')
+
+        if acl:
+            extra_args.setdefault('ACL', acl.lower())
+
+        if cache_control:
+            extra_args.setdefault('CacheControl', cache_control)
 
         if content_disposition:
             extra_args['ContentDisposition'] = content_disposition
@@ -387,6 +394,7 @@ class S3Driver(Driver):
                                       content_disposition: str = None,
                                       content_length: ContentLength = None,
                                       content_type: str = None,
+                                      cache_control: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         meta_data = {} if meta_data is None else meta_data
         extra = {} if extra is None else extra
@@ -402,6 +410,7 @@ class S3Driver(Driver):
         headers = {
             'Content-Disposition': content_disposition,
             'Content-Type': content_type,
+            'Cache-Control': cache_control,
         }
         for header_name, header_value in headers.items():
             if not header_value:
