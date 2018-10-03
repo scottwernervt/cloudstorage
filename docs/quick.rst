@@ -275,6 +275,7 @@ object or `Content-Disposition` set to inline or attachment.
         'acl': 'public-read',
         'content_disposition': 'attachment; filename="user-1-avatar.png"',
         'content_type': 'image/png',
+        'cache_control': 'max-age=86400',
         'meta_data': {
             'owner-id': '1',
             'owner-email': 'user.one@startup.com',
@@ -285,6 +286,8 @@ object or `Content-Disposition` set to inline or attachment.
     picture_blob = container.upload_blob(picture_path, **options)
     picture_blob.content_disposition
     # 'attachment; filename="user-1-avatar.png"'
+    picture_blob.cache_control
+    # 'max-age=86400'
     picture_blob.meta_data
     # {'owner-id': '1', 'owner-email': 'user.one@startup.com'}
 
