@@ -77,6 +77,7 @@ class CloudFilesDriver(Driver):
       cdn-api-reference/>`_
 
     .. todo:: Add support for RackspaceSDK ACL.
+    .. todo:: Add support for missing features like Cache-Control.
 
     :param key: Rackspace username.
     :type key: str
@@ -343,8 +344,9 @@ class CloudFilesDriver(Driver):
                     etag=obj.etag, size=size, container=container, driver=self,
                     acl=None, meta_data=obj.metadata,
                     content_disposition=obj.content_disposition,
-                    content_type=obj.content_type, created_at=None,
-                    modified_at=modified_at, expires_at=delete_at)
+                    content_type=obj.content_type, cache_control=None,
+                    created_at=None, modified_at=modified_at,
+                    expires_at=delete_at)
 
     @property
     def _token(self) -> str:
@@ -471,18 +473,22 @@ class CloudFilesDriver(Driver):
     def upload_blob(self, container: Container, filename: FileLike,
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, chunk_size: int = 1024,
+                    content_disposition: str = None, cache_control: str = None,
+                    chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         if acl:
             logger.warning(messages.OPTION_NOT_SUPPORTED, 'acl')
 
+        if cache_control:
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'cache_control')
+
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
 
-        extra_norm = self._normalize_parameters(extra, self._OBJECT_META_KEYS)
-        extra_norm.setdefault('content_encoding', None)
-        extra_norm.setdefault('delete_at', None)
-        extra_norm.setdefault('delete_after', None)
+        extra_args = self._normalize_parameters(extra, self._OBJECT_META_KEYS)
+
+        # Default arguments
+        extra_args.setdefault('content_encoding', None)
 
         blob_name = blob_name or validate_file_or_path(filename)
 
@@ -498,17 +504,14 @@ class CloudFilesDriver(Driver):
             file_obj = filename
 
         with file_obj as data:
+            extra_args['data'] = data
+            extra_args['content_type'] = content_type
+            extra_args['content_disposition'] = content_disposition
+            extra_args['cache_control'] = cache_control
+
             obj = self.object_store.create_object(
-                container=container.name, name=blob_name, **dict(
-                    data=data,
-                    content_type=content_type,
-                    content_disposition=content_disposition,
-                    content_encoding=extra_norm['content_encoding'],
-                    # TODO: BUG: Bad request exception
-                    # delete_after=extra_norm['delete_after'],
-                    # delete_at=extra_norm['delete_at']
-                )
-            )  # type: OpenStackObject
+                container=container.name, name=blob_name,
+                **extra_args)  # type: OpenStackObject
 
         # Manually set meta data after object upload
         self._set_object_meta(obj, meta_data)
@@ -569,6 +572,7 @@ class CloudFilesDriver(Driver):
                                       content_disposition: str = None,
                                       content_length: ContentLength = None,
                                       content_type: str = None,
+                                      cache_control: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         if acl:
             logger.warning(messages.OPTION_NOT_SUPPORTED, 'acl')
@@ -581,6 +585,9 @@ class CloudFilesDriver(Driver):
 
         if content_type:
             logger.warning(messages.OPTION_NOT_SUPPORTED, 'content_type')
+
+        if cache_control:
+            logger.warning(messages.OPTION_NOT_SUPPORTED, 'cache_control')
 
         extra = extra if extra is not None else {}
         extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
@@ -741,6 +748,7 @@ class CloudFilesDriver(Driver):
         'content_type': 'content_type',
         'content_encoding': 'content_encoding',
         'content_disposition': 'content_disposition',
+        'cache_control': 'cache-control',
         'delete_after': 'delete_after',
         'delete_at': 'delete_at',
         'is_content_type_detected': 'is_content_type_detected',
@@ -768,5 +776,6 @@ class CloudFilesDriver(Driver):
         'write': 'X-Container-Write',
         'version': 'X-Versions-Location',
         'content_type': 'Content-Type',
+        'cache_control': 'cache_control',
         'detect-content-type': 'X-Detect-Content-Type',
     }

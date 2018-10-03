@@ -116,9 +116,8 @@ def test_container_generate_upload_url(container, binary_stream):
     assert response.status_code == HTTPStatus.CREATED, response.text
 
     blob = container.get_blob('prefix_' + BINARY_FORM_FILENAME)
-    # Option meta_data is not supported for rackspace upload url.
+    # Options not supported: meta_data, content_disposition, and cache_control.
     assert blob.content_type == BINARY_OPTIONS['content_type']
-    # Option content_disposition is not supported for rackspace upload url.
 
 
 def test_container_generate_upload_url_expiration(container, text_stream):
@@ -169,9 +168,10 @@ def test_blob_upload_options(container, binary_stream):
     assert blob.name == BINARY_STREAM_FILENAME
     assert blob.checksum == BINARY_MD5_CHECKSUM
     assert blob.meta_data == BINARY_OPTIONS['meta_data']
-    # TODO: Openstack Bug: Always returns "text/html; charset=UTF-8"
+    # TODO: Openstack: Always returns "text/html; charset=UTF-8"
     # assert blob.content_type == BINARY_OPTIONS['content_type']
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
+    # Options not supported: cache_control.
 
 
 def test_blob_delete(container, text_blob):

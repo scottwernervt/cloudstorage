@@ -131,6 +131,7 @@ def test_container_generate_upload_url(container, binary_stream):
     assert blob.meta_data == BINARY_OPTIONS['meta_data']
     assert blob.content_type == BINARY_OPTIONS['content_type']
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
+    assert blob.cache_control == BINARY_OPTIONS['cache_control']
 
 
 @rate_limited()
@@ -189,6 +190,7 @@ def test_blob_upload_options(container, binary_stream):
     assert blob.meta_data == BINARY_OPTIONS['meta_data']
     assert blob.content_type == BINARY_OPTIONS['content_type']
     assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
+    assert blob.cache_control == BINARY_OPTIONS['cache_control']
 
 
 @rate_limited()
