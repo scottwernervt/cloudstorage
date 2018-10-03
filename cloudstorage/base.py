@@ -112,8 +112,8 @@ class Blob:
     def __init__(self, name: str, checksum: str, etag: str, size: int,
                  container: 'Container', driver: 'Driver', acl: Acl = None,
                  meta_data: MetaData = None, content_disposition: str = None,
-                 content_type: str = None, created_at: datetime = None,
-                 modified_at: datetime = None,
+                 content_type: str = None, cache_control: str = None,
+                 created_at: datetime = None, modified_at: datetime = None,
                  expires_at: datetime = None) -> None:
         acl = acl if acl is not None else {}
         meta_data = meta_data if meta_data is not None else {}
@@ -129,6 +129,7 @@ class Blob:
         self.meta_data = meta_data
         self.content_disposition = content_disposition
         self.content_type = content_type
+        self.cache_control = cache_control
         self.created_at = created_at
         self.modified_at = modified_at
         self.expires_at = expires_at
@@ -576,7 +577,8 @@ class Container:
     def upload_blob(self, filename: Union[str, FileLike], blob_name: str = None,
                     acl: str = None, meta_data: MetaData = None,
                     content_type: str = None, content_disposition: str = None,
-                    chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
+                    cache_control: str = None, chunk_size: int = 1024,
+                    extra: ExtraOptions = None) -> Blob:
         """Upload a filename or file like object to a container.
 
         If `content_type` is `None`, Cloud Storage will attempt to guess the
@@ -638,8 +640,6 @@ class Container:
           storage-api-reference/object-services-operations/
           #create-or-update-object>`_
 
-        :param chunk_size:
-        :type chunk_size:
         :param filename: A file handle open for reading or the path to the file.
         :type filename: file or str
 
@@ -671,6 +671,10 @@ class Container:
           information for the blob.
         :type content_disposition: str or None
 
+        :param cache_control: (optional) Specify directives for caching
+         mechanisms for the blob.
+        :type cache_control: str or None
+
         :param chunk_size: (optional) Optional chunk size for streaming a
           transfer.
         :type chunk_size: int
@@ -686,8 +690,8 @@ class Container:
                                        meta_data=meta_data,
                                        content_type=content_type,
                                        content_disposition=content_disposition,
-                                       chunk_size=chunk_size,
-                                       extra=extra)
+                                       cache_control=cache_control,
+                                       chunk_size=chunk_size, extra=extra)
 
     def get_blob(self, blob_name: str) -> Blob:
         """Get a blob object by name.
@@ -712,7 +716,7 @@ class Container:
                             acl: str = None, meta_data: MetaData = None,
                             content_disposition: str = None,
                             content_length: ContentLength = None,
-                            content_type: str = None,
+                            content_type: str = None, cache_control: str = None,
                             extra: ExtraOptions = None) -> FormPost:
         """Generate a signature and policy for uploading objects to this
         container.
@@ -852,13 +856,17 @@ class Container:
           information for the blob.
         :type content_disposition: str or None
 
+        :param content_length: Specifies that uploaded files can only be
+          between a certain size range in bytes: `(<min>, <max>)`.
+        :type content_length: tuple[int, int] or None
+
         :param content_type: (optional) A standard MIME type describing the
           format of the object data.
         :type content_type: str or None
 
-        :param content_length: Specifies that uploaded files can only be
-          between a certain size range in bytes: `(<min>, <max>)`.
-        :type content_length: tuple[int, int] or None
+        :param cache_control: (optional) Specify directives for caching
+         mechanisms for the blob.
+        :type cache_control: str or None
 
         :param extra: (optional) Extra parameters for the request.
 
@@ -884,6 +892,7 @@ class Container:
             content_disposition=content_disposition,
             content_length=content_length,
             content_type=content_type,
+            cache_control=cache_control,
             extra=extra)
 
     def enable_cdn(self) -> bool:
@@ -1179,8 +1188,8 @@ class Driver(metaclass=DocstringMeta):
     def upload_blob(self, container: Container, filename: Union[str, FileLike],
                     blob_name: str = None, acl: str = None,
                     meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, chunk_size=1024,
-                    extra: ExtraOptions = None) -> Blob:
+                    content_disposition: str = None, cache_control: str = None,
+                    chunk_size=1024, extra: ExtraOptions = None) -> 'Blob':
         """Upload a filename or file like object to a container.
 
         .. important:: This class method is called by
@@ -1209,6 +1218,10 @@ class Driver(metaclass=DocstringMeta):
         :param content_disposition: (optional) Specifies presentational
           information for the blob.
         :type content_disposition: str or None
+
+        :param cache_control: (optional) Specify directives for caching
+         mechanisms for the blob.
+        :type cache_control: str or None
 
         :param chunk_size: (optional) Optional chunk size for streaming a
           transfer.
@@ -1328,6 +1341,7 @@ class Driver(metaclass=DocstringMeta):
                                       content_disposition: str = None,
                                       content_length: ContentLength = None,
                                       content_type: str = None,
+                                      cache_control: str = None,
                                       extra: ExtraOptions = None) -> FormPost:
         """Generate a signature and policy for uploading objects to the
         container.
@@ -1363,6 +1377,10 @@ class Driver(metaclass=DocstringMeta):
         :param content_length: Specifies that uploaded files can only be
           between a certain size range in bytes.
         :type content_length: tuple[int, int] or None
+
+        :param cache_control: (optional) Specify directives for caching
+         mechanisms for the blob.
+        :type cache_control: str or None
 
         :param extra: (optional) Extra parameters for the request.
         :type extra: Dict[Any, Any] or None
