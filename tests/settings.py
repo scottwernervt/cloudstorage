@@ -44,11 +44,16 @@ AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY', default=None)
 GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None,
                             cast=lambda path: os.path.abspath(path))
 
-RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)
-RACKSPACE_SECRET = config('RACKSPACE_SECRET', default=None)
-RACKSPACE_REGION = config('RACKSPACE_REGION', default='IAD')
-
 LOCAL_KEY = config('LOCAL_KEY', default=mkdtemp(prefix='cloud-storage-test-'))
 if not os.path.exists(LOCAL_KEY):
     os.makedirs(LOCAL_KEY)
 LOCAL_SECRET = config('LOCAL_SECRET', default='local-storage-secret')
+
+RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)
+RACKSPACE_SECRET = config('RACKSPACE_SECRET', default=None)
+RACKSPACE_REGION = config('RACKSPACE_REGION', default='IAD')
+
+MINIO_ENDPOINT = config('MINIO_ENDPOINT', default=None)
+MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default=None)
+MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default=None)
+MINIO_REGION = config('MINIO_REGION', default='us-east-1')
