@@ -19,6 +19,7 @@ Also install the storage driver(s) you will be using:
     pip install cloudstorage[google]
     pip install cloudstorage[local]
     pip install cloudstorage[microsoft]
+    pip install cloudstorage[minio]
     pip install cloudstorage[rackspace]
 
 If you don't have `pip <https://pip.pypa.io>`_ installed,

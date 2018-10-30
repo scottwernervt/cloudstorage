@@ -14,5 +14,6 @@ For more examples and usage, check out the API documentation for
    advanced/amazon
    advanced/google
    advanced/microsoft
+   advanced/minio
    advanced/rackspace
    advanced/local
