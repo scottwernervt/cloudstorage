@@ -45,6 +45,7 @@ setup(
         'google',
         'cloudstorage',
         'gcs',
+        'minio',
     ]),
     url='https://github.com/scottwernervt/cloudstorage',
     project_urls={
@@ -85,6 +86,9 @@ setup(
         ],
         'microsoft': [
             'azure>=3.0.0',  # MIT
+        ],
+        'minio': [
+            'minio>=4.0.0',  # Apache 2.0
         ],
         'rackspace': [
             'rackspacesdk>=0.7.5',  # Apache 2.0
