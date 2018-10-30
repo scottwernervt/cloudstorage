@@ -611,8 +611,8 @@ class CloudFilesDriver(Driver):
         fields = {}  # type: Dict[Any, Any]
 
         # Optional parameters and attributes
-        redirect = (extra_norm.get('success_action_redirect') or
-                    extra_norm.get('redirect'))
+        redirect = extra_norm.get('success_action_redirect') or \
+                   extra_norm.get('redirect')
         fields['redirect'] = '' if redirect is None else redirect
 
         # Required parameters and attributes

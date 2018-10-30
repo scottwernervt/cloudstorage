@@ -47,7 +47,7 @@ def test_driver_create_container(storage):
 def test_driver_create_container_invalid_name(storage):
     # noinspection PyTypeChecker
     with pytest.raises(CloudStorageError):
-        storage.create_container('\?!<>container-name<>!?/')
+        storage.create_container('?!<>container-name<>!?')
 
 
 # noinspection PyShadowingNames
