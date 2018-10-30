@@ -1,6 +1,5 @@
 """Minio Driver."""
 import logging
-import os
 import re
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, List  # noqa: F401
@@ -74,22 +73,26 @@ class MinioDriver(Driver):
     References:
 
     * `Python Client API Reference
-       <https://docs.minio.io/docs/python-client-api-reference.html>`_
+      <https://docs.minio.io/docs/python-client-api-reference.html>`_
     * `Minio Python Library <https://github.com/minio/minio-py>`_
 
-    :param endpoint: Server to connect to.
+    :param endpoint: Minio server to connect to.
     :type endpoint: str
 
-    :param key: Minio Access Key ID.
+    :param key: Minio access key.
     :type key: str
 
-    :param secret: Minio Secret Access Key.
+    :param secret: Minio secret key.
     :type secret: str
 
     :param region: (optional) Region to connect to. Defaults to `us-east-1`.
     :type region: str
 
     :param kwargs: (optional) Extra driver options.
+
+                   * secure (`bool`): Use secure connection.
+                   * http_client (:class:`urllib3.poolmanager.PoolManager`):
+                     Use custom http client.
     :type kwargs: dict
     """
     name = 'MINIO'
