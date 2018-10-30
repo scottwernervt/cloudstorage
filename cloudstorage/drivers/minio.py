@@ -92,7 +92,7 @@ class MinioDriver(Driver):
     :param kwargs: (optional) Extra driver options.
     :type kwargs: dict
     """
-    name = 'Minio'
+    name = 'MINIO'
     url = 'https://www.minio.io'
 
     def __init__(self, endpoint: str, key: str, secret: str = None,

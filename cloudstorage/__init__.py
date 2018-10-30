@@ -89,6 +89,7 @@ def get_driver_by_name(driver_name: str) -> Driver:
         * `GOOGLESTORAGE`
         * `S3`
         * `LOCAL`
+        * `MINIO`
     :type driver_name: str
 
     :return: DriverName driver class.
