@@ -26,7 +26,6 @@ from cloudstorage.exceptions import (
 )
 from cloudstorage.helpers import (
     file_content_type,
-    read_in_chunks,
     validate_file_or_path,
 )
 from cloudstorage.structures import CaseInsensitiveDict
@@ -256,6 +255,7 @@ class MinioDriver(Driver):
                     chunk_size: int = 1024,
                     extra: ExtraOptions = None) -> Blob:
         meta_data = {} if meta_data is None else meta_data
+        extra = {} if extra is None else extra
 
         blob_name = blob_name or validate_file_or_path(filename)
 
@@ -266,16 +266,14 @@ class MinioDriver(Driver):
                 content_type = file_content_type(blob_name)
 
         if isinstance(filename, str):
-            file_stat = os.stat(filename)
-            with open(filename, 'rb') as data:
-                self.client.put_object(container.name,
-                                       blob_name,
-                                       data,
-                                       file_stat.st_size,
-                                       content_type=content_type,
-                                       metadata=meta_data)
+            self.client.fput_object(container.name,
+                                    blob_name,
+                                    filename,
+                                    content_type=content_type,
+                                    metadata=meta_data)
         else:
-            length = 0
+            length = extra.pop('length', len(filename.read()))
+            filename.seek(0)
             self.client.put_object(container.name,
                                    blob_name,
                                    filename,
@@ -299,12 +297,13 @@ class MinioDriver(Driver):
     def download_blob(self, blob: Blob,
                       destination: FileLike) -> None:
         data = self.client.get_object(blob.container.name, blob.name)
+
         if isinstance(destination, str):
             with open(destination, 'wb') as blob_data:
-                for d in read_in_chunks(data):
+                for d in data.stream(4096):
                     blob_data.write(d)
         else:
-            for d in read_in_chunks(data):
+            for d in data.stream(4096):
                 destination.write(d)
 
     def patch_blob(self, blob: Blob) -> None:
