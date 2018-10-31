@@ -21,8 +21,8 @@ Cloud Storage
 
 `Cloud Storage`_ is a Python +3.4 package which creates a unified API for the
 cloud storage services: Amazon Simple Storage Service (S3),
-Microsoft Azure Storage, Rackspace Cloud Files, Google Cloud Storage, and the
-Local File System.
+Microsoft Azure Storage, Minio Cloud Storage, Rackspace Cloud Files,
+Google Cloud Storage, and the Local File System.
 
 Cloud Storage is inspired by `Apache Libcloud <https://libcloud.apache.org/>`_.
 Advantages to Apache Libcloud Storage are:
@@ -72,6 +72,7 @@ Supported Services
 * `Amazon S3`_
 * `Google Cloud Storage`_
 * `Microsoft Azure Storage`_
+* `Minio Cloud Storage`_
 * `Rackspace CloudFiles`_
 * Local File System
 
@@ -93,11 +94,13 @@ Also install the storage driver(s) you will be using:
     pip install cloudstorage[google]
     pip install cloudstorage[local]
     pip install cloudstorage[microsoft]
+    pip install cloudstorage[minio]
     pip install cloudstorage[rackspace]
 
 .. _`Amazon S3`: http://aws.amazon.com/s3/
 .. _`Blackblaze B2 Cloud Storage`: https://www.backblaze.com/b2/Cloud-Storage.html
 .. _`Google Cloud Storage`: https://cloud.google.com/storage/
 .. _`Microsoft Azure Storage`: https://azure.microsoft.com/services/storage/
+.. _`Minio Cloud Storage`: https://www.minio.io/
 .. _`Rackspace CloudFiles`: https://www.rackspace.com/cloud/files
 .. _`Cloud Storage`: https://github.com/scottwernervt/cloudstorage

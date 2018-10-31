@@ -10,7 +10,6 @@ install_requires = [
     'inflection>=0.3.1',  # MIT
     'python-dateutil>=2.7.3',  # Simplified BSD
     'python-magic>=0.4.15',  # MIT
-    'requests>=2.19.1',  # Apache 2.0
     # Python 3.4 needs backports
     'typing;python_version<"3.5"',  # PSF
     'httpstatus35;python_version<"3.5"',  # PSF
@@ -45,6 +44,7 @@ setup(
         'google',
         'cloudstorage',
         'gcs',
+        'minio',
     ]),
     url='https://github.com/scottwernervt/cloudstorage',
     project_urls={
@@ -86,8 +86,13 @@ setup(
         'microsoft': [
             'azure>=3.0.0',  # MIT
         ],
+        'minio': [
+            'minio>=4.0.0',  # Apache 2.0
+        ],
         'rackspace': [
+            'openstacksdk<=0.17.2',  # Apache 2.0
             'rackspacesdk>=0.7.5',  # Apache 2.0
+            'requests>=2.19.1',  # Apache 2.0
         ],
         'docs': [
             'sphinx',  # BSD
@@ -103,6 +108,7 @@ setup(
         'flake8',  # MIT
         'pytest',  # MIT
         'prettyconf',  # MIT
+        'requests',
         'tox',  # MIT
     ],
     test_suite='tests',

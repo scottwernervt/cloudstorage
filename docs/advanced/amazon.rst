@@ -7,7 +7,7 @@ Amazon :class:`.S3Driver` is a wrapper around `Boto 3 <http://boto3.readthedocs.
 Connecting
 ----------
 
-Change region from default `us-east-1` to `us-west-`:
+Change region from default `us-east-1` to `us-west-1`:
 
 .. code-block:: python
 

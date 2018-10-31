@@ -24,6 +24,7 @@ Drivers
    api/rackspace
    api/google
    api/local
+   api/minio
    api/amazon
 
 
