@@ -90,11 +90,6 @@ class Blob:
         else:
             meta_data = CaseInsensitiveDict(meta_data)
 
-        if acl is None:
-            acl = CaseInsensitiveDict()
-        else:
-            acl = CaseInsensitiveDict(acl)
-
         self.name = name
         self.size = size
         self.checksum = checksum
@@ -112,11 +107,20 @@ class Blob:
         self.expires_at = expires_at
 
         self._attr = CaseInsensitiveDict()  # type: CaseInsensitiveDict
-        self._acl = CaseInsensitiveDict()  # type: CaseInsensitiveDict
         self._meta_data = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+        self._acl = None
 
-        # Track attributes for object PUT
-        for key, value in locals().items():
+        # Track attributes for blob update (PUT request)
+        track_params = CaseInsensitiveDict({
+            'name': name,
+            'meta_data': meta_data,
+            'acl': acl,
+            'content_disposition': content_disposition,
+            'content_type': content_type,
+            'cache_control': cache_control,
+            'expires_at': expires_at,
+        })
+        for key, value in track_params.items():
             if key == 'meta_data':
                 self._meta_data = value
             elif key == 'acl':
@@ -414,8 +418,13 @@ class Container:
         self._acl = acl  # type: Optional[str]
         self._meta_data = CaseInsensitiveDict()  # type: Dict[Any, Any]
 
-        # Track attributes for object PUT
-        for key, value in locals().items():
+        # Track attributes for container update (PUT request)
+        track_params = CaseInsensitiveDict({
+            'name': name,
+            'meta_data': meta_data,
+            'acl': acl,
+        })
+        for key, value in track_params.items():
             if key == 'meta_data':
                 self._meta_data = value
             elif key == 'acl':
