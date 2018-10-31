@@ -27,7 +27,6 @@ from cloudstorage.helpers import (
     file_content_type,
     validate_file_or_path,
 )
-from cloudstorage.structures import CaseInsensitiveDict
 from cloudstorage.typed import (
     ContentLength,
     ExtraOptions,
@@ -164,11 +163,11 @@ class MinioDriver(Driver):
         :rtype: :class:`.Blob`
         """
         if obj.metadata is None:
-            metadata = CaseInsensitiveDict()
+            metadata = {}
         else:
-            metadata = CaseInsensitiveDict(obj.metadata)
+            metadata = {}
 
-        meta_data = CaseInsensitiveDict()
+        meta_data = {}
         for name, value in metadata.items():
             meta_key = re.sub(r'\b%s\b' % re.escape(self._OBJECT_META_PREFIX),
                               '', name, flags=re.IGNORECASE)
