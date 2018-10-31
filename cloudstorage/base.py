@@ -14,6 +14,7 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
+from .structures import CaseInsensitiveDict
 
 __all__ = ['Blob', 'Container', 'Driver']
 
@@ -84,8 +85,10 @@ class Blob:
                  content_type: str = None, cache_control: str = None,
                  created_at: datetime = None, modified_at: datetime = None,
                  expires_at: datetime = None) -> None:
-        acl = acl if acl is not None else {}
-        meta_data = meta_data if meta_data is not None else {}
+        if meta_data is None:
+            meta_data = CaseInsensitiveDict()
+        else:
+            meta_data = CaseInsensitiveDict(meta_data)
 
         self.name = name
         self.size = size
@@ -103,12 +106,21 @@ class Blob:
         self.modified_at = modified_at
         self.expires_at = expires_at
 
-        self._attr = {}  # type: Dict
-        self._acl = {}  # type: Dict
-        self._meta_data = {}  # type: Dict
+        self._attr = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+        self._meta_data = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+        self._acl = None
 
-        # Track attributes for object PUT
-        for key, value in locals().items():
+        # Track attributes for blob update (PUT request)
+        track_params = CaseInsensitiveDict({
+            'name': name,
+            'meta_data': meta_data,
+            'acl': acl,
+            'content_disposition': content_disposition,
+            'content_type': content_type,
+            'cache_control': cache_control,
+            'expires_at': expires_at,
+        })
+        for key, value in track_params.items():
             if key == 'meta_data':
                 self._meta_data = value
             elif key == 'acl':
@@ -389,7 +401,10 @@ class Container:
     def __init__(self, name: str, driver: 'Driver', acl: str = None,
                  meta_data: MetaData = None,
                  created_at: datetime = None) -> None:
-        meta_data = meta_data if meta_data is not None else {}
+        if meta_data is None:
+            meta_data = CaseInsensitiveDict()
+        else:
+            meta_data = CaseInsensitiveDict(meta_data)
 
         self.name = name
         self.driver = driver
@@ -399,12 +414,17 @@ class Container:
         self.meta_data = meta_data
         self.created_at = created_at
 
-        self._attr = {}  # type: Dict[Any, Any]
+        self._attr = CaseInsensitiveDict()  # type: Dict[Any, Any]
         self._acl = acl  # type: Optional[str]
-        self._meta_data = {}  # type: Dict[Any, Any]
+        self._meta_data = CaseInsensitiveDict()  # type: Dict[Any, Any]
 
-        # Track attributes for object PUT
-        for key, value in locals().items():
+        # Track attributes for container update (PUT request)
+        track_params = CaseInsensitiveDict({
+            'name': name,
+            'meta_data': meta_data,
+            'acl': acl,
+        })
+        for key, value in track_params.items():
             if key == 'meta_data':
                 self._meta_data = value
             elif key == 'acl':
@@ -1397,12 +1417,12 @@ class Driver(metaclass=abc.ABCMeta):
 
         return '<Driver: %s>' % self.name
 
-    _POST_OBJECT_KEYS = {}  # type: Dict
-    _GET_OBJECT_KEYS = {}  # type: Dict
-    _PUT_OBJECT_KEYS = {}  # type: Dict
-    _DELETE_OBJECT_KEYS = {}  # type: Dict
+    _POST_OBJECT_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+    _GET_OBJECT_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+    _PUT_OBJECT_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+    _DELETE_OBJECT_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
 
-    _POST_CONTAINER_KEYS = {}  # type: Dict
-    _GET_CONTAINER_KEYS = {}  # type: Dict
-    _PUT_CONTAINER_KEYS = {}  # type: Dict
-    _DELETE_CONTAINER_KEYS = {}  # type: Dict
+    _POST_CONTAINER_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+    _GET_CONTAINER_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+    _PUT_CONTAINER_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict
+    _DELETE_CONTAINER_KEYS = CaseInsensitiveDict()  # type: CaseInsensitiveDict

@@ -3,6 +3,15 @@
 Changelog
 ---------
 
+0.8.0 (Unreleased)
+++++++++++++++++++
+
+Features
+
+* ``Blob`` and ``Container``'s ``meta_data`` is now a case insensitive dictionary.
+* Add new driver for Minio Cloud Storage (`#25 <https://github.com/scottwernervt/cloudstorage/issues/25>`_).
+  Install driver requirements with: ``pip install cloudstorage[minio]``.
+
 0.7.0 (2018-10-03)
 ++++++++++++++++++
 
