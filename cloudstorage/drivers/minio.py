@@ -162,13 +162,9 @@ class MinioDriver(Driver):
         :return: A blob object.
         :rtype: :class:`.Blob`
         """
-        if obj.metadata is None:
-            metadata = {}
-        else:
-            metadata = {}
-
+        obj_metadata = {} if obj.metadata is None else obj.metadata
         meta_data = {}
-        for name, value in metadata.items():
+        for name, value in obj_metadata.items():
             meta_key = re.sub(r'\b%s\b' % re.escape(self._OBJECT_META_PREFIX),
                               '', name, flags=re.IGNORECASE)
             meta_data[meta_key] = value
