@@ -1,5 +1,8 @@
+=============
 Cloud Storage
 =============
+
+.. start-badges
 
 .. image:: https://img.shields.io/pypi/v/cloudstorage.svg
     :target: https://pypi.python.org/pypi/cloudstorage
@@ -19,6 +22,8 @@ Cloud Storage
 .. image:: https://codeclimate.com/github/scottwernervt/cloudstorage/badges/gpa.svg
     :target: https://codeclimate.com/github/scottwernervt/cloudstorage
 
+.. end-badges
+
 `Cloud Storage`_ is a Python +3.4 package which creates a unified API for the
 cloud storage services: Amazon Simple Storage Service (S3),
 Microsoft Azure Storage, Minio Cloud Storage, Rackspace Cloud Files,
@@ -34,7 +39,7 @@ Advantages to Apache Libcloud Storage are:
   storage using respective objects.
 
 Usage
------
+=====
 
 .. code-block:: python
 
@@ -67,7 +72,7 @@ Usage
     }
 
 Supported Services
-------------------
+==================
 
 * `Amazon S3`_
 * `Google Cloud Storage`_
@@ -78,7 +83,7 @@ Supported Services
 
 
 Installation
-------------
+============
 
 To install Cloud Storage:
 
