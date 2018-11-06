@@ -1,11 +1,13 @@
-recursive-include tests *
+graft docs
+graft src
+graft tests
 
+include AUTHORS.rst
 include CHANGELOG.rst
+include CONTRIBUTING.rst
 include LICENSE
-include MANIFEST.in
 include README.rst
 
-graft docs
-prune docs/_build
+include tox.ini .travis.yml
 
-global-exclude *.pyc *.ini *.json .git*
+global-exclude *.py[cod] __pycache__ *.so *.dylib *.enc

@@ -67,13 +67,9 @@ class CloudFilesDriver(Driver):
     References:
 
     * `Using OpenStack Object Store
-      <https://developer.openstack.org/sdks/python/openstacksdk/users/guides/
-      object_store.html>`_
+      <https://docs.openstack.org/openstacksdk/latest/user/guides/object_store.html>`_
     * `Object Store API
-      <https://developer.openstack.org/sdks/python/openstacksdk/users/proxies/
-      object_store.html>`_
-    * `Working with Container Metadata <https://developer.openstack.org
-      /sdks/python/openstacksdk/users/guides/object_store.html>`_
+      <https://docs.openstack.org/openstacksdk/latest/user/proxies/object_store.html>`_
     * `CDN API reference - Rackspace Developer Portal
       <https://developer.rackspace.com/docs/cloud-files/v1/
       cdn-api-reference/>`_

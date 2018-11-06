@@ -2,7 +2,7 @@ Microsoft Azure Storage
 =======================
 
 Microsoft :class:`.AzureStorageDriver` is a wrapper around
-`Azure Storage SDK for Python <http://https://azure-storage.readthedocs.io/>`_.
+`Azure Storage SDK for Python <https://azure-storage.readthedocs.io/>`_.
 
 
 Connecting
