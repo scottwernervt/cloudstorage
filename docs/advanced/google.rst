@@ -1,7 +1,8 @@
 Google Cloud Storage
 ====================
 
-:class:`.GoogleStorageDriver` is a wrapper around `google-cloud-storage <https://googlecloudplatform.github.io/google-cloud-python/stable/storage-client.html>`_.
+:class:`.GoogleStorageDriver` is a wrapper around
+`google-cloud-storage <https://googleapis.github.io/google-cloud-python/latest/storage/index.html>`_.
 
 
 Connecting

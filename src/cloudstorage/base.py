@@ -253,8 +253,7 @@ class Blob:
         explicitly log in. [#f1]_
 
         .. [#f1] `Blobs / Objects — google-cloud 0.24.0 documentation
-         <https://googlecloudplatform.github.io/google-cloud-python/
-         stable/storage-blobs.html>`_
+         <https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html>`_
 
         Basic example:
 
@@ -295,8 +294,7 @@ class Blob:
           <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
           S3.Client.generate_presigned_url>`_
         * `Google Cloud Storage: generate_signed_url
-          <https://googlecloudplatform.github.io/google-cloud-python/stable/
-          storage-blobs.html>`_
+          <https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html>`_
         * `Rackspace: TempURL
           <https://developer.rackspace.com/docs/cloud-files/v1/use-cases/
           public-access-to-your-cloud-files-account/#tempurl>`_
@@ -621,8 +619,7 @@ class Container:
           <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
           S3.Client.put_object>`_
         * `Google Cloud Storage: upload_from_file / upload_from_filename
-          <https://googlecloudplatform.github.io/google-cloud-python/stable/
-          storage-blobs.html>`_
+          <https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html>`_
         * `Rackspace Cloud Files: Create or update object
           <https://developer.rackspace.com/docs/cloud-files/v1/
           storage-api-reference/object-services-operations/
