@@ -12,6 +12,10 @@ Features
 * Add new driver for Minio Cloud Storage (`#25 <https://github.com/scottwernervt/cloudstorage/issues/25>`_).
   Install driver requirements with: ``pip install cloudstorage[minio]``.
 
+Other
+
+* Move to ``src`` folder structure for package.
+
 0.7.0 (2018-10-03)
 ++++++++++++++++++
 
