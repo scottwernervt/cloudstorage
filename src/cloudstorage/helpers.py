@@ -15,7 +15,7 @@ def read_in_chunks(file_object: FileLike,
     """Return a generator which yields data in chunks.
 
     Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file
-    <http://stackoverflow.com/questions/17056382/
+    <https://stackoverflow.com/questions/17056382/
     read-file-in-chunks-ram-usage-read-strings-from-binary-files>`_
 
     :param file_object: File object to read in chunks.
@@ -43,7 +43,7 @@ def file_checksum(filename: FileLike, hash_type: str = 'md5',
         file_checksum(picture_path, hash_type='sha256')
         # '03ef90ba683795018e541ddfb0ae3e958a359ee70dd4fccc7e747ee29b5df2f8'
 
-    Source: `get-md5-hash-of-big-files-in-python <http://stackoverflow.com/
+    Source: `get-md5-hash-of-big-files-in-python <https://stackoverflow.com/
     questions/1131220/get-md5-hash-of-big-files-in-python>`_
 
     :param filename: File path or stream.
@@ -82,7 +82,7 @@ def file_checksum(filename: FileLike, hash_type: str = 'md5',
 def validate_file_or_path(filename: FileLike) -> Optional[str]:
     """Return filename from file path or from file like object.
 
-    Source: `rackspace/pyrax/object_storage.py <https://github.com/rackspace/
+    Source: `rackspace/pyrax/object_storage.py <https://github.com/pycontribs/
     pyrax/blob/master/pyrax/object_storage.py>`_
 
     :param filename: File path or file like object.

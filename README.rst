@@ -5,22 +5,22 @@ Cloud Storage
 .. start-badges
 
 .. image:: https://img.shields.io/pypi/v/cloudstorage.svg
-    :target: https://pypi.python.org/pypi/cloudstorage
+    :target: https://pypi.org/project/cloudstorage/
 
 .. image:: https://img.shields.io/pypi/l/cloudstorage.svg
-    :target: https://pypi.python.org/pypi/cloudstorage
+    :target: https://pypi.org/project/cloudstorage/
 
 .. image:: https://img.shields.io/pypi/wheel/cloudstorage.svg
-    :target: https://pypi.python.org/pypi/cloudstorage
+    :target: https://pypi.org/project/cloudstorage/
 
 .. image:: https://img.shields.io/pypi/pyversions/cloudstorage.svg
-    :target: https://pypi.python.org/pypi/cloudstorage
+    :target: https://pypi.org/project/cloudstorage/
 
 .. image:: https://travis-ci.org/scottwernervt/cloudstorage.svg?branch=master
-    :target: https://travis-ci.org/scottwernervt/cloudstorage
+    :target: https://travis-ci.org/scottwernervt/cloudstorage/
 
 .. image:: https://codeclimate.com/github/scottwernervt/cloudstorage/badges/gpa.svg
-    :target: https://codeclimate.com/github/scottwernervt/cloudstorage
+    :target: https://codeclimate.com/github/scottwernervt/cloudstorage/
 
 .. end-badges
 
@@ -102,10 +102,10 @@ Also install the storage driver(s) you will be using:
     pip install cloudstorage[minio]
     pip install cloudstorage[rackspace]
 
-.. _`Amazon S3`: http://aws.amazon.com/s3/
+.. _`Amazon S3`: https://aws.amazon.com/s3/
 .. _`Blackblaze B2 Cloud Storage`: https://www.backblaze.com/b2/Cloud-Storage.html
 .. _`Google Cloud Storage`: https://cloud.google.com/storage/
 .. _`Microsoft Azure Storage`: https://azure.microsoft.com/services/storage/
 .. _`Minio Cloud Storage`: https://www.minio.io/
 .. _`Rackspace CloudFiles`: https://www.rackspace.com/cloud/files
-.. _`Cloud Storage`: https://github.com/scottwernervt/cloudstorage
+.. _`Cloud Storage`: https://github.com/scottwernervt/cloudstorage/

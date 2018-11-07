@@ -1,7 +1,8 @@
 Amazon Simple Storage Service (S3)
 ==================================
 
-Amazon :class:`.S3Driver` is a wrapper around `Boto 3 <http://boto3.readthedocs.io>`_.
+Amazon :class:`.S3Driver` is a wrapper around `Boto 3
+<https://boto3.amazonaws.com/v1/documentation/api/latest/index.html>`_.
 
 
 Connecting

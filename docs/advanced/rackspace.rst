@@ -2,8 +2,8 @@ Rackspace Cloud Files
 =====================
 
 Rackspace :class:`.CloudFilesDriver` extends `rackspacesdk
-<https://pypi.python.org/pypi/rackspacesdk>`_ which is a wrapper around
-`OpenStack SDK <https://pypi.python.org/pypi/openstacksdk>`_.
+<https://pypi.org/project/rackspacesdk/>`_ which is a wrapper around
+`OpenStack SDK <https://pypi.org/project/openstacksdk/>`_.
 
 
 Connecting

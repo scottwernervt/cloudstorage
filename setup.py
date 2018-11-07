@@ -26,7 +26,7 @@ setup(
     ),
     author='Scott Werner',
     author_email='scott.werner.vt@gmail.com',
-    url='https://github.com/scottwernervt/cloudstorage',
+    url='https://github.com/scottwernervt/cloudstorage/',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],

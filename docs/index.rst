@@ -37,6 +37,6 @@ Other
 Links
 =====
 
-- `cloudstorage @ GitHub <https://github.com/scottwernervt/cloudstorage>`_
-- `cloudstorage @ PyPI <https://pypi.python.org/pypi/cloudstorage>`_
+- `cloudstorage @ GitHub <https://github.com/scottwernervt/cloudstorage/>`_
+- `cloudstorage @ PyPI <https://pypi.org/project/cloudstorage/>`_
 - `Issue Tracker <https://github.com/scottwernervt/cloudstorage/issues>`_

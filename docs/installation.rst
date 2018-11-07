@@ -22,15 +22,15 @@ Also install the storage driver(s) you will be using:
     pip install cloudstorage[minio]
     pip install cloudstorage[rackspace]
 
-If you don't have `pip <https://pip.pypa.io>`_ installed,
-`this Python installation guide <http://docs.python-guide.org/en/latest/
-starting/installation/>`_ can guide you through the process.
+If you don't have `pip <https://pip.pypa.io/en/stable/>`_ installed,
+`this Python installation guide <https://docs.python-guide.org/starting/
+installation/>`_ can guide you through the process.
 
 Source Code
 ===========
 
 Cloud Storage is actively developed on GitHub, where the code is
-`always available <https://github.com/scottwernervt/cloudstorage>`_.
+`always available <https://github.com/scottwernervt/cloudstorage/>`_.
 
 You can either clone the public repository:
 

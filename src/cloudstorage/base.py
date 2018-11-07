@@ -291,8 +291,8 @@ class Blob:
         References:
 
         * `Boto 3: S3.Client.generate_presigned_url
-          <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
-          S3.Client.generate_presigned_url>`_
+          <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/
+          services/s3.html#S3.Client.generate_presigned_url>`_
         * `Google Cloud Storage: generate_signed_url
           <https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html>`_
         * `Rackspace: TempURL
@@ -616,8 +616,8 @@ class Container:
         References:
 
         * `Boto 3: PUT Object
-          <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
-          S3.Client.put_object>`_
+          <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/
+          services/s3.html#S3.Client.put_object>`_
         * `Google Cloud Storage: upload_from_file / upload_from_filename
           <https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html>`_
         * `Rackspace Cloud Files: Create or update object
@@ -805,8 +805,8 @@ class Container:
         References:
 
         * `Boto 3: S3.Client.generate_presigned_post
-          <http://boto3.readthedocs.io/en/latest/reference/services/s3.html#
-          S3.Client.generate_presigned_post>`_
+          <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/
+          services/s3.html#S3.Client.generate_presigned_post>`_
         * `Google Cloud Storage: POST Object
           <https://cloud.google.com/storage/docs/xml-api/post-object>`_
         * `Rackspace Cloud Files: FormPost
