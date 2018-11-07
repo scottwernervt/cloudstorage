@@ -1,4 +1,4 @@
 sphinx>=1.3
 sphinx-rtd-theme
 sphinx_autodoc_typehints>=1.3.0
--e .
+-e .[amazon,google,local,microsoft,minio,rackspace]
