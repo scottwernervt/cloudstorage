@@ -41,7 +41,8 @@ class S3Driver(Driver):
 
     References:
 
-    * `Boto 3 Docs <http://boto3.readthedocs.io>`_
+    * `Boto 3 Docs <https://boto3.amazonaws.com/v1/documentation/api/
+      latest/index.html>`_
     * `Amazon S3 REST API Introduction
       <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html>`_
 
