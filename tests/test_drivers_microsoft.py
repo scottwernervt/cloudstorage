@@ -10,6 +10,7 @@ import requests
 from cloudstorage.drivers.microsoft import AzureStorageDriver
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
 )
@@ -36,6 +37,21 @@ def storage():
                 blob.delete()
 
             container.delete()
+
+
+def test_driver_validate_credentials():
+    driver = AzureStorageDriver(account_name=AZURE_ACCOUNT_NAME,
+                                key=AZURE_ACCOUNT_KEY)
+    assert driver.validate_credentials() is None
+
+    driver = AzureStorageDriver(account_name=AZURE_ACCOUNT_NAME,
+                                key='invalidkeyinvalidkeyinvalidkeyinvalidkeyin'
+                                    'validkeyinvalidkeyinvalidkeyinvalidkeyinva'
+                                    'li==')
+    with pytest.raises(CredentialsError) as excinfo:
+        driver.validate_credentials()
+    assert excinfo.value
+    assert excinfo.value.message
 
 
 # noinspection PyShadowingNames

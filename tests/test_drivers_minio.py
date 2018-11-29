@@ -12,6 +12,7 @@ import requests
 from cloudstorage.drivers.minio import MinioDriver
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
 )
@@ -26,7 +27,7 @@ pytestmark = pytest.mark.skipif(not bool(MINIO_ACCESS_KEY),
 @pytest.fixture(scope='module')
 def storage():
     driver = MinioDriver(MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY,
-                         MINIO_REGION, secure=False)
+                         MINIO_REGION)
 
     yield driver
 
@@ -36,6 +37,19 @@ def storage():
                 blob.delete()
 
             container.delete()
+
+
+def test_driver_validate_credentials():
+    driver = MinioDriver(MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY,
+                         MINIO_REGION)
+    assert driver.validate_credentials() is None
+
+    driver = MinioDriver(MINIO_ENDPOINT, MINIO_ACCESS_KEY, 'invalid-secret',
+                         MINIO_REGION)
+    with pytest.raises(CredentialsError) as excinfo:
+        driver.validate_credentials()
+    assert excinfo.value
+    assert excinfo.value.message
 
 
 # noinspection PyShadowingNames

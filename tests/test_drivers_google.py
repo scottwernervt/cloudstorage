@@ -15,6 +15,7 @@ from cloudstorage.drivers.google import GoogleStorageDriver
 from cloudstorage.exceptions import CloudStorageError
 from cloudstorage.exceptions import IsNotEmptyError
 from cloudstorage.exceptions import NotFoundError
+from cloudstorage.exceptions import CredentialsError
 from cloudstorage.helpers import file_checksum
 from tests.helpers import random_container_name, uri_validator, rate_limited
 from tests.settings import *
@@ -38,6 +39,18 @@ def storage():
 
             sleep(seconds)
             container.delete()
+
+
+@pytest.mark.skip('Generate invalid private key for gcs service account.')
+def test_driver_validate_credentials():
+    driver = GoogleStorageDriver(key=GOOGLE_CREDENTIALS)
+    assert driver.validate_credentials() is None
+
+    driver = GoogleStorageDriver(key=GOOGLE_CREDENTIALS)
+    with pytest.raises(CredentialsError) as excinfo:
+        driver.validate_credentials()
+    assert excinfo.value
+    assert excinfo.value.message
 
 
 # noinspection PyShadowingNames

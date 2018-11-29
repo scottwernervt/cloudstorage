@@ -10,6 +10,7 @@ import requests
 from cloudstorage.drivers.rackspace import CloudFilesDriver
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
 )
@@ -37,6 +38,17 @@ def storage():
                     pass
 
             container.delete()
+
+
+def test_driver_validate_credentials():
+    driver = CloudFilesDriver(RACKSPACE_KEY, RACKSPACE_SECRET, RACKSPACE_REGION)
+    assert driver.validate_credentials() is None
+
+    driver = CloudFilesDriver(RACKSPACE_KEY, 'invalid-secret', RACKSPACE_REGION)
+    with pytest.raises(CredentialsError) as excinfo:
+        driver.validate_credentials()
+    assert excinfo.value
+    assert excinfo.value.message
 
 
 # noinspection PyShadowingNames

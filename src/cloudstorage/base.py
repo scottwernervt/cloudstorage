@@ -1020,6 +1020,16 @@ class Driver(metaclass=abc.ABCMeta):
         """
         pass
 
+    @abstractmethod
+    def validate_credentials(self) -> None:
+        """Validate driver credentials (key and secret).
+
+        :return: None
+        :rtype: None
+        :raises CredentialsError: If driver authentication fails.
+        """
+        pass
+
     @property
     @abstractmethod
     def regions(self) -> List[str]:
