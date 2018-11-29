@@ -10,6 +10,7 @@ import requests
 from cloudstorage.drivers.amazon import S3Driver
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
 )
@@ -33,6 +34,17 @@ def storage():
                 blob.delete()
 
             container.delete()
+
+
+def test_driver_validate_credentials():
+    driver = S3Driver(AMAZON_KEY, AMAZON_SECRET, AMAZON_REGION)
+    assert driver.validate_credentials() is None
+
+    driver = S3Driver(AMAZON_KEY, 'invalid-secret', AMAZON_REGION)
+    with pytest.raises(CredentialsError) as excinfo:
+        driver.validate_credentials()
+    assert excinfo.value
+    assert excinfo.value.message
 
 
 # noinspection PyShadowingNames

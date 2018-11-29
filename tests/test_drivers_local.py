@@ -4,6 +4,7 @@ import pytest
 
 from cloudstorage.drivers.local import LocalDriver
 from cloudstorage.exceptions import (
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
     SignatureExpiredError,
@@ -29,6 +30,17 @@ def storage():
             container.delete()
 
     shutil.rmtree(LOCAL_KEY)
+
+
+def test_driver_validate_credentials():
+    driver = LocalDriver(key=LOCAL_KEY)
+    assert driver.validate_credentials() is None
+
+    driver = LocalDriver(key='/')
+    with pytest.raises(CredentialsError) as excinfo:
+        driver.validate_credentials()
+    assert excinfo.value
+    assert excinfo.value.message
 
 
 # noinspection PyShadowingNames
