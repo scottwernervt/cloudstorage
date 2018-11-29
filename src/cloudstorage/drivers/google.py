@@ -18,6 +18,8 @@ from google.cloud import storage
 # noinspection PyPackageRequirements
 from google.cloud.exceptions import Conflict, NotFound
 # noinspection PyPackageRequirements
+from google.auth.exceptions import GoogleAuthError
+# noinspection PyPackageRequirements
 from google.cloud.storage.blob import Blob as GoogleBlob
 # noinspection PyPackageRequirements
 from google.cloud.storage.bucket import Bucket
@@ -28,6 +30,7 @@ from cloudstorage.exceptions import (
     CloudStorageError,
     IsNotEmptyError,
     NotFoundError,
+    CredentialsError,
 )
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.typed import (
@@ -87,17 +90,15 @@ class GoogleStorageDriver(Driver):
     def __init__(self, key: str = None, **kwargs: Dict) -> None:
         super().__init__(key=key, **kwargs)
 
-        google_application_credentials = os.getenv(self._CREDENTIALS_ENV_NAME)
-
-        # Set environment variable using credentials json file path.
-        if not google_application_credentials:
-            if not key or not os.path.isfile(key):
-                raise CloudStorageError(
-                    "Please set environment variable "
-                    "'GOOGLE_APPLICATION_CREDENTIALS' or provider file path "
-                    "to Google service account key json file.")
-
+        if key:
             os.environ[self._CREDENTIALS_ENV_NAME] = key
+
+        google_application_credentials = os.getenv(self._CREDENTIALS_ENV_NAME)
+        if not os.path.isfile(google_application_credentials):
+            raise CredentialsError(
+                "Please set environment variable "
+                "'GOOGLE_APPLICATION_CREDENTIALS' or provider file path "
+                "to Google service account key json file.")
 
         self._client = storage.Client()
 
@@ -226,6 +227,13 @@ class GoogleStorageDriver(Driver):
         :rtype: :class:`google.cloud.storage.client.Client`
         """
         return self._client
+
+    def validate_credentials(self) -> None:
+        try:
+            for _ in self.client.list_buckets():
+                break
+        except GoogleAuthError as err:
+            raise CredentialsError(str(err))
 
     @property
     def regions(self) -> List[str]:

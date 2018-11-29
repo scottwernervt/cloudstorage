@@ -18,6 +18,7 @@ from inflection import underscore
 from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
     SignatureExpiredError,
@@ -114,9 +115,11 @@ class LocalDriver(Driver):
         self.base_path = key
         self.salt = salt
 
-        # Create base path
-        if not os.path.exists(key):
-            os.makedirs(key)
+        try:
+            if not os.path.exists(key):
+                os.makedirs(key)
+        except PermissionError as err:
+            raise CredentialsError(str(err))
 
         # Check if base path is a directory and not a file
         if not os.path.isdir(self.base_path):
@@ -363,6 +366,11 @@ class LocalDriver(Driver):
                     content_disposition=content_disposition,
                     content_type=content_type, cache_control=cache_control,
                     created_at=created_at, modified_at=modified_at)
+
+    def validate_credentials(self) -> None:
+        if not os.access(self.base_path, os.W_OK):
+            raise CredentialsError(
+                "[Errno 13] Permission denied: '{}'".format(self.base_path))
 
     @property
     def regions(self) -> List[str]:

@@ -11,15 +11,18 @@ from minio.error import (
     BucketAlreadyExists,
     BucketAlreadyOwnedByYou,
     BucketNotEmpty,
+    InvalidAccessKeyId,
     InvalidBucketError,
     InvalidBucketName,
     NoSuchKey,
     ResponseError,
+    SignatureDoesNotMatch,
 )
 
 from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
 )
@@ -98,8 +101,7 @@ class MinioDriver(Driver):
     url = 'https://www.minio.io'
 
     def __init__(self, endpoint: str, key: str, secret: str = None,
-                 region: str = 'us-east-1',
-                 **kwargs: Dict) -> None:
+                 region: str = 'us-east-1', **kwargs: Dict) -> None:
         secure = kwargs.pop('secure', True)
         http_client = kwargs.pop('http_client', None)
         self._client = Minio(endpoint, access_key=key, secret_key=secret,
@@ -197,6 +199,13 @@ class MinioDriver(Driver):
         :rtype: :class:`minio.Minio`
         """
         return self._client
+
+    def validate_credentials(self) -> None:
+        try:
+            for _ in self.client.list_buckets():
+                break
+        except (InvalidAccessKeyId, SignatureDoesNotMatch) as err:
+            raise CredentialsError(str(err))
 
     @property
     def regions(self) -> List[str]:

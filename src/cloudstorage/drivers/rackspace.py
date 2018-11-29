@@ -22,6 +22,7 @@ from openstack.exceptions import (
     NotFoundException,
     ResourceNotFound,
 )
+from keystoneauth1.exceptions import Unauthorized
 from openstack.object_store.v1.obj import Object as OpenStackObject
 from openstack.object_store.v1.container import Container as OpenStackContainer
 from rackspace import connection
@@ -38,6 +39,7 @@ from cloudstorage.exceptions import (
     CloudStorageError,
     IsNotEmptyError,
     NotFoundError,
+    CredentialsError,
 )
 from cloudstorage.helpers import (
     file_content_type,
@@ -379,6 +381,12 @@ class CloudFilesDriver(Driver):
         """
         # noinspection PyUnresolvedReferences
         return self.conn.object_store
+
+    def validate_credentials(self) -> None:
+        try:
+            self.conn.auth_token
+        except Unauthorized as err:
+            raise CredentialsError(str(err))
 
     @property
     def regions(self) -> List[str]:

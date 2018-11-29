@@ -29,6 +29,7 @@ from cloudstorage.exceptions import (
     NotFoundError,
     CloudStorageError,
     IsNotEmptyError,
+    CredentialsError,
 )
 from cloudstorage.helpers import file_checksum, validate_file_or_path
 from cloudstorage.typed import (
@@ -217,6 +218,13 @@ class AzureStorageDriver(Driver):
         :rtype: :class:`azure.storage.blob.blockblobservice.BlockBlobService`
         """
         return self._service
+
+    def validate_credentials(self) -> None:
+        try:
+            for _ in self.service.list_containers():
+                break
+        except AzureHttpError as err:
+            raise CredentialsError(str(err))
 
     @property
     def regions(self) -> List[str]:

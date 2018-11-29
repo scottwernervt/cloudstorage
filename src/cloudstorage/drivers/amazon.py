@@ -10,6 +10,7 @@ from inflection import camelize, underscore
 from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
 )
@@ -219,6 +220,12 @@ class S3Driver(Driver):
         :rtype: :class:`boto3.resources.base.ServiceResource`
         """
         return self.session.resource(service_name='s3', region_name=self.region)
+
+    def validate_credentials(self) -> None:
+        try:
+            self.session.client('sts').get_caller_identity()
+        except ClientError as err:
+            raise CredentialsError(str(err))
 
     @property
     def regions(self) -> List[str]:
