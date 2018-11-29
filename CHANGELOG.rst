@@ -3,6 +3,19 @@
 Changelog
 ---------
 
+0.9.0 (Unreleased)
+++++++++++++++++++
+
+Features
+
+* Driver authentication can be verified using ``DriverName.validate_credentials()`` (`#34 <https://github.com/scottwernervt/cloudstorage/issues/34>`_).
+
+Changes from 0.8.0:
+
+* Initializing ``GoogleStorageDriver`` with an invalid credentials file will
+  raise ``CredentialsError`` exception instead of ``CloudStorageError``.
+
+
 0.8.0 (2018-11-06)
 ++++++++++++++++++
 
