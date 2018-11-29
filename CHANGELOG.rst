@@ -3,7 +3,7 @@
 Changelog
 ---------
 
-0.9.0 (Unreleased)
+0.9.0 (2018-11-29)
 ++++++++++++++++++
 
 Features
@@ -14,7 +14,6 @@ Changes from 0.8.0:
 
 * Initializing ``GoogleStorageDriver`` with an invalid credentials file will
   raise ``CredentialsError`` exception instead of ``CloudStorageError``.
-
 
 0.8.0 (2018-11-06)
 ++++++++++++++++++
