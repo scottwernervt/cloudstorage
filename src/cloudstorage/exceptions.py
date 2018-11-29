@@ -25,6 +25,11 @@ class IsNotEmptyError(CloudStorageError):
     code = HTTPStatus.CONFLICT
 
 
+class CredentialsError(CloudStorageError):
+    """Raised when driver credentials are invalid."""
+    code = HTTPStatus.UNAUTHORIZED
+
+
 class SignatureExpiredError(CloudStorageError):
     """Raised when signature timestamp is older than required maximum age."""
     code = HTTPStatus.UNAUTHORIZED
