@@ -1,17 +1,18 @@
 language: python
 sudo: false
 cache: pip
-before_install:
-  - if [ -z ${encrypted_12e75a453f27_key+x} ]; then
+
+install:
+  - pip install tox
+script:
+  - tox -v
+  - |
+    if [ -z ${encrypted_12e75a453f27_key+x} ]; then
       echo "Decrypting gcs-service-account.json.enc";
       openssl aes-256-cbc -K $encrypted_12e75a453f27_key -iv $encrypted_12e75a453f27_iv -in gcs-service-account.json.enc -out gcs-service-account.json -d;
     else
       echo "gcs-service-account.json.enc not found!"
     fi
-install:
-  - pip install tox
-script:
-  - tox -v
 
 jobs:
   fast_finish: true
