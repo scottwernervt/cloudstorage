@@ -13,7 +13,7 @@ from cloudstorage.exceptions import (
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 
-if not os.path.exists(LOCAL_KEY):
+if LOCAL_KEY and not os.path.exists(LOCAL_KEY):
     os.makedirs(LOCAL_KEY)
 
 pytestmark = pytest.mark.skipif(not os.path.isdir(LOCAL_KEY),
