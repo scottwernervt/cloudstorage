@@ -1,4 +1,5 @@
 import random
+import os
 
 try:
     from http import HTTPStatus
@@ -20,7 +21,7 @@ from cloudstorage.helpers import file_checksum
 from tests.helpers import random_container_name, uri_validator, rate_limited
 from tests.settings import *
 
-pytestmark = pytest.mark.skipif(not bool(GOOGLE_CREDENTIALS),
+pytestmark = pytest.mark.skipif(not os.path.isfile(GOOGLE_CREDENTIALS),
                                 reason='settings missing key and secret')
 
 
