@@ -3,9 +3,9 @@ sudo: false
 cache: pip
 before_install:
   - |
-      if [ -f gcs-service-account.json.enc ]; then
-        openssl aes-256-cbc -K $encrypted_12e75a453f27_key -iv $encrypted_12e75a453f27_iv -in gcs-service-account.json.enc -out gcs-service-account.json -d;
-      fi
+    if [ -z ${encrypted_12e75a453f27_key+x} ]; then
+      openssl aes-256-cbc -K $encrypted_12e75a453f27_key -iv $encrypted_12e75a453f27_iv -in gcs-service-account.json.enc -out gcs-service-account.json -d;
+    fi
 install:
   - pip install tox
 script:
