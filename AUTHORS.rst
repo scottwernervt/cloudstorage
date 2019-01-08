@@ -11,3 +11,5 @@ Contributors
 ============
 
 .. * <contributor-name-here>
+
+* James Stewart `@JamesStewy <https://github.com/JamesStewy>`_

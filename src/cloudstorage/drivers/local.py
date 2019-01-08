@@ -360,7 +360,7 @@ class LocalDriver(Driver):
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
         modified_at = datetime.fromtimestamp(stat.st_mtime, timezone.utc)
 
-        return Blob(name=object_path.name, checksum=checksum, etag=etag,
+        return Blob(name=object_name, checksum=checksum, etag=etag,
                     size=stat.st_size, container=container, driver=self,
                     acl=None, meta_data=meta_data,
                     content_disposition=content_disposition,
