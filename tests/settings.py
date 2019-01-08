@@ -48,8 +48,6 @@ GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None,
                             cast=lambda path: os.path.abspath(path))
 
 LOCAL_KEY = config('LOCAL_KEY', default=mkdtemp(prefix='cloud-storage-test-'))
-if not os.path.exists(LOCAL_KEY):
-    os.makedirs(LOCAL_KEY)
 LOCAL_SECRET = config('LOCAL_SECRET', default='local-storage-secret')
 
 RACKSPACE_KEY = config('RACKSPACE_KEY', default=None)

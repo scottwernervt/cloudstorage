@@ -1,4 +1,5 @@
 import shutil
+import os
 
 import pytest
 
@@ -12,8 +13,11 @@ from cloudstorage.exceptions import (
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 
-pytestmark = pytest.mark.skipif(not bool(LOCAL_KEY),
-                                reason='settings missing key and secret')
+if LOCAL_KEY and not os.path.exists(LOCAL_KEY):
+    os.makedirs(LOCAL_KEY)
+
+pytestmark = pytest.mark.skipif(not os.path.isdir(LOCAL_KEY),
+                                reason='Directory does not exist.')
 
 
 @pytest.fixture(scope='module')
