@@ -56,6 +56,9 @@ class S3Driver(Driver):
     :param region: (optional) Region to connect to. Defaults to `us-east-1`.
     :type region: str
 
+    :param token: (optional) AWS Session Token
+    :type token: str
+
     :param kwargs: (optional) Extra driver options.
     :type kwargs: dict
     """
@@ -64,14 +67,13 @@ class S3Driver(Driver):
     url = 'https://aws.amazon.com/s3/'
 
     def __init__(self, key: str, secret: str = None, region: str = 'us-east-1',
-                 token: str = None,
                  **kwargs: Dict) -> None:
         region = region.lower()
         super().__init__(key=key, secret=secret, region=region, **kwargs)
 
         self._session = boto3.Session(aws_access_key_id=key,
                                       aws_secret_access_key=secret,
-                                      aws_session_token=token,
+                                      aws_session_token=kwargs.get('token'),
                                       region_name=region)
 
         # session required for loading regions list
