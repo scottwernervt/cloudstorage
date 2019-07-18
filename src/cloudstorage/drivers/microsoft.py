@@ -152,14 +152,18 @@ class AzureStorageDriver(Driver):
         """
         content_settings = azure_blob.properties.content_settings
 
-        # TODO: CODE: Move to helper since google uses it too.
-        md5_bytes = base64.b64decode(content_settings.content_md5)
+        if content_settings.content_md5:
+            # TODO: CODE: Move to helper since google uses it too.
+            md5_bytes = base64.b64decode(content_settings.content_md5)
 
-        try:
-            checksum = md5_bytes.hex()
-        except AttributeError:
-            # Python 3.4: 'bytes' object has no attribute 'hex'
-            checksum = codecs.encode(md5_bytes, 'hex_codec').decode('ascii')
+            try:
+                checksum = md5_bytes.hex()
+            except AttributeError:
+                # Python 3.4: 'bytes' object has no attribute 'hex'
+                checksum = codecs.encode(md5_bytes, 'hex_codec').decode('ascii')
+        else:
+            logger.warning('Content MD5 not populated, content will not be validated')
+            checksum = None
 
         return Blob(name=azure_blob.name,
                     size=azure_blob.properties.content_length,
