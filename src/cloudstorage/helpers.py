@@ -75,6 +75,9 @@ def file_checksum(filename: FileLike, hash_type: str = 'md5',
     else:
         for chunk in read_in_chunks(filename, block_size=block_size):
             file_hash.update(chunk)
+        # rewind the stream so it can be re-read later
+        if filename.seekable():
+            filename.seek(0)
 
     return file_hash
 

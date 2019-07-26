@@ -45,7 +45,7 @@ AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME', default=None)
 AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY', default=None)
 
 GOOGLE_CREDENTIALS = config('GOOGLE_CREDENTIALS', default=None,
-                            cast=lambda path: os.path.abspath(path))
+                            cast=lambda path: os.path.abspath(path) if path else None)
 
 LOCAL_KEY = config('LOCAL_KEY', default=mkdtemp(prefix='cloud-storage-test-'))
 LOCAL_SECRET = config('LOCAL_SECRET', default='local-storage-secret')

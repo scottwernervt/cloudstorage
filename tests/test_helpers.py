@@ -19,9 +19,15 @@ def test_read_in_chunks(binary_stream):
     assert sum(1 for _ in data) == total_chunks_read
 
 
-def test_file_checksum(text_filename):
+def test_file_checksum_filename(text_filename):
     file_hash = file_checksum(text_filename, hash_type='md5', block_size=32)
     assert file_hash.hexdigest() == TEXT_MD5_CHECKSUM
+
+
+def test_file_checksum_stream(binary_stream):
+    file_hash = file_checksum(binary_stream, hash_type='md5', block_size=32)
+    assert file_hash.hexdigest() == BINARY_MD5_CHECKSUM
+    assert binary_stream.tell() == 0
 
 
 def test_validate_file_or_path(text_filename, binary_stream):
