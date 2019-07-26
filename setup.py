@@ -75,6 +75,7 @@ setup(
         ],
         'google': [
             'google-cloud-storage>=1.10.0',  # Apache 2.0
+            'requests>=2.19.1',  # Apache 2.0
         ],
         'local': [
             'filelock>=3.0.0',  # Public Domain
