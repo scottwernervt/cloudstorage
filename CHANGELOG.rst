@@ -3,6 +3,20 @@
 Changelog
 ---------
 
+0.10.0 (2019-08-10)
++++++++++++++++++++
+
+Bugs
+
+* Azure ``get_blob`` raises ``TypeError`` when Content MD5 missing in remote (`#47 <https://github.com/scottwernervt/cloudstorage/issues/47>`_). Thanks @matt-carr.
+* ``AzureStorageDriver`` reads stream twice without rewinding (`#44 <https://github.com/scottwernervt/cloudstorage/issues/44>`_). Thanks @matt-carr.
+* Update package dependencies to fix tests (`#43 <https://github.com/scottwernervt/cloudstorage/issues/43>`_).
+
+Changes from 0.9.0:
+
+* Azure driver will issue a warning if Content MD5 is not populated.
+* Google driver tests will not run if credentials file is not present.
+
 0.9.0 (2018-11-29)
 ++++++++++++++++++
 
