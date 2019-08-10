@@ -71,18 +71,19 @@ setup(
     ],
     extras_require={
         'amazon': [
-            'boto3>=1.7.60',  # Apache 2.0
+            'boto3>=1.8.00',  # Apache 2.0
         ],
         'google': [
-            'google-cloud-storage>=1.10.0',  # Apache 2.0
+            'google-cloud-storage>=1.18.0',  # Apache 2.0
+            'requests>=2.19.1',  # Apache 2.0
         ],
         'local': [
             'filelock>=3.0.0',  # Public Domain
-            'itsdangerous>=0.24',  # BSD License
-            'xattr>=0.9.3',  # MIT
+            'itsdangerous>=1.1.0',  # BSD License
+            'xattr>=0.9.6',  # MIT
         ],
         'microsoft': [
-            'azure>=3.0.0',  # MIT
+            'azure>=4.0.0',  # MIT
         ],
         'minio': [
             'minio>=4.0.0',  # Apache 2.0
@@ -106,7 +107,7 @@ setup(
         'flake8',  # MIT
         'pytest',  # MIT
         'prettyconf',  # MIT
-        'requests',
+        'requests>=2.19.1',
         'tox',  # MIT
     ],
     test_suite='tests',

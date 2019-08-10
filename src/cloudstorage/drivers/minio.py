@@ -169,7 +169,8 @@ class MinioDriver(Driver):
         for name, value in obj_metadata.items():
             meta_key = re.sub(r'\b%s\b' % re.escape(self._OBJECT_META_PREFIX),
                               '', name, flags=re.IGNORECASE)
-            meta_data[meta_key] = value
+            if meta_key != name:  # Content-Type key is in the obj meta data
+                meta_data[meta_key] = value
 
         return Blob(name=obj.object_name, checksum='', etag=obj.etag,
                     size=obj.size, container=container, driver=self, acl={},
@@ -428,7 +429,7 @@ class MinioDriver(Driver):
         'ssecustomerkey': 'SSECustomerKey',
         'requestpayer': 'RequestPayer',
         'partnumber': 'PartNumber',
-        # Extra keys to standarize across all drivers
+        # Extra keys to standardize across all drivers
         'cachecontrol': 'ResponseCacheControl',
         'contentdisposition': 'ResponseContentDisposition',
         'contentencoding': 'ResponseContentEncoding',
