@@ -92,9 +92,11 @@ class GoogleStorageDriver(Driver):
 
         if key:
             os.environ[self._CREDENTIALS_ENV_NAME] = key
+        else:
+            logger.debug('No key provided, attempting to authenticate with Google Metadata API')
 
         google_application_credentials = os.getenv(self._CREDENTIALS_ENV_NAME)
-        if not os.path.isfile(google_application_credentials):
+        if google_application_credentials and not os.path.isfile(google_application_credentials):
             raise CredentialsError(
                 "Please set environment variable "
                 "'GOOGLE_APPLICATION_CREDENTIALS' or provider file path "
