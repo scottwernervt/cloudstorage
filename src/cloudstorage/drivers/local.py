@@ -9,10 +9,12 @@ import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Iterable, List
+import simplejson as json
 
 import filelock
 import itsdangerous
-import xattr
+if os.name != 'nt':
+    import xattr
 from inflection import underscore
 
 from cloudstorage import Blob, Container, Driver, messages
@@ -68,7 +70,8 @@ def lock_local_file(path: str) -> filelock.FileLock:
     if lock.is_locked:
         lock.release()
 
-    os.remove(lock.lock_file)
+    if os.path.exists(lock.lock_file):
+        os.remove(lock.lock_file)
 
 
 class LocalDriver(Driver):
@@ -114,6 +117,7 @@ class LocalDriver(Driver):
 
         self.base_path = key
         self.salt = salt
+        self.is_windows = os.name == 'nt'
 
         try:
             if not os.path.exists(key):
@@ -165,6 +169,29 @@ class LocalDriver(Driver):
                 'digest_method': 'SHA1'
             })
 
+    def _make_xattr(self, filename: str):
+        """
+        Make a xattr-like object depending on the current platform.
+        :param filename:
+        :return:
+        """
+        if self.is_windows:
+            return xattr_Windows(filename)
+        return xattr.xattr(filename)
+
+    def _check_path_accessible(self, path: str) -> bool:
+        """
+        Check if the path is accessible. In windows custom files are used to simulate file attributes,
+        these must not be accessed.
+        :param filename:
+        :return:
+        """
+        if self.is_windows:
+            p = pathlib.Path(path)
+            if p.name.startswith('.') and p.name.endswith('.xattr'):
+                return False
+        return True
+
     def _get_folders(self) -> Iterable[str]:
         """Iterate over first level folders found in base path.
 
@@ -173,6 +200,8 @@ class LocalDriver(Driver):
         """
         for container_name in os.listdir(self.base_path):
             full_path = os.path.join(self.base_path, container_name)
+            if not self._check_path_accessible(full_path):
+                continue
             if not os.path.isdir(full_path):
                 continue
 
@@ -194,6 +223,8 @@ class LocalDriver(Driver):
         :raises NotFoundError: If the container doesn't exist.
         """
         full_path = os.path.join(self.base_path, container.name)
+        if validate and not self._check_path_accessible(full_path):
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % container.name)
         if validate and not os.path.isdir(full_path):
             raise NotFoundError(messages.CONTAINER_NOT_FOUND % container.name)
 
@@ -221,7 +252,7 @@ class LocalDriver(Driver):
         :raises CloudStorageError: If the local file system does not support
           extended filesystem attributes.
         """
-        xattrs = xattr.xattr(filename)
+        xattrs = self._make_xattr(filename)
 
         for key, value in attributes.items():
             if not value:
@@ -288,6 +319,8 @@ class LocalDriver(Driver):
         :raises FileNotFoundError: If container does not exist.
         """
         full_path = os.path.join(self.base_path, folder_name)
+        if not self._check_path_accessible(full_path):
+            raise NotFoundError(messages.CONTAINER_NOT_FOUND % folder_name)
 
         try:
             stat = os.stat(full_path)
@@ -312,6 +345,9 @@ class LocalDriver(Driver):
         :rtype: :class:`.Blob`
         """
         full_path = os.path.join(self.base_path, container.name, object_name)
+        if not self._check_path_accessible(full_path):
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name,
+                                                           container.name))
 
         object_path = pathlib.Path(full_path)
 
@@ -327,7 +363,7 @@ class LocalDriver(Driver):
         cache_control = None
 
         try:
-            attributes = xattr.xattr(full_path)
+            attributes = self._make_xattr(full_path)
 
             for attr_key, attr_value in attributes.items():
                 value_str = None
@@ -385,6 +421,8 @@ class LocalDriver(Driver):
             logger.info(messages.OPTION_NOT_SUPPORTED, 'meta_data')
 
         full_path = os.path.join(self.base_path, container_name)
+        if not self._check_path_accessible(full_path):
+            raise CloudStorageError(messages.CONTAINER_NAME_INVALID)
 
         self._make_path(full_path, ignore_existing=True)
         try:
@@ -483,6 +521,8 @@ class LocalDriver(Driver):
 
             for name in files:
                 full_path = os.path.join(folder, name)
+                if not self._check_path_accessible(full_path):
+                    continue
                 object_name = pathlib.Path(full_path).name
                 yield self._make_blob(container, object_name)
 
@@ -609,3 +649,48 @@ class LocalDriver(Driver):
     _PUT_OBJECT_KEYS = {
         'metadata': 'meta_data',
     }
+
+
+class xattr_Windows:
+    """
+    Simulate xattr on windows.
+    A file named ".<filename>.xattr" will be created on the same directory as the source file.
+    """
+    def __init__(self, filename) -> None:
+        self.filename = filename
+        p = pathlib.Path(filename)
+        self.xattr_filename = os.path.join(p.parent, '.{}.xattr'.format(p.name))
+
+    def __setitem__(self, key, value) -> None:
+        """
+        Write an attribute to the json file.
+        """
+        data = self._load()
+        data[key] = value
+        with open(self.xattr_filename, 'w') as outfile:
+            json.dump(data, outfile)
+
+    def items(self):
+        """
+        Return a list of the attributes.
+        :return:
+        """
+        # xattr returns items as bytes, must convert all str first
+        items = self._load()
+        ret = {}
+        for itemname, itemvalue in items.items():
+            if isinstance(itemvalue, str):
+                ret[itemname] = itemvalue.encode('utf-8')
+            else:
+                ret[itemname] = itemvalue
+        return  ret.items()
+
+    def _load(self) -> Dict:
+        """
+        Load json file if it exists
+        :return:
+        """
+        if os.path.exists(self.xattr_filename):
+            with open(self.xattr_filename) as json_file:
+                return json.load(json_file)
+        return {}

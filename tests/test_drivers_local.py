@@ -37,6 +37,8 @@ def storage():
 
 
 def test_driver_validate_credentials():
+    if os.name == 'nt':
+        pytest.skip("skipping Windows incompatible test")
     driver = LocalDriver(key=LOCAL_KEY)
     assert driver.validate_credentials() is None
 

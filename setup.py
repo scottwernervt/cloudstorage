@@ -80,7 +80,7 @@ setup(
         'local': [
             'filelock>=3.0.0',  # Public Domain
             'itsdangerous>=1.1.0',  # BSD License
-            'xattr>=0.9.6',  # MIT
+            'xattr>=0.9.6; sys_platform != "win32"',  # MIT
         ],
         'microsoft': [
             'azure>=4.0.0',  # MIT
