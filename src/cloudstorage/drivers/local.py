@@ -176,7 +176,7 @@ class LocalDriver(Driver):
         :return:
         """
         if self.is_windows:
-            return xattr_Windows(filename)
+            return XattrWindows(filename)
         return xattr.xattr(filename)
 
     def _check_path_accessible(self, path: str) -> bool:
@@ -558,6 +558,10 @@ class LocalDriver(Driver):
             except OSError as err:
                 logger.exception(err)
 
+        if self.is_windows:
+            xattr = XattrWindows(path)
+            xattr.remove_attributes()
+
     def blob_cdn_url(self, blob: Blob) -> str:
         return os.path.join(self.base_path, blob.container.name, blob.name)
 
@@ -651,7 +655,7 @@ class LocalDriver(Driver):
     }
 
 
-class xattr_Windows:
+class XattrWindows:
     """
     Simulate xattr on windows.
     A file named ".<filename>.xattr" will be created on the same directory as the source file.
@@ -694,3 +698,11 @@ class xattr_Windows:
             with open(self.xattr_filename) as json_file:
                 return json.load(json_file)
         return {}
+
+    def remove_attributes(self):
+        if os.path.exists(self.xattr_filename):
+            with lock_local_file(self.xattr_filename):
+                try:
+                    os.unlink(self.xattr_filename)
+                except OSError as err:
+                    logger.exception(err)
