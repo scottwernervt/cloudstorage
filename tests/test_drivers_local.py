@@ -37,6 +37,8 @@ def storage():
 
 
 def test_driver_validate_credentials():
+    if os.name == 'nt':
+        pytest.skip("skipping Windows incompatible test")
     driver = LocalDriver(key=LOCAL_KEY)
     assert driver.validate_credentials() is None
 
@@ -146,6 +148,26 @@ def test_blob_upload_path(container, text_filename):
     blob = container.upload_blob(text_filename)
     assert blob.name == TEXT_FILENAME
     assert blob.checksum == TEXT_MD5_CHECKSUM
+
+
+def test_blob_windows_xattr(container, text_filename):
+    if os.name != 'nt':
+        pytest.skip("skipping Windows-only test")
+    blob = container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
+    try:
+        internal_blob = container.get_blob('.{}.xattr'.format(TEXT_FILENAME))
+        pytest.fail('should not be possible to get internal xattr file')
+    except NotFoundError:
+        pass
+
+
+def test_blob_windows_xattr_list(container, text_filename):
+    if os.name != 'nt':
+        pytest.skip("skipping Windows-only test")
+    blob = container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
+    for blobitem in container:
+        if blobitem.name.startswith('.') and blobitem.name.endswith('.xattr'):
+            pytest.fail('should not be possible to get internal xattr file')
 
 
 def test_blob_upload_stream(container, binary_stream):
