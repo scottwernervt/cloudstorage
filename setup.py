@@ -41,7 +41,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -65,9 +64,6 @@ setup(
         'inflection>=0.3.1',  # MIT
         'python-dateutil>=2.7.3',  # Simplified BSD
         'python-magic>=0.4.15',  # MIT
-        # Python 3.4 needs backports
-        'typing;python_version<"3.5"',  # PSF
-        'httpstatus35;python_version<"3.5"',  # PSF
     ],
     extras_require={
         'amazon': [
