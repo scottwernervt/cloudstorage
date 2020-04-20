@@ -68,6 +68,7 @@ setup(
     extras_require={
         'amazon': [
             'boto3>=1.8.00',  # Apache 2.0
+            'boto3-stubs[s3]>==1.12.41.0',  # MIT
         ],
         'google': [
             'google-cloud-storage>=1.18.0',  # Apache 2.0
