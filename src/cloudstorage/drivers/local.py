@@ -1,9 +1,9 @@
 """Local File System Driver."""
 import errno
 import hashlib
+import json
 import logging
 import os
-import json
 import pathlib
 import shutil
 import sys
@@ -13,8 +13,7 @@ from typing import Dict, Iterable, List
 
 import filelock
 import itsdangerous
-if os.name != 'nt':
-    import xattr
+
 from inflection import underscore
 
 from cloudstorage import Blob, Container, Driver, messages
@@ -38,6 +37,10 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
+
+if os.name != 'nt':
+    import xattr    # noqa: E402
+
 
 __all__ = ['LocalDriver']
 
@@ -687,7 +690,7 @@ class XattrWindows:
                 ret[itemname] = itemvalue.encode('utf-8')
             else:
                 ret[itemname] = itemvalue
-        return  ret.items()
+        return ret.items()
 
     def _load(self) -> Dict:
         """
