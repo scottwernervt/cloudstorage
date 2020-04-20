@@ -11,8 +11,9 @@ import magic  # type: ignore
 from cloudstorage.typed import FileLike
 
 
-def read_in_chunks(file_object: Union[BinaryIO, TextIO],
-                   block_size: int = 4096) -> Generator[Union[bytes, str], None, None]:
+def read_in_chunks(
+    file_object: Union[BinaryIO, TextIO], block_size: int = 4096
+) -> Generator[Union[bytes, str], None, None]:
     """Return a generator which yields data in chunks.
 
     Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file
@@ -28,12 +29,13 @@ def read_in_chunks(file_object: Union[BinaryIO, TextIO],
     :yield: The next chunk in file object.
     :yield type: `bytes`
     """
-    for chunk in iter(lambda: file_object.read(block_size), b''):
+    for chunk in iter(lambda: file_object.read(block_size), b""):
         yield chunk
 
 
-def file_checksum(filename: FileLike, hash_type: str = 'md5',
-                  block_size: int = 4096) -> HASH:
+def file_checksum(
+    filename: FileLike, hash_type: str = "md5", block_size: int = 4096
+) -> HASH:
     """Returns checksum for file.
 
     .. code-block:: python
@@ -66,10 +68,10 @@ def file_checksum(filename: FileLike, hash_type: str = 'md5',
     try:
         file_hash = getattr(hashlib, hash_type)()
     except AttributeError:
-        raise RuntimeError('Invalid or unsupported hash type: %s' % hash_type)
+        raise RuntimeError("Invalid or unsupported hash type: %s" % hash_type)
 
     if isinstance(filename, str):
-        with open(filename, 'rb') as file_:
+        with open(filename, "rb") as file_:
             for chunk in read_in_chunks(file_, block_size=block_size):
                 file_hash.update(chunk)
     else:
@@ -162,32 +164,32 @@ def parse_content_disposition(data: str) -> Tuple[Optional[str], Dict]:
     end = 0
     i = 0
     quoted = False
-    previous = ''
+    previous = ""
     field = None
 
     while i < length:
         c = data[i]
-        if not quoted and c == ';':
+        if not quoted and c == ";":
             if dtype is None:
                 dtype = data[start:end]
             elif field is not None:
-                params[field.lower()] = data[start:end].replace('\\', '')
+                params[field.lower()] = data[start:end].replace("\\", "")
                 field = None
             i += 1
             start = end = i
         elif c == '"':
             i += 1
-            if not previous or previous != '\\':
+            if not previous or previous != "\\":
                 if not quoted:
                     start = i
                 quoted = not quoted
             else:
                 end = i
-        elif c == '=':
+        elif c == "=":
             field = data[start:end]
             i += 1
             start = end = i
-        elif c == ' ':
+        elif c == " ":
             i += 1
             if not quoted and start == end:  # Leading spaces.
                 start = end = i
@@ -201,6 +203,6 @@ def parse_content_disposition(data: str) -> Tuple[Optional[str], Dict]:
         if dtype is None:
             dtype = data[start:end].lower()
         elif field is not None:
-            params[field.lower()] = data[start:end].replace('\\', '')
+            params[field.lower()] = data[start:end].replace("\\", "")
 
     return dtype, params

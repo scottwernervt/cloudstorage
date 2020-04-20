@@ -38,15 +38,15 @@ from cloudstorage.typed import (
     MetaData,
 )
 
-if os.name != 'nt':
-    import xattr    # noqa: E402
+if os.name != "nt":
+    import xattr  # noqa: E402
 
 
-__all__ = ['LocalDriver']
+__all__ = ["LocalDriver"]
 
 logger = logging.getLogger(__name__)
 
-IGNORE_FOLDERS = ['.lock', '.hash', '.DS_STORE']
+IGNORE_FOLDERS = [".lock", ".hash", ".DS_STORE"]
 
 
 @contextmanager
@@ -61,12 +61,12 @@ def lock_local_file(path: str) -> filelock.FileLock:
 
     :raise CloudStorageError: If lock could not be acquired.
     """
-    lock = filelock.FileLock(path + '.lock')
+    lock = filelock.FileLock(path + ".lock")
 
     try:
         lock.acquire(timeout=0.1)
     except filelock.Timeout:
-        raise CloudStorageError('Lock timeout')
+        raise CloudStorageError("Lock timeout")
 
     yield lock
 
@@ -110,17 +110,19 @@ class LocalDriver(Driver):
     :raise NotADirectoryError: If the key storage path is invalid or does not
       exist.
     """
-    name = 'LOCAL'
-    hash_type = 'md5'
-    url = ''
 
-    def __init__(self, key: str, secret: str = None, salt: str = None,
-                 **kwargs: Dict) -> None:
+    name = "LOCAL"
+    hash_type = "md5"
+    url = ""
+
+    def __init__(
+        self, key: str, secret: str = None, salt: str = None, **kwargs: Dict
+    ) -> None:
         super().__init__(key, secret, **kwargs)
 
         self.base_path = key
         self.salt = salt
-        self.is_windows = os.name == 'nt'
+        self.is_windows = os.name == "nt"
 
         try:
             if not os.path.exists(key):
@@ -130,8 +132,7 @@ class LocalDriver(Driver):
 
         # Check if base path is a directory and not a file
         if not os.path.isdir(self.base_path):
-            raise NotADirectoryError(
-                "The base path '%s' is not a directory." % key)
+            raise NotADirectoryError("The base path '%s' is not a directory." % key)
 
     def __iter__(self) -> Iterable[Container]:
         for container_name in self._get_folders():
@@ -141,8 +142,9 @@ class LocalDriver(Driver):
         return len(list(self._get_folders()))
 
     @staticmethod
-    def _normalize_parameters(params: Dict[str, str],
-                              normalizers: Dict[str, str]) -> Dict[str, str]:
+    def _normalize_parameters(
+        params: Dict[str, str], normalizers: Dict[str, str]
+    ) -> Dict[str, str]:
         normalized = params.copy()
 
         for key, value in params.items():
@@ -167,10 +169,10 @@ class LocalDriver(Driver):
         """
         # TODO: Throw exception if secret / salt not set.
         return itsdangerous.URLSafeTimedSerializer(
-            secret_key=self.secret, salt=self.salt, signer_kwargs={
-                'key_derivation': 'hmac',
-                'digest_method': 'SHA1'
-            })
+            secret_key=self.secret,
+            salt=self.salt,
+            signer_kwargs={"key_derivation": "hmac", "digest_method": "SHA1"},
+        )
 
     def _make_xattr(self, filename: str):
         """
@@ -191,7 +193,7 @@ class LocalDriver(Driver):
         """
         if self.is_windows:
             p = pathlib.Path(path)
-            if p.name.startswith('.') and p.name.endswith('.xattr'):
+            if p.name.startswith(".") and p.name.endswith(".xattr"):
                 return False
         return True
 
@@ -210,8 +212,7 @@ class LocalDriver(Driver):
 
             yield container_name
 
-    def _get_folder_path(self, container: Container,
-                         validate: bool = True) -> str:
+    def _get_folder_path(self, container: Container, validate: bool = True) -> str:
         """Get the container's full folder path.
 
         :param container: A container instance.
@@ -262,16 +263,17 @@ class LocalDriver(Driver):
                 continue
 
             try:
-                if key == 'meta_data':
+                if key == "meta_data":
                     for meta_key, meta_value in value.items():
                         # user.metadata.name
-                        attr_name = self._OBJECT_META_PREFIX + 'metadata.' + \
-                                    meta_key  # noqa: E126
-                        xattrs[attr_name] = meta_value.encode('utf-8')
+                        attr_name = (
+                            self._OBJECT_META_PREFIX + "metadata." + meta_key
+                        )  # noqa: E126
+                        xattrs[attr_name] = meta_value.encode("utf-8")
                 else:
                     # user.name
                     attr_name = self._OBJECT_META_PREFIX + key
-                    xattrs[attr_name] = value.encode('utf-8')
+                    xattrs[attr_name] = value.encode("utf-8")
             except OSError:
                 logger.warning(messages.LOCAL_NO_ATTRIBUTES)
 
@@ -332,8 +334,9 @@ class LocalDriver(Driver):
 
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
 
-        return Container(name=folder_name, driver=self, meta_data=None,
-                         created_at=created_at)
+        return Container(
+            name=folder_name, driver=self, meta_data=None, created_at=created_at
+        )
 
     def _make_blob(self, container: Container, object_name: str) -> Blob:
         """Convert local file name to a Cloud Storage Blob.
@@ -349,16 +352,14 @@ class LocalDriver(Driver):
         """
         full_path = os.path.join(self.base_path, container.name, object_name)
         if not self._check_path_accessible(full_path):
-            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name,
-                                                           container.name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name, container.name))
 
         object_path = pathlib.Path(full_path)
 
         try:
             stat = os.stat(str(object_path))
         except FileNotFoundError:
-            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name,
-                                                           container.name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (object_name, container.name))
 
         meta_data = {}
         content_type = None
@@ -372,18 +373,18 @@ class LocalDriver(Driver):
                 value_str = None
 
                 try:
-                    value_str = attr_value.decode('utf-8')
+                    value_str = attr_value.decode("utf-8")
                 except UnicodeDecodeError:
                     pass
 
-                if attr_key.startswith(self._OBJECT_META_PREFIX + 'metadata'):
-                    meta_key = attr_key.split('.')[-1]
+                if attr_key.startswith(self._OBJECT_META_PREFIX + "metadata"):
+                    meta_key = attr_key.split(".")[-1]
                     meta_data[meta_key] = value_str
-                elif attr_key.endswith('content_type'):
+                elif attr_key.endswith("content_type"):
                     content_type = value_str
-                elif attr_key.endswith('content_disposition'):
+                elif attr_key.endswith("content_disposition"):
                     content_disposition = value_str
-                elif attr_key.endswith('cache_control'):
+                elif attr_key.endswith("cache_control"):
                     cache_control = value_str
                 else:
                     logger.warning("Unknown file attribute '%s'", attr_key)
@@ -395,33 +396,44 @@ class LocalDriver(Driver):
         file_hash = file_checksum(full_path, hash_type=self.hash_type)
         checksum = file_hash.hexdigest()
 
-        etag = hashlib.sha1(full_path.encode('utf-8')).hexdigest()
+        etag = hashlib.sha1(full_path.encode("utf-8")).hexdigest()
         created_at = datetime.fromtimestamp(stat.st_ctime, timezone.utc)
         modified_at = datetime.fromtimestamp(stat.st_mtime, timezone.utc)
 
-        return Blob(name=object_name, checksum=checksum, etag=etag,
-                    size=stat.st_size, container=container, driver=self,
-                    acl=None, meta_data=meta_data,
-                    content_disposition=content_disposition,
-                    content_type=content_type, cache_control=cache_control,
-                    created_at=created_at, modified_at=modified_at)
+        return Blob(
+            name=object_name,
+            checksum=checksum,
+            etag=etag,
+            size=stat.st_size,
+            container=container,
+            driver=self,
+            acl=None,
+            meta_data=meta_data,
+            content_disposition=content_disposition,
+            content_type=content_type,
+            cache_control=cache_control,
+            created_at=created_at,
+            modified_at=modified_at,
+        )
 
     def validate_credentials(self) -> None:
         if not os.access(self.base_path, os.W_OK):
             raise CredentialsError(
-                "[Errno 13] Permission denied: '{}'".format(self.base_path))
+                "[Errno 13] Permission denied: '{}'".format(self.base_path)
+            )
 
     @property
     def regions(self) -> List[str]:
         return []
 
-    def create_container(self, container_name: str, acl: str = None,
-                         meta_data: MetaData = None) -> Container:
+    def create_container(
+        self, container_name: str, acl: str = None, meta_data: MetaData = None
+    ) -> Container:
         if acl:
-            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, "acl")
 
         if meta_data:
-            logger.info(messages.OPTION_NOT_SUPPORTED, 'meta_data')
+            logger.info(messages.OPTION_NOT_SUPPORTED, "meta_data")
 
         full_path = os.path.join(self.base_path, container_name)
         if not self._check_path_accessible(full_path):
@@ -458,28 +470,36 @@ class LocalDriver(Driver):
         return self._get_folder_path(container)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, "enable_container_cdn")
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, "disable_container_cdn")
         return False
 
-    def upload_blob(self, container: Container, filename: FileLike,
-                    blob_name: str = None, acl: str = None,
-                    meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, cache_control: str = None,
-                    chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
+    def upload_blob(
+        self,
+        container: Container,
+        filename: FileLike,
+        blob_name: str = None,
+        acl: str = None,
+        meta_data: MetaData = None,
+        content_type: str = None,
+        content_disposition: str = None,
+        cache_control: str = None,
+        chunk_size: int = 1024,
+        extra: ExtraOptions = None,
+    ) -> Blob:
         if acl:
-            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, "acl")
 
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}
 
         attributes = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
-        attributes.setdefault('meta_data', meta_data)
-        attributes.setdefault('content_disposition', content_disposition)
-        attributes.setdefault('cache_control', cache_control)
+        attributes.setdefault("meta_data", meta_data)
+        attributes.setdefault("content_disposition", content_disposition)
+        attributes.setdefault("cache_control", cache_control)
 
         path = self._get_folder_path(container, validate=True)
 
@@ -493,17 +513,17 @@ class LocalDriver(Driver):
             if isinstance(filename, str):
                 shutil.copy(filename, blob_path)
             else:
-                with open(blob_path, 'wb') as blob_file:
+                with open(blob_path, "wb") as blob_file:
                     for data in filename:
                         blob_file.write(data)
 
         # Disable execute mode on file
-        os.chmod(blob_path, int('664', 8))
+        os.chmod(blob_path, int("664", 8))
 
         if not content_type:
-            attributes['content_type'] = file_content_type(blob_path)
+            attributes["content_type"] = file_content_type(blob_path)
         else:
-            attributes['content_type'] = content_type
+            attributes["content_type"] = content_type
 
         # Set meta data and other attributes
         self._set_file_attributes(blob_path, attributes)
@@ -529,14 +549,13 @@ class LocalDriver(Driver):
                 object_name = pathlib.Path(full_path).name
                 yield self._make_blob(container, object_name)
 
-    def download_blob(self, blob: Blob,
-                      destination: FileLike) -> None:
+    def download_blob(self, blob: Blob, destination: FileLike) -> None:
         blob_path = self._get_file_path(blob)
 
         if isinstance(destination, str):
             base_name = os.path.basename(destination)
             if not base_name and not os.path.exists(destination):
-                raise CloudStorageError('Path %s does not exist.' % destination)
+                raise CloudStorageError("Path %s does not exist." % destination)
 
             if not base_name:
                 file_path = os.path.join(destination, blob.name)
@@ -545,7 +564,7 @@ class LocalDriver(Driver):
 
             shutil.copy(blob_path, file_path)
         else:
-            with open(blob_path, 'rb') as blob_file:
+            with open(blob_path, "rb") as blob_file:
                 for data in read_in_chunks(blob_file):
                     destination.write(data)
 
@@ -568,15 +587,19 @@ class LocalDriver(Driver):
     def blob_cdn_url(self, blob: Blob) -> str:
         return os.path.join(self.base_path, blob.container.name, blob.name)
 
-    def generate_container_upload_url(self, container: Container,
-                                      blob_name: str,
-                                      expires: int = 3600, acl: str = None,
-                                      meta_data: MetaData = None,
-                                      content_disposition: str = None,
-                                      content_length: ContentLength = None,
-                                      content_type: str = None,
-                                      cache_control: str = None,
-                                      extra: ExtraOptions = None) -> FormPost:
+    def generate_container_upload_url(
+        self,
+        container: Container,
+        blob_name: str,
+        expires: int = 3600,
+        acl: str = None,
+        meta_data: MetaData = None,
+        content_disposition: str = None,
+        content_length: ContentLength = None,
+        content_type: str = None,
+        cache_control: str = None,
+        extra: ExtraOptions = None,
+    ) -> FormPost:
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
 
@@ -584,33 +607,37 @@ class LocalDriver(Driver):
         expires_at = expiration.timestamp()
 
         fields = {
-            'blob_name': blob_name,
-            'container': container.name,
-            'expires': expires_at,
+            "blob_name": blob_name,
+            "container": container.name,
+            "expires": expires_at,
         }
 
         payload = {
-            'acl': acl,
-            'meta_data': meta_data,
-            'content_disposition': content_disposition,
-            'content_length': content_length,
-            'content_type': content_type,
-            'cache_control': cache_control,
-            'max_age': int(expires),
+            "acl": acl,
+            "meta_data": meta_data,
+            "content_disposition": content_disposition,
+            "content_length": content_length,
+            "content_type": content_type,
+            "cache_control": cache_control,
+            "max_age": int(expires),
         }
         payload.update(**fields)
         payload.update(**extra)
 
         serializer = self._make_serializer()
         token = serializer.dumps(payload)
-        fields['signature'] = token
+        fields["signature"] = token
 
-        return {'url': '', 'fields': fields}
+        return {"url": "", "fields": fields}
 
-    def generate_blob_download_url(self, blob: Blob, expires: int = 3600,
-                                   method: str = 'GET',
-                                   content_disposition: str = None,
-                                   extra: ExtraOptions = None) -> str:
+    def generate_blob_download_url(
+        self,
+        blob: Blob,
+        expires: int = 3600,
+        method: str = "GET",
+        content_disposition: str = None,
+        extra: ExtraOptions = None,
+    ) -> str:
         extra = extra if extra is not None else {}
         serializer = self._make_serializer()
 
@@ -618,12 +645,12 @@ class LocalDriver(Driver):
         expires_at = expiration.timestamp()
 
         payload = {
-            'max_age': int(expires),
-            'expires': expires_at,
-            'blob_name': blob.name,
-            'container': blob.container.name,
-            'method': method,
-            'content_disposition': content_disposition,
+            "max_age": int(expires),
+            "expires": expires_at,
+            "blob_name": blob.name,
+            "container": blob.container.name,
+            "method": method,
+            "content_disposition": content_disposition,
         }
         payload.update(**extra)
 
@@ -643,7 +670,7 @@ class LocalDriver(Driver):
         """
         serializer = self._make_serializer()
         payload = serializer.loads(signature, max_age=None)
-        max_age = payload.get('max_age', 0)
+        max_age = payload.get("max_age", 0)
 
         # https://github.com/pallets/itsdangerous/issues/43
         try:
@@ -651,10 +678,10 @@ class LocalDriver(Driver):
         except itsdangerous.SignatureExpired:
             raise SignatureExpiredError
 
-    _OBJECT_META_PREFIX = 'user.'
+    _OBJECT_META_PREFIX = "user."
 
     _PUT_OBJECT_KEYS = {
-        'metadata': 'meta_data',
+        "metadata": "meta_data",
     }
 
 
@@ -663,10 +690,11 @@ class XattrWindows:
     Simulate xattr on windows.
     A file named ".<filename>.xattr" will be created on the same directory as the source file.
     """
+
     def __init__(self, filename) -> None:
         self.filename = filename
         p = pathlib.Path(filename)
-        self.xattr_filename = os.path.join(p.parent, '.{}.xattr'.format(p.name))
+        self.xattr_filename = os.path.join(p.parent, ".{}.xattr".format(p.name))
 
     def __setitem__(self, key, value) -> None:
         """
@@ -674,7 +702,7 @@ class XattrWindows:
         """
         data = self._load()
         data[key] = value
-        with open(self.xattr_filename, 'w') as outfile:
+        with open(self.xattr_filename, "w") as outfile:
             json.dump(data, outfile)
 
     def items(self):
@@ -687,7 +715,7 @@ class XattrWindows:
         ret = {}
         for itemname, itemvalue in items.items():
             if isinstance(itemvalue, str):
-                ret[itemname] = itemvalue.encode('utf-8')
+                ret[itemname] = itemvalue.encode("utf-8")
             else:
                 ret[itemname] = itemvalue
         return ret.items()

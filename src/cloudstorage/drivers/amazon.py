@@ -26,7 +26,7 @@ from cloudstorage.typed import (
 if TYPE_CHECKING:
     from cloudstorage.structures import CaseInsensitiveDict  # noqa
 
-__all__ = ['S3Driver']
+__all__ = ["S3Driver"]
 
 logger = logging.getLogger(__name__)
 
@@ -62,18 +62,20 @@ class S3Driver(Driver):
     :param kwargs: (optional) Extra driver options.
     :type kwargs: dict
     """
-    name = 'S3'
-    hash_type = 'md5'
-    url = 'https://aws.amazon.com/s3/'
 
-    def __init__(self, key: str, secret: str = None, region: str = 'us-east-1',
-                 **kwargs: Dict) -> None:
+    name = "S3"
+    hash_type = "md5"
+    url = "https://aws.amazon.com/s3/"
+
+    def __init__(
+        self, key: str, secret: str = None, region: str = "us-east-1", **kwargs: Dict
+    ) -> None:
         region = region.lower()
         super().__init__(key=key, secret=secret, region=region, **kwargs)
 
-        self._session = boto3.Session(aws_access_key_id=key,
-                                      aws_secret_access_key=secret,
-                                      region_name=region)
+        self._session = boto3.Session(
+            aws_access_key_id=key, aws_secret_access_key=secret, region_name=region
+        )
 
         # session required for loading regions list
         if region not in self.regions:
@@ -88,8 +90,9 @@ class S3Driver(Driver):
         return len(buckets)
 
     @staticmethod
-    def _normalize_parameters(params: Dict[str, str],
-                              normalizers: Dict[str, str]) -> Dict[str, str]:
+    def _normalize_parameters(
+        params: Dict[str, str], normalizers: Dict[str, str]
+    ) -> Dict[str, str]:
         normalized = params.copy()
 
         for key, value in params.items():
@@ -97,8 +100,7 @@ class S3Driver(Driver):
             if not value:
                 continue
 
-            key_inflected = camelize(underscore(key),
-                                     uppercase_first_letter=True)
+            key_inflected = camelize(underscore(key), uppercase_first_letter=True)
             # Only include parameters found in normalizers
             key_overrider = normalizers.get(key_inflected.lower())
             if key_overrider:
@@ -126,16 +128,16 @@ class S3Driver(Driver):
         if validate:
             try:
                 response = self.s3.meta.client.head_bucket(Bucket=bucket_name)
-                logger.debug('response=%s', response)
+                logger.debug("response=%s", response)
             except ClientError as err:
-                error_code = int(err.response['Error']['Code'])
+                error_code = int(err.response["Error"]["Code"])
                 if error_code == 404:
-                    raise NotFoundError(messages.CONTAINER_NOT_FOUND %
-                                        bucket_name)
+                    raise NotFoundError(messages.CONTAINER_NOT_FOUND % bucket_name)
 
-                raise CloudStorageError('%s: %s' % (
-                    err.response['Error']['Code'],
-                    err.response['Error']['Message']))
+                raise CloudStorageError(
+                    "%s: %s"
+                    % (err.response["Error"]["Code"], err.response["Error"]["Message"])
+                )
 
             try:
                 bucket.wait_until_exists()
@@ -161,35 +163,47 @@ class S3Driver(Driver):
         try:
             name = object_summary.key
             #: etag wrapped in quotes
-            checksum = etag = object_summary.e_tag.replace('"', '')
+            checksum = etag = object_summary.e_tag.replace('"', "")
             size = object_summary.size
 
             acl = object_summary.Acl()
-            meta_data = object_summary.meta.data.get('Metadata', {})
+            meta_data = object_summary.meta.data.get("Metadata", {})
             content_disposition = object_summary.meta.data.get(
-                'ContentDisposition', None)
-            content_type = object_summary.meta.data.get('ContentType', None)
-            cache_control = object_summary.meta.data.get('CacheControl', None)
+                "ContentDisposition", None
+            )
+            content_type = object_summary.meta.data.get("ContentType", None)
+            cache_control = object_summary.meta.data.get("CacheControl", None)
             modified_at = object_summary.last_modified
             created_at = None
             expires_at = None  # TODO: FEATURE: Delete at / expires at
         except ClientError as err:
-            error_code = int(err.response['Error']['Code'])
+            error_code = int(err.response["Error"]["Code"])
             if error_code == 404:
-                raise NotFoundError(messages.BLOB_NOT_FOUND % (
-                    container.name, object_summary.key))
+                raise NotFoundError(
+                    messages.BLOB_NOT_FOUND % (container.name, object_summary.key)
+                )
 
-            raise CloudStorageError('%s: %s' % (
-                err.response['Error']['Code'],
-                err.response['Error']['Message']))
+            raise CloudStorageError(
+                "%s: %s"
+                % (err.response["Error"]["Code"], err.response["Error"]["Message"])
+            )
 
-        return Blob(name=name, checksum=checksum, etag=etag, size=size,
-                    container=container, driver=self, acl=acl,
-                    meta_data=meta_data,
-                    content_disposition=content_disposition,
-                    content_type=content_type, cache_control=cache_control,
-                    created_at=created_at, modified_at=modified_at,
-                    expires_at=expires_at)
+        return Blob(
+            name=name,
+            checksum=checksum,
+            etag=etag,
+            size=size,
+            container=container,
+            driver=self,
+            acl=acl,
+            meta_data=meta_data,
+            content_disposition=content_disposition,
+            content_type=content_type,
+            cache_control=cache_control,
+            created_at=created_at,
+            modified_at=modified_at,
+            expires_at=expires_at,
+        )
 
     def _make_container(self, bucket) -> Container:
         """Convert S3 Bucket to Container.
@@ -202,8 +216,13 @@ class S3Driver(Driver):
         """
         acl = bucket.Acl()
         created_at = bucket.creation_date.astimezone(tz=None)
-        return Container(name=bucket.name, driver=self, acl=acl,
-                         meta_data=None, created_at=created_at)
+        return Container(
+            name=bucket.name,
+            driver=self,
+            acl=acl,
+            meta_data=None,
+            created_at=created_at,
+        )
 
     @property
     def session(self) -> boto3.session.Session:
@@ -222,44 +241,45 @@ class S3Driver(Driver):
         :return: The s3 resource instance.
         :rtype: :class:`boto3.resources.base.ServiceResource`
         """
-        return self.session.resource(service_name='s3', region_name=self.region)
+        return self.session.resource(service_name="s3", region_name=self.region)
 
     def validate_credentials(self) -> None:
         try:
-            self.session.client('sts').get_caller_identity()
+            self.session.client("sts").get_caller_identity()
         except ClientError as err:
             raise CredentialsError(str(err))
 
     @property
     def regions(self) -> List[str]:
-        return self.session.get_available_regions('s3')
+        return self.session.get_available_regions("s3")
 
-    def create_container(self, container_name: str, acl: str = None,
-                         meta_data: MetaData = None) -> Container:
+    def create_container(
+        self, container_name: str, acl: str = None, meta_data: MetaData = None
+    ) -> Container:
         if meta_data:
-            logger.info(messages.OPTION_NOT_SUPPORTED, 'meta_data')
+            logger.info(messages.OPTION_NOT_SUPPORTED, "meta_data")
 
         # Required parameters
         params = {
-            'Bucket': container_name,
+            "Bucket": container_name,
         }  # type: Dict[Any, Any]
 
         if acl:
-            params['ACL'] = acl.lower()
+            params["ACL"] = acl.lower()
 
         # TODO: BUG: Creating S3 bucket in us-east-1
         # See https://github.com/boto/boto3/issues/125
-        if self.region != 'us-east-1':
-            params['CreateBucketConfiguration'] = {
-                'LocationConstraint': self.region,
+        if self.region != "us-east-1":
+            params["CreateBucketConfiguration"] = {
+                "LocationConstraint": self.region,
             }
 
-        logger.debug('params=%s', params)
+        logger.debug("params=%s", params)
 
         try:
             bucket = self.s3.create_bucket(**params)
         except ParamValidationError as err:
-            msg = err.kwargs.get('report', messages.CONTAINER_NAME_INVALID)
+            msg = err.kwargs.get("report", messages.CONTAINER_NAME_INVALID)
             raise CloudStorageError(msg)
 
         try:
@@ -282,31 +302,37 @@ class S3Driver(Driver):
         try:
             bucket.delete()
         except ClientError as err:
-            error_code = err.response['Error']['Code']
-            if error_code == 'BucketNotEmpty':
-                raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY %
-                                      bucket.name)
+            error_code = err.response["Error"]["Code"]
+            if error_code == "BucketNotEmpty":
+                raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY % bucket.name)
             raise
 
     def container_cdn_url(self, container: Container) -> str:
         bucket = self._get_bucket(container.name, validate=False)
         endpoint_url = bucket.meta.client.meta.endpoint_url
-        return '%s/%s' % (endpoint_url, container.name)
+        return "%s/%s" % (endpoint_url, container.name)
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, "enable_container_cdn")
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, "disable_container_cdn")
         return False
 
-    def upload_blob(self, container: Container, filename: FileLike,
-                    blob_name: str = None, acl: str = None,
-                    meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, cache_control: str = None,
-                    chunk_size: int = 1024,
-                    extra: ExtraOptions = None) -> Blob:
+    def upload_blob(
+        self,
+        container: Container,
+        filename: FileLike,
+        blob_name: str = None,
+        acl: str = None,
+        meta_data: MetaData = None,
+        content_type: str = None,
+        content_disposition: str = None,
+        cache_control: str = None,
+        chunk_size: int = 1024,
+        extra: ExtraOptions = None,
+    ) -> Blob:
         meta_data = {} if meta_data is None else meta_data
         extra = {} if extra is None else extra
 
@@ -315,17 +341,17 @@ class S3Driver(Driver):
         config = boto3.s3.transfer.TransferConfig(io_chunksize=chunk_size)
 
         # Default arguments
-        extra_args.setdefault('Metadata', meta_data)
-        extra_args.setdefault('StorageClass', 'STANDARD')
+        extra_args.setdefault("Metadata", meta_data)
+        extra_args.setdefault("StorageClass", "STANDARD")
 
         if acl:
-            extra_args.setdefault('ACL', acl.lower())
+            extra_args.setdefault("ACL", acl.lower())
 
         if cache_control:
-            extra_args.setdefault('CacheControl', cache_control)
+            extra_args.setdefault("CacheControl", cache_control)
 
         if content_disposition:
-            extra_args['ContentDisposition'] = content_disposition
+            extra_args["ContentDisposition"] = content_disposition
 
         blob_name = blob_name or validate_file_or_path(filename)
 
@@ -333,30 +359,29 @@ class S3Driver(Driver):
         if not content_type:
             if isinstance(filename, str):
                 # TODO: QUESTION: Any advantages between filename vs blob_name?
-                extra_args['ContentType'] = file_content_type(filename)
+                extra_args["ContentType"] = file_content_type(filename)
             else:
-                extra_args['ContentType'] = file_content_type(blob_name)
+                extra_args["ContentType"] = file_content_type(blob_name)
         else:
-            extra_args['ContentType'] = content_type
+            extra_args["ContentType"] = content_type
 
-        logger.debug('extra_args=%s', extra_args)
+        logger.debug("extra_args=%s", extra_args)
 
         if isinstance(filename, str):
-            self.s3.Bucket(container.name).upload_file(Filename=filename,
-                                                       Key=blob_name,
-                                                       ExtraArgs=extra_args,
-                                                       Config=config)
+            self.s3.Bucket(container.name).upload_file(
+                Filename=filename, Key=blob_name, ExtraArgs=extra_args, Config=config
+            )
         else:
-            self.s3.Bucket(container.name).upload_fileobj(Fileobj=filename,
-                                                          Key=blob_name,
-                                                          ExtraArgs=extra_args,
-                                                          Config=config)
+            self.s3.Bucket(container.name).upload_fileobj(
+                Fileobj=filename, Key=blob_name, ExtraArgs=extra_args, Config=config
+            )
 
         return self.get_blob(container, blob_name)
 
     def get_blob(self, container: Container, blob_name: str) -> Blob:
-        object_summary = self.s3.ObjectSummary(bucket_name=container.name,
-                                               key=blob_name)
+        object_summary = self.s3.ObjectSummary(
+            bucket_name=container.name, key=blob_name
+        )
         return self._make_blob(container, object_summary)
 
     def get_blobs(self, container: Container) -> Iterable[Blob]:
@@ -364,14 +389,15 @@ class S3Driver(Driver):
         for key in bucket.objects.all():  # s3.ObjectSummary
             yield self._make_blob(container, key)
 
-    def download_blob(self, blob: Blob,
-                      destination: FileLike) -> None:
+    def download_blob(self, blob: Blob, destination: FileLike) -> None:
         if isinstance(destination, str):
             self.s3.Bucket(name=blob.container.name).download_file(
-                Key=blob.name, Filename=destination, ExtraArgs={})
+                Key=blob.name, Filename=destination, ExtraArgs={}
+            )
         else:
             self.s3.Bucket(name=blob.container.name).download_fileobj(
-                Key=blob.name, Fileobj=destination, ExtraArgs={})
+                Key=blob.name, Fileobj=destination, ExtraArgs={}
+            )
 
     def patch_blob(self, blob: Blob) -> None:
         raise NotImplementedError
@@ -379,39 +405,44 @@ class S3Driver(Driver):
     def delete_blob(self, blob: Blob) -> None:
         # Required parameters
         params = {
-            'Bucket': blob.container.name,
-            'Key': blob.name,
+            "Bucket": blob.container.name,
+            "Key": blob.name,
         }
 
-        logger.debug('params=%s', params)
+        logger.debug("params=%s", params)
 
         try:
             response = self.s3.meta.client.delete_object(**params)
-            logger.debug('response=%s', response)
+            logger.debug("response=%s", response)
         except ClientError as err:
-            error_code = int(err.response['Error']['Code'])
+            error_code = int(err.response["Error"]["Code"])
             if error_code != 200 or error_code != 204:
-                raise NotFoundError(messages.BLOB_NOT_FOUND % (
-                    blob.name, blob.container.name))
+                raise NotFoundError(
+                    messages.BLOB_NOT_FOUND % (blob.name, blob.container.name)
+                )
             raise
 
     def blob_cdn_url(self, blob: Blob) -> str:
         container_url = self.container_cdn_url(blob.container)
         blob_name_cleaned = quote(blob.name)
 
-        blob_path = '%s/%s' % (container_url, blob_name_cleaned)
+        blob_path = "%s/%s" % (container_url, blob_name_cleaned)
         url = urljoin(container_url, blob_path)
         return url
 
-    def generate_container_upload_url(self, container: Container,
-                                      blob_name: str,
-                                      expires: int = 3600, acl: str = None,
-                                      meta_data: MetaData = None,
-                                      content_disposition: str = None,
-                                      content_length: ContentLength = None,
-                                      content_type: str = None,
-                                      cache_control: str = None,
-                                      extra: ExtraOptions = None) -> FormPost:
+    def generate_container_upload_url(
+        self,
+        container: Container,
+        blob_name: str,
+        expires: int = 3600,
+        acl: str = None,
+        meta_data: MetaData = None,
+        content_disposition: str = None,
+        content_length: ContentLength = None,
+        content_type: str = None,
+        cache_control: str = None,
+        extra: ExtraOptions = None,
+    ) -> FormPost:
         meta_data = {} if meta_data is None else meta_data
         extra = {} if extra is None else extra
         extra_norm = self._normalize_parameters(extra, self._POST_OBJECT_KEYS)
@@ -420,25 +451,25 @@ class S3Driver(Driver):
         fields = {}  # type: Dict[Any, Any]
 
         if acl:
-            conditions.append({'acl': acl})
-            fields['acl'] = acl
+            conditions.append({"acl": acl})
+            fields["acl"] = acl
 
         headers = {
-            'Content-Disposition': content_disposition,
-            'Content-Type': content_type,
-            'Cache-Control': cache_control,
+            "Content-Disposition": content_disposition,
+            "Content-Type": content_type,
+            "Cache-Control": cache_control,
         }
         for header_name, header_value in headers.items():
             if not header_value:
                 continue
 
             fields[header_name.lower()] = header_value
-            conditions.append(['eq', '$' + header_name, header_value])
+            conditions.append(["eq", "$" + header_name, header_value])
 
         # Add content-length-range which is a tuple
         if content_length:
             min_range, max_range = content_length
-            conditions.append(['content-length-range', min_range, max_range])
+            conditions.append(["content-length-range", min_range, max_range])
 
         for meta_name, meta_value in meta_data.items():
             meta_name = self._OBJECT_META_PREFIX + meta_name
@@ -455,130 +486,138 @@ class S3Driver(Driver):
             Key=blob_name,
             Fields=fields,
             Conditions=conditions,
-            ExpiresIn=int(expires))
+            ExpiresIn=int(expires),
+        )
 
-    def generate_blob_download_url(self, blob: Blob, expires: int = 3600,
-                                   method: str = 'GET',
-                                   content_disposition: str = None,
-                                   extra: ExtraOptions = None) -> str:
+    def generate_blob_download_url(
+        self,
+        blob: Blob,
+        expires: int = 3600,
+        method: str = "GET",
+        content_disposition: str = None,
+        extra: ExtraOptions = None,
+    ) -> str:
         extra = extra if extra is not None else {}
         params = self._normalize_parameters(extra, self._GET_OBJECT_KEYS)
 
         # Required parameters
-        params['Bucket'] = blob.container.name
-        params['Key'] = blob.name
+        params["Bucket"] = blob.container.name
+        params["Key"] = blob.name
 
         # Optional
         if content_disposition:
-            params['ResponseContentDisposition'] = content_disposition
+            params["ResponseContentDisposition"] = content_disposition
 
-        logger.debug('params=%s', params)
+        logger.debug("params=%s", params)
         return self.s3.meta.client.generate_presigned_url(
-            ClientMethod='get_object', Params=params, ExpiresIn=int(expires),
-            HttpMethod=method.lower())
+            ClientMethod="get_object",
+            Params=params,
+            ExpiresIn=int(expires),
+            HttpMethod=method.lower(),
+        )
 
-    _OBJECT_META_PREFIX = 'x-amz-meta-'  # type: str
+    _OBJECT_META_PREFIX = "x-amz-meta-"  # type: str
 
     #: `S3.Client.generate_presigned_post
     #: <http://boto3.readthedocs.io/en/latest/reference/services/s3.html
     #: #S3.Client.generate_presigned_post>`_
     _POST_OBJECT_KEYS = {
-        'acl': 'acl',
-        'cachecontrol': 'Cache-Control',
-        'contenttype': 'Content-Type',
-        'contentdisposition': 'Content-Disposition',
-        'contentencoding': 'Content-Encoding',
-        'expires': 'Expires',
-        'successactionredirect': 'success_action_redirect',
-        'redirect': 'redirect',
-        'successactionstatus': 'success_action_status',
-        'xamzmeta': 'x-amz-meta-',
+        "acl": "acl",
+        "cachecontrol": "Cache-Control",
+        "contenttype": "Content-Type",
+        "contentdisposition": "Content-Disposition",
+        "contentencoding": "Content-Encoding",
+        "expires": "Expires",
+        "successactionredirect": "success_action_redirect",
+        "redirect": "redirect",
+        "successactionstatus": "success_action_status",
+        "xamzmeta": "x-amz-meta-",
     }
 
     #: `#S3.Client.get_object
     #: <http://boto3.readthedocs.io/en/latest/reference/services/s3.html
     #: #S3.Client.get_object>`_
     _GET_OBJECT_KEYS = {
-        'bucket': 'Bucket',
-        'ifmatch': 'IfMatch',
-        'ifmodifiedsince': 'IfModifiedSince',
-        'ifnonematch': 'IfNoneMatch',
-        'ifunmodifiedsince': 'IfUnmodifiedSince',
-        'key': 'Key',
-        'range': 'Range',
-        'responsecachecontrol': 'ResponseCacheControl',
-        'responsecontentdisposition': 'ResponseContentDisposition',
-        'responsecontentencoding': 'ResponseContentEncoding',
-        'responsecontentlanguage': 'ResponseContentLanguage',
-        'responsecontenttype': 'ResponseContentType',
-        'responseexpires': 'ResponseExpires',
-        'versionid': 'VersionId',
-        'ssecustomeralgorithm': 'SSECustomerAlgorithm',
-        'ssecustomerkey': 'SSECustomerKey',
-        'requestpayer': 'RequestPayer',
-        'partnumber': 'PartNumber',
+        "bucket": "Bucket",
+        "ifmatch": "IfMatch",
+        "ifmodifiedsince": "IfModifiedSince",
+        "ifnonematch": "IfNoneMatch",
+        "ifunmodifiedsince": "IfUnmodifiedSince",
+        "key": "Key",
+        "range": "Range",
+        "responsecachecontrol": "ResponseCacheControl",
+        "responsecontentdisposition": "ResponseContentDisposition",
+        "responsecontentencoding": "ResponseContentEncoding",
+        "responsecontentlanguage": "ResponseContentLanguage",
+        "responsecontenttype": "ResponseContentType",
+        "responseexpires": "ResponseExpires",
+        "versionid": "VersionId",
+        "ssecustomeralgorithm": "SSECustomerAlgorithm",
+        "ssecustomerkey": "SSECustomerKey",
+        "requestpayer": "RequestPayer",
+        "partnumber": "PartNumber",
         # Extra keys to standarize across all drivers
-        'cachecontrol': 'ResponseCacheControl',
-        'contentdisposition': 'ResponseContentDisposition',
-        'contentencoding': 'ResponseContentEncoding',
-        'contentlanguage': 'ResponseContentLanguage',
-        'contenttype': 'ResponseContentType',
-        'expires': 'ResponseExpires',
+        "cachecontrol": "ResponseCacheControl",
+        "contentdisposition": "ResponseContentDisposition",
+        "contentencoding": "ResponseContentEncoding",
+        "contentlanguage": "ResponseContentLanguage",
+        "contenttype": "ResponseContentType",
+        "expires": "ResponseExpires",
     }
 
     #: `S3.Client.put_object
     #: <http://boto3.readthedocs.io/en/latest/reference/services/s3.html
     #: #S3.Client.put_object>`_
     _PUT_OBJECT_KEYS = {
-        'acl': 'ACL',
-        'body': 'Body',
-        'bucket': 'Bucket',
-        'cachecontrol': 'CacheControl',
-        'contentdisposition': 'ContentDisposition',
-        'contentencoding': 'ContentEncoding',
-        'contentlanguage': 'ContentLanguage',
-        'contentlength': 'ContentLength',
-        'contentmd5': 'ContentMD5',
-        'contenttype': 'ContentType',
-        'expires': 'Expires',
-        'grantfullcontrol': 'GrantFullControl',
-        'grantread': 'GrantRead',
-        'grantreadacp': 'GrantReadACP',
-        'grantwriteacp': 'GrantWriteACP',
-        'key': 'Key',
-        'metadata': 'Metadata',
-        'serversideencryption': 'ServerSideEncryption',
-        'storageclass': 'StorageClass',
-        'websiteredirectlocation': 'WebsiteRedirectLocation',
-        'ssecustomeralgorithm': 'SSECustomerAlgorithm',
-        'ssecustomerkey': 'SSECustomerKey',
-        'ssekmskeyid': 'SSEKMSKeyId',
-        'requestpayer': 'RequestPayer',
-        'tagging': 'Tagging',
+        "acl": "ACL",
+        "body": "Body",
+        "bucket": "Bucket",
+        "cachecontrol": "CacheControl",
+        "contentdisposition": "ContentDisposition",
+        "contentencoding": "ContentEncoding",
+        "contentlanguage": "ContentLanguage",
+        "contentlength": "ContentLength",
+        "contentmd5": "ContentMD5",
+        "contenttype": "ContentType",
+        "expires": "Expires",
+        "grantfullcontrol": "GrantFullControl",
+        "grantread": "GrantRead",
+        "grantreadacp": "GrantReadACP",
+        "grantwriteacp": "GrantWriteACP",
+        "key": "Key",
+        "metadata": "Metadata",
+        "serversideencryption": "ServerSideEncryption",
+        "storageclass": "StorageClass",
+        "websiteredirectlocation": "WebsiteRedirectLocation",
+        "ssecustomeralgorithm": "SSECustomerAlgorithm",
+        "ssecustomerkey": "SSECustomerKey",
+        "ssekmskeyid": "SSEKMSKeyId",
+        "requestpayer": "RequestPayer",
+        "tagging": "Tagging",
     }
 
     #: `S3.Client.delete_object
     #: <http://boto3.readthedocs.io/en/latest/reference/services/s3.html
     #: #S3.Client.delete_object>`_
     _DELETE_OBJECT_KEYS = {
-        'bucket': 'Bucket',
-        'key': 'Key',
-        'mfa': 'MFA',
-        'versionid': 'VersionId',
-        'requestpayer': 'RequestPayer',
+        "bucket": "Bucket",
+        "key": "Key",
+        "mfa": "MFA",
+        "versionid": "VersionId",
+        "requestpayer": "RequestPayer",
     }
 
     #: `S3.Bucket.create
     #: <http://boto3.readthedocs.io/en/latest/reference/services/s3.html
     #: #S3.Bucket.create>`_
     _POST_CONTAINER_KEYS = {
-        'acl': 'ACL',
-        'bucket': 'Bucket',
-        'createbucketconfiguration': 'CreateBucketConfiguration',
-        'locationconstraint': 'LocationConstraint',
-        'grantfullcontrol': 'GrantFullControl',
-        'grantread': 'GrantRead',
-        'grantreadacp': 'GrantReadACP',
-        'grantwrite': 'GrantWrite',
-        'grantwriteacp': 'GrantWriteACP',
+        "acl": "ACL",
+        "bucket": "Bucket",
+        "createbucketconfiguration": "CreateBucketConfiguration",
+        "locationconstraint": "LocationConstraint",
+        "grantfullcontrol": "GrantFullControl",
+        "grantread": "GrantRead",
+        "grantreadacp": "GrantReadACP",
+        "grantwrite": "GrantWrite",
+        "grantwriteacp": "GrantWriteACP",
     }

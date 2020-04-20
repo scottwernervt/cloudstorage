@@ -2,7 +2,7 @@
 from typing import Any, BinaryIO, Dict, Optional, TYPE_CHECKING, TextIO, Union
 
 if TYPE_CHECKING:
-    from cloudstorage.structures import CaseInsensitiveDict # noqa
+    from cloudstorage.structures import CaseInsensitiveDict  # noqa
 
 FileLike = Union[BinaryIO, TextIO, str]
 Acl = Optional[Dict[Any, Any]]

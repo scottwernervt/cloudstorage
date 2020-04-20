@@ -40,7 +40,7 @@ from cloudstorage.typed import (
     FormPost,
 )
 
-__all__ = ['AzureStorageDriver']
+__all__ = ["AzureStorageDriver"]
 
 logger = logging.getLogger(__name__)
 
@@ -77,14 +77,16 @@ class AzureStorageDriver(Driver):
     :param kwargs: (optional) Extra driver options.
     :type kwargs: dict
     """
-    name = 'AZURE'
-    hash_type = 'md5'
-    url = 'https://azure.microsoft.com/en-us/services/storage/'
+
+    name = "AZURE"
+    hash_type = "md5"
+    url = "https://azure.microsoft.com/en-us/services/storage/"
 
     def __init__(self, account_name: str, key: str, **kwargs: Dict) -> None:
         super().__init__(key=key, **kwargs)
-        self._service = BlockBlobService(account_name=account_name,
-                                         account_key=key, **kwargs)
+        self._service = BlockBlobService(
+            account_name=account_name, account_key=key, **kwargs
+        )
 
     def __iter__(self) -> Iterable[Container]:
         azure_containers = self.service.list_containers(include_metadata=True)
@@ -96,8 +98,9 @@ class AzureStorageDriver(Driver):
         return len(azure_containers)
 
     @staticmethod
-    def _normalize_parameters(params: Dict[str, str],
-                              normalizers: Dict[str, str]) -> Dict[str, str]:
+    def _normalize_parameters(
+        params: Dict[str, str], normalizers: Dict[str, str]
+    ) -> Dict[str, str]:
         normalized = params.copy()
 
         for key, value in params.items():
@@ -128,17 +131,14 @@ class AzureStorageDriver(Driver):
         :rtype: :class:`azure.storage.blob.models.Blob`
         """
         try:
-            azure_blob = self.service.get_blob_properties(container_name,
-                                                          blob_name)
+            azure_blob = self.service.get_blob_properties(container_name, blob_name)
         except AzureMissingResourceHttpError as err:
             logger.debug(err)
-            raise NotFoundError(messages.BLOB_NOT_FOUND % (blob_name,
-                                                           container_name))
+            raise NotFoundError(messages.BLOB_NOT_FOUND % (blob_name, container_name))
 
         return azure_blob
 
-    def _convert_azure_blob(self, container: Container,
-                            azure_blob: AzureBlob) -> Blob:
+    def _convert_azure_blob(self, container: Container, azure_blob: AzureBlob) -> Blob:
         """Convert Azure Storage Blob to a Cloud Storage Blob.
 
         :param container: Container instance.
@@ -160,25 +160,27 @@ class AzureStorageDriver(Driver):
                 checksum = md5_bytes.hex()
             except AttributeError:
                 # Python 3.4: 'bytes' object has no attribute 'hex'
-                checksum = codecs.encode(md5_bytes, 'hex_codec').decode('ascii')
+                checksum = codecs.encode(md5_bytes, "hex_codec").decode("ascii")
         else:
-            logger.warning('Content MD5 not populated, content will not be validated')
+            logger.warning("Content MD5 not populated, content will not be validated")
             checksum = None
 
-        return Blob(name=azure_blob.name,
-                    size=azure_blob.properties.content_length,
-                    checksum=checksum,
-                    etag=azure_blob.properties.etag,
-                    container=container,
-                    driver=self,
-                    acl=None,
-                    meta_data=azure_blob.metadata,
-                    content_disposition=content_settings.content_disposition,
-                    content_type=content_settings.content_type,
-                    cache_control=content_settings.cache_control,
-                    created_at=None,
-                    modified_at=azure_blob.properties.last_modified,
-                    expires_at=None)
+        return Blob(
+            name=azure_blob.name,
+            size=azure_blob.properties.content_length,
+            checksum=checksum,
+            etag=azure_blob.properties.etag,
+            container=container,
+            driver=self,
+            acl=None,
+            meta_data=azure_blob.metadata,
+            content_disposition=content_settings.content_disposition,
+            content_type=content_settings.content_type,
+            cache_control=content_settings.cache_control,
+            created_at=None,
+            modified_at=azure_blob.properties.last_modified,
+            expires_at=None,
+        )
 
     def _get_azure_container(self, container_name: str) -> AzureContainer:
         """Get Azure Storage container by name.
@@ -190,16 +192,14 @@ class AzureStorageDriver(Driver):
         :rtype: :class:`azure.storage.blob.models.Container`
         """
         try:
-            azure_container = self.service.get_container_properties(
-                container_name)
+            azure_container = self.service.get_container_properties(container_name)
         except AzureMissingResourceHttpError as err:
             logger.debug(err)
             raise NotFoundError(messages.CONTAINER_NOT_FOUND % container_name)
 
         return azure_container
 
-    def _convert_azure_container(self,
-                                 azure_container: AzureContainer) -> Container:
+    def _convert_azure_container(self, azure_container: AzureContainer) -> Container:
         """Convert Azure Storage container to Cloud Storage Container.
 
         :param azure_container: The container to convert.
@@ -208,11 +208,13 @@ class AzureStorageDriver(Driver):
         :return: A container instance.
         :rtype: :class:`.Container`
         """
-        return Container(name=azure_container.name,
-                         driver=self,
-                         acl=azure_container.properties.public_access,
-                         meta_data=azure_container.metadata,
-                         created_at=azure_container.properties.last_modified)
+        return Container(
+            name=azure_container.name,
+            driver=self,
+            acl=azure_container.properties.public_access,
+            meta_data=azure_container.metadata,
+            created_at=azure_container.properties.last_modified,
+        )
 
     @property
     def service(self) -> BlockBlobService:
@@ -232,26 +234,29 @@ class AzureStorageDriver(Driver):
 
     @property
     def regions(self) -> List[str]:
-        logger.warning('Regions not supported.')
+        logger.warning("Regions not supported.")
         return []
 
-    def create_container(self, container_name: str, acl: str = None,
-                         meta_data: MetaData = None) -> Container:
+    def create_container(
+        self, container_name: str, acl: str = None, meta_data: MetaData = None
+    ) -> Container:
         meta_data = meta_data if meta_data is not None else {}
 
         # Review options: Off, Blob, Container
-        if acl == 'container-public-access':
+        if acl == "container-public-access":
             public_access = PublicAccess.Container
-        elif acl == 'blob-public-access':
+        elif acl == "blob-public-access":
             public_access = PublicAccess.Blob
         else:
             public_access = None
 
         try:
-            self.service.create_container(container_name,
-                                          metadata=meta_data,
-                                          public_access=public_access,
-                                          fail_on_exist=False)
+            self.service.create_container(
+                container_name,
+                metadata=meta_data,
+                public_access=public_access,
+                fail_on_exist=False,
+            )
         except AzureConflictHttpError:
             logger.debug(messages.CONTAINER_EXISTS, container_name)
         except AzureHttpError as err:
@@ -270,47 +275,50 @@ class AzureStorageDriver(Driver):
 
     def delete_container(self, container: Container) -> None:
         azure_container = self._get_azure_container(container.name)
-        azure_blobs = self.service.list_blobs(azure_container.name,
-                                              num_results=1)
+        azure_blobs = self.service.list_blobs(azure_container.name, num_results=1)
         if len(azure_blobs.items) > 0:
-            raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY %
-                                  azure_container.name)
+            raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY % azure_container.name)
 
-        self.service.delete_container(azure_container.name,
-                                      fail_not_exist=False)
+        self.service.delete_container(azure_container.name, fail_not_exist=False)
 
     def container_cdn_url(self, container: Container) -> str:
         azure_container = self._get_azure_container(container.name)
-        url = '{}://{}/{}'.format(
-            self.service.protocol,
-            self.service.primary_endpoint,
-            azure_container.name,
+        url = "{}://{}/{}".format(
+            self.service.protocol, self.service.primary_endpoint, azure_container.name,
         )
         return url
 
     def enable_container_cdn(self, container: Container) -> bool:
-        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'enable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, "enable_container_cdn")
         return False
 
     def disable_container_cdn(self, container: Container) -> bool:
-        logger.warning(messages.FEATURE_NOT_SUPPORTED, 'disable_container_cdn')
+        logger.warning(messages.FEATURE_NOT_SUPPORTED, "disable_container_cdn")
         return False
 
-    def upload_blob(self, container: Container, filename: FileLike,
-                    blob_name: str = None, acl: str = None,
-                    meta_data: MetaData = None, content_type: str = None,
-                    content_disposition: str = None, cache_control: str = None,
-                    chunk_size: int = 1024, extra: ExtraOptions = None) -> Blob:
+    def upload_blob(
+        self,
+        container: Container,
+        filename: FileLike,
+        blob_name: str = None,
+        acl: str = None,
+        meta_data: MetaData = None,
+        content_type: str = None,
+        content_disposition: str = None,
+        cache_control: str = None,
+        chunk_size: int = 1024,
+        extra: ExtraOptions = None,
+    ) -> Blob:
         if acl:
-            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, "acl")
 
         meta_data = {} if meta_data is None else meta_data
         extra = extra if extra is not None else {}
 
         extra_args = self._normalize_parameters(extra, self._PUT_OBJECT_KEYS)
-        extra_args.setdefault('content_type', content_type)
-        extra_args.setdefault('content_disposition', content_disposition)
-        extra_args.setdefault('cache_control', cache_control)
+        extra_args.setdefault("content_type", content_type)
+        extra_args.setdefault("content_disposition", content_disposition)
+        extra_args.setdefault("cache_control", cache_control)
 
         azure_container = self._get_azure_container(container.name)
         blob_name = blob_name or validate_file_or_path(filename)
@@ -318,8 +326,8 @@ class AzureStorageDriver(Driver):
         # azure does not set content_md5 on backend
         file_hash = file_checksum(filename, hash_type=self.hash_type)
         file_digest = file_hash.digest()
-        checksum = base64.b64encode(file_digest).decode('utf-8').strip()
-        extra_args.setdefault('content_md5', checksum)
+        checksum = base64.b64encode(file_digest).decode("utf-8").strip()
+        extra_args.setdefault("content_md5", checksum)
 
         content_settings = ContentSettings(**extra_args)
 
@@ -353,13 +361,13 @@ class AzureStorageDriver(Driver):
     def get_blobs(self, container: Container) -> Iterable[Blob]:
         azure_container = self._get_azure_container(container.name)
 
-        azure_blobs = self.service.list_blobs(azure_container.name,
-                                              include=Include(metadata=True))
+        azure_blobs = self.service.list_blobs(
+            azure_container.name, include=Include(metadata=True)
+        )
         for azure_blob in azure_blobs:
             yield self._convert_azure_blob(container, azure_blob)
 
-    def download_blob(self, blob: Blob,
-                      destination: FileLike) -> None:
+    def download_blob(self, blob: Blob, destination: FileLike) -> None:
         azure_blob = self._get_azure_blob(blob.container.name, blob.name)
 
         if isinstance(destination, str):
@@ -387,17 +395,21 @@ class AzureStorageDriver(Driver):
         url = self.service.make_blob_url(blob.container.name, azure_blob.name)
         return url
 
-    def generate_container_upload_url(self, container: Container,
-                                      blob_name: str,
-                                      expires: int = 3600, acl: str = None,
-                                      meta_data: MetaData = None,
-                                      content_disposition: str = None,
-                                      content_length: ContentLength = None,
-                                      content_type: str = None,
-                                      cache_control: str = None,
-                                      extra: ExtraOptions = None) -> FormPost:
+    def generate_container_upload_url(
+        self,
+        container: Container,
+        blob_name: str,
+        expires: int = 3600,
+        acl: str = None,
+        meta_data: MetaData = None,
+        content_disposition: str = None,
+        content_length: ContentLength = None,
+        content_type: str = None,
+        cache_control: str = None,
+        extra: ExtraOptions = None,
+    ) -> FormPost:
         if acl:
-            logger.info(messages.OPTION_NOT_SUPPORTED, 'acl')
+            logger.info(messages.OPTION_NOT_SUPPORTED, "acl")
 
         meta_data = meta_data if meta_data is not None else {}
         extra = extra if extra is not None else {}
@@ -412,14 +424,14 @@ class AzureStorageDriver(Driver):
             expiry=expires_at,
             content_disposition=content_disposition,
             content_type=content_type,
-            **params
+            **params,
         )
 
         headers = {
-            'x-ms-blob-type': 'BlockBlob',
-            'x-ms-blob-content-type': content_type,
-            'x-ms-blob-content-disposition': content_disposition,
-            'x-ms-blob-cache-control': cache_control,
+            "x-ms-blob-type": "BlockBlob",
+            "x-ms-blob-content-type": content_type,
+            "x-ms-blob-content-disposition": content_disposition,
+            "x-ms-blob-cache-control": cache_control,
         }
         for meta_key, meta_value in meta_data.items():
             key = self._OBJECT_META_PREFIX + meta_key
@@ -430,17 +442,21 @@ class AzureStorageDriver(Driver):
             blob_name=blob_name,
             sas_token=sas_token,
         )
-        return {'url': upload_url, 'fields': None, 'headers': headers}
+        return {"url": upload_url, "fields": None, "headers": headers}
 
-    def generate_blob_download_url(self, blob: Blob, expires: int = 3600,
-                                   method: str = 'GET',
-                                   content_disposition: str = None,
-                                   extra: ExtraOptions = None) -> str:
+    def generate_blob_download_url(
+        self,
+        blob: Blob,
+        expires: int = 3600,
+        method: str = "GET",
+        content_disposition: str = None,
+        extra: ExtraOptions = None,
+    ) -> str:
         extra = extra if extra is not None else {}
         params = self._normalize_parameters(extra, self._GET_OBJECT_KEYS)
 
         azure_blob = self._get_azure_blob(blob.container.name, blob.name)
-        content_type = params.get('content_type', None)
+        content_type = params.get("content_type", None)
         expires_at = datetime.utcnow() + timedelta(seconds=expires)
 
         sas_token = self.service.generate_blob_shared_access_signature(
@@ -450,7 +466,7 @@ class AzureStorageDriver(Driver):
             expiry=expires_at,
             content_disposition=content_disposition,
             content_type=content_type,
-            **params
+            **params,
         )
         download_url = self.service.make_blob_url(
             container_name=blob.container.name,
@@ -459,20 +475,17 @@ class AzureStorageDriver(Driver):
         )
         return download_url
 
-    _OBJECT_META_PREFIX = 'x-ms-meta-'
+    _OBJECT_META_PREFIX = "x-ms-meta-"
 
     #: `insert-object
     #: <https://docs.microsoft.com/en-us/rest/api/storageservices/
     # set-blob-properties>`
-    _PUT_OBJECT_KEYS = {
-    }  # type: Dict
+    _PUT_OBJECT_KEYS = {}  # type: Dict
 
     #: `post-object
     #: <https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob>`_
-    _POST_OBJECT_KEYS = {
-    }  # type: Dict
+    _POST_OBJECT_KEYS = {}  # type: Dict
 
     #: `get-object
     #: <https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob>`_
-    _GET_OBJECT_KEYS = {
-    }  # type: Dict
+    _GET_OBJECT_KEYS = {}  # type: Dict

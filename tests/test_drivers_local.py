@@ -15,11 +15,12 @@ from tests.settings import *
 if LOCAL_KEY and not os.path.exists(LOCAL_KEY):
     os.makedirs(LOCAL_KEY)
 
-pytestmark = pytest.mark.skipif(not os.path.isdir(LOCAL_KEY),
-                                reason='Directory does not exist.')
+pytestmark = pytest.mark.skipif(
+    not os.path.isdir(LOCAL_KEY), reason="Directory does not exist."
+)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def storage():
     driver = LocalDriver(key=LOCAL_KEY, secret=LOCAL_SECRET)
 
@@ -36,12 +37,12 @@ def storage():
 
 
 def test_driver_validate_credentials():
-    if os.name == 'nt':
+    if os.name == "nt":
         pytest.skip("skipping Windows incompatible test")
     driver = LocalDriver(key=LOCAL_KEY)
     assert driver.validate_credentials() is None
 
-    driver = LocalDriver(key='/')
+    driver = LocalDriver(key="/")
     with pytest.raises(CredentialsError) as excinfo:
         driver.validate_credentials()
     assert excinfo.value
@@ -89,11 +90,11 @@ def test_container_delete_not_empty(container, text_blob):
 
 
 def test_container_enable_cdn(container):
-    assert not container.enable_cdn(), 'Local does not support enabling CDN.'
+    assert not container.enable_cdn(), "Local does not support enabling CDN."
 
 
 def test_container_disable_cdn(container):
-    assert not container.disable_cdn(), 'Local does not support disabling CDN.'
+    assert not container.disable_cdn(), "Local does not support disabling CDN."
 
 
 def test_container_cdn_url(container):
@@ -106,25 +107,23 @@ def test_container_cdn_url(container):
 
 # noinspection PyShadowingNames
 def test_container_generate_upload_url(storage, container):
-    form_post = container.generate_upload_url(BINARY_FORM_FILENAME,
-                                              **BINARY_OPTIONS)
-    assert 'url' in form_post and 'fields' in form_post
-    assert 'signature' in form_post['fields']
+    form_post = container.generate_upload_url(BINARY_FORM_FILENAME, **BINARY_OPTIONS)
+    assert "url" in form_post and "fields" in form_post
+    assert "signature" in form_post["fields"]
 
-    signature = form_post['fields']['signature']
+    signature = form_post["fields"]["signature"]
     payload = storage.validate_signature(signature)
-    assert payload['content_disposition'] == BINARY_OPTIONS[
-        'content_disposition']
-    assert payload['cache_control'] == BINARY_OPTIONS['cache_control']
-    assert payload['blob_name'] == BINARY_FORM_FILENAME
-    assert payload['container'] == container.name
-    assert payload['meta_data'] == BINARY_OPTIONS['meta_data']
+    assert payload["content_disposition"] == BINARY_OPTIONS["content_disposition"]
+    assert payload["cache_control"] == BINARY_OPTIONS["cache_control"]
+    assert payload["blob_name"] == BINARY_FORM_FILENAME
+    assert payload["container"] == container.name
+    assert payload["meta_data"] == BINARY_OPTIONS["meta_data"]
 
 
 # noinspection PyShadowingNames
 def test_container_generate_upload_url_expiration(storage, container):
     form_post = container.generate_upload_url(TEXT_FORM_FILENAME, expires=-10)
-    signature = form_post['fields']['signature']
+    signature = form_post["fields"]["signature"]
 
     with pytest.raises(SignatureExpiredError):
         storage.validate_signature(signature)
@@ -150,46 +149,47 @@ def test_blob_upload_path(container, text_filename):
 
 
 def test_blob_windows_xattr(container, text_filename):
-    if os.name != 'nt':
+    if os.name != "nt":
         pytest.skip("skipping Windows-only test")
-    container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
+    container.upload_blob(text_filename, meta_data={"test": "testvalue"})
     try:
-        container.get_blob('.{}.xattr'.format(TEXT_FILENAME))
-        pytest.fail('should not be possible to get internal xattr file')
+        container.get_blob(".{}.xattr".format(TEXT_FILENAME))
+        pytest.fail("should not be possible to get internal xattr file")
     except NotFoundError:
         pass
 
 
 def test_blob_windows_xattr_list(container, text_filename):
-    if os.name != 'nt':
+    if os.name != "nt":
         pytest.skip("skipping Windows-only test")
-    container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
+    container.upload_blob(text_filename, meta_data={"test": "testvalue"})
     for blobitem in container:
-        if blobitem.name.startswith('.') and blobitem.name.endswith('.xattr'):
-            pytest.fail('should not be possible to get internal xattr file')
+        if blobitem.name.startswith(".") and blobitem.name.endswith(".xattr"):
+            pytest.fail("should not be possible to get internal xattr file")
 
 
 def test_blob_upload_stream(container, binary_stream):
-    blob = container.upload_blob(filename=binary_stream,
-                                 blob_name=BINARY_STREAM_FILENAME,
-                                 **BINARY_OPTIONS)
+    blob = container.upload_blob(
+        filename=binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+    )
     assert blob.name == BINARY_STREAM_FILENAME
     assert blob.checksum == BINARY_MD5_CHECKSUM
 
 
 @pytest.mark.skipif(
-    LOCAL_KEY.startswith('/tmp'),
-    reason='Extended attributes are not supported for tmpfs file system.')
+    LOCAL_KEY.startswith("/tmp"),
+    reason="Extended attributes are not supported for tmpfs file system.",
+)
 def test_blob_upload_options(container, binary_stream):
-    blob = container.upload_blob(binary_stream,
-                                 blob_name=BINARY_STREAM_FILENAME,
-                                 **BINARY_OPTIONS)
+    blob = container.upload_blob(
+        binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+    )
     assert blob.name == BINARY_STREAM_FILENAME
     assert blob.checksum == BINARY_MD5_CHECKSUM
-    assert blob.meta_data == BINARY_OPTIONS['meta_data']
-    assert blob.content_type == BINARY_OPTIONS['content_type']
-    assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
-    assert blob.cache_control == BINARY_OPTIONS['cache_control']
+    assert blob.meta_data == BINARY_OPTIONS["meta_data"]
+    assert blob.content_type == BINARY_OPTIONS["content_type"]
+    assert blob.content_disposition == BINARY_OPTIONS["content_disposition"]
+    assert blob.cache_control == BINARY_OPTIONS["cache_control"]
 
 
 def test_blob_delete(container, text_blob):
@@ -206,14 +206,15 @@ def test_blob_cdn_url(binary_blob):
 
 # noinspection PyShadowingNames
 def test_blob_generate_download_url(storage, binary_blob):
-    content_disposition = BINARY_OPTIONS.get('content_disposition')
+    content_disposition = BINARY_OPTIONS.get("content_disposition")
     signature = binary_blob.generate_download_url(
-        content_disposition=content_disposition)
+        content_disposition=content_disposition
+    )
 
     payload = storage.validate_signature(signature)
-    assert payload['blob_name'] == binary_blob.name
-    assert payload['container'] == binary_blob.container.name
-    assert payload['content_disposition'] == content_disposition
+    assert payload["blob_name"] == binary_blob.name
+    assert payload["container"] == binary_blob.container.name
+    assert payload["content_disposition"] == content_disposition
 
 
 # noinspection PyShadowingNames

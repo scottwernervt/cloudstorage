@@ -20,14 +20,16 @@ from cloudstorage.helpers import file_checksum
 from tests.helpers import random_container_name, uri_validator
 from tests.settings import *
 
-pytestmark = pytest.mark.skipif(not bool(MINIO_ACCESS_KEY),
-                                reason='settings missing key and secret')
+pytestmark = pytest.mark.skipif(
+    not bool(MINIO_ACCESS_KEY), reason="settings missing key and secret"
+)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def storage():
-    driver = MinioDriver(MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY,
-                         MINIO_REGION)
+    driver = MinioDriver(
+        MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_REGION
+    )
 
     yield driver
 
@@ -40,12 +42,14 @@ def storage():
 
 
 def test_driver_validate_credentials():
-    driver = MinioDriver(MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY,
-                         MINIO_REGION)
+    driver = MinioDriver(
+        MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_REGION
+    )
     assert driver.validate_credentials() is None
 
-    driver = MinioDriver(MINIO_ENDPOINT, MINIO_ACCESS_KEY, 'invalid-secret',
-                         MINIO_REGION)
+    driver = MinioDriver(
+        MINIO_ENDPOINT, MINIO_ACCESS_KEY, "invalid-secret", MINIO_REGION
+    )
     with pytest.raises(CredentialsError) as excinfo:
         driver.validate_credentials()
     assert excinfo.value
@@ -64,7 +68,7 @@ def test_driver_create_container(storage):
 def test_driver_create_container_invalid_name(storage):
     # noinspection PyTypeChecker
     with pytest.raises(CloudStorageError):
-        storage.create_container('?!<>container-name<>!?')  # noqa: W605
+        storage.create_container("?!<>container-name<>!?")  # noqa: W605
 
 
 # noinspection PyShadowingNames
@@ -100,11 +104,11 @@ def test_container_delete_not_empty(container, text_blob):
 
 
 def test_container_enable_cdn(container):
-    assert not container.enable_cdn(), 'Minio does not support enabling CDN.'
+    assert not container.enable_cdn(), "Minio does not support enabling CDN."
 
 
 def test_container_disable_cdn(container):
-    assert not container.disable_cdn(), 'Minio does not support disabling CDN.'
+    assert not container.disable_cdn(), "Minio does not support disabling CDN."
 
 
 def test_container_cdn_url(container):
@@ -116,41 +120,38 @@ def test_container_cdn_url(container):
 
 
 def test_container_generate_upload_url(container, binary_stream, temp_file):
-    form_post = container.generate_upload_url(BINARY_FORM_FILENAME,
-                                              **BINARY_OPTIONS)
-    assert 'url' in form_post and 'fields' in form_post
-    assert uri_validator(form_post['url'])
+    form_post = container.generate_upload_url(BINARY_FORM_FILENAME, **BINARY_OPTIONS)
+    assert "url" in form_post and "fields" in form_post
+    assert uri_validator(form_post["url"])
 
-    url = form_post['url']
-    fields = form_post['fields']
+    url = form_post["url"]
+    fields = form_post["fields"]
     multipart_form_data = {
-        'file': (BINARY_FORM_FILENAME, binary_stream, 'image/png'),
+        "file": (BINARY_FORM_FILENAME, binary_stream, "image/png"),
     }
     response = requests.post(url, data=fields, files=multipart_form_data)
     assert response.status_code == HTTPStatus.NO_CONTENT, response.text
 
     blob = container.get_blob(BINARY_FORM_FILENAME)
-    assert blob.meta_data == BINARY_OPTIONS['meta_data']
-    assert blob.content_type == BINARY_OPTIONS['content_type']
+    assert blob.meta_data == BINARY_OPTIONS["meta_data"]
+    assert blob.content_type == BINARY_OPTIONS["content_type"]
     # assert blob.content_disposition == BINARY_OPTIONS['content_disposition']
     # assert blob.cache_control == BINARY_OPTIONS['cache_control']
 
 
 def test_container_generate_upload_url_expiration(container, text_stream):
     form_post = container.generate_upload_url(TEXT_FORM_FILENAME, expires=1)
-    assert 'url' in form_post and 'fields' in form_post
-    assert uri_validator(form_post['url'])
+    assert "url" in form_post and "fields" in form_post
+    assert uri_validator(form_post["url"])
 
     sleep(1.1)  # cannot generate a policy with -1 value
 
-    url = form_post['url']
-    fields = form_post['fields']
-    multipart_form_data = {
-        'file': text_stream
-    }
+    url = form_post["url"]
+    fields = form_post["fields"]
+    multipart_form_data = {"file": text_stream}
     response = requests.post(url, data=fields, files=multipart_form_data)
 
-    if 's3' in container.driver.client._endpoint_url:
+    if "s3" in container.driver.client._endpoint_url:
         http_code = HTTPStatus.FORBIDDEN
     else:  # minio server
         http_code = HTTPStatus.BAD_REQUEST
@@ -184,9 +185,9 @@ def test_blob_upload_path(container, text_filename, temp_file):
 
 
 def test_blob_upload_stream(container, binary_stream, temp_file):
-    blob = container.upload_blob(filename=binary_stream,
-                                 blob_name=BINARY_STREAM_FILENAME,
-                                 **BINARY_OPTIONS)
+    blob = container.upload_blob(
+        filename=binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+    )
     assert blob.name == BINARY_STREAM_FILENAME
 
     blob.download(temp_file)
@@ -198,12 +199,12 @@ def test_blob_upload_stream(container, binary_stream, temp_file):
 
 
 def test_blob_upload_options(container, binary_stream, temp_file):
-    blob = container.upload_blob(filename=binary_stream,
-                                 blob_name=BINARY_STREAM_FILENAME,
-                                 **BINARY_OPTIONS)
+    blob = container.upload_blob(
+        filename=binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+    )
     assert blob.name == BINARY_STREAM_FILENAME
-    assert blob.meta_data == BINARY_OPTIONS['meta_data']
-    assert blob.content_type == BINARY_OPTIONS['content_type']
+    assert blob.meta_data == BINARY_OPTIONS["meta_data"]
+    assert blob.content_type == BINARY_OPTIONS["content_type"]
 
     blob.download(temp_file)
 
@@ -225,7 +226,7 @@ def test_blob_download_path(binary_blob, temp_file):
 
 
 def test_blob_download_stream(binary_blob, temp_file):
-    with open(temp_file, 'wb') as download_file:
+    with open(temp_file, "wb") as download_file:
         binary_blob.download(download_file)
 
     hash_type = binary_blob.driver.hash_type
@@ -243,16 +244,17 @@ def test_blob_cdn_url(container, binary_blob):
 
 
 def test_blob_generate_download_url(binary_blob, temp_file):
-    content_disposition = BINARY_OPTIONS.get('content_disposition')
+    content_disposition = BINARY_OPTIONS.get("content_disposition")
     download_url = binary_blob.generate_download_url(
-        content_disposition=content_disposition)
+        content_disposition=content_disposition
+    )
     assert uri_validator(download_url)
 
     response = requests.get(download_url)
     assert response.status_code == HTTPStatus.OK, response.text
-    assert response.headers['content-disposition'] == content_disposition
+    assert response.headers["content-disposition"] == content_disposition
 
-    with open(temp_file, 'wb') as f:
+    with open(temp_file, "wb") as f:
         for chunk in response.iter_content(chunk_size=128):
             f.write(chunk)
 

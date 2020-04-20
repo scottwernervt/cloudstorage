@@ -10,41 +10,40 @@ from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.exceptions import CloudStorageError
 
 __all__ = [
-    'Blob',
-    'Container',
-    'Driver',
-    'DriverName',
-    'get_driver',
-    'get_driver_by_name',
+    "Blob",
+    "Container",
+    "Driver",
+    "DriverName",
+    "get_driver",
+    "get_driver_by_name",
 ]
 
-__title__ = 'Cloud Storage'
-__version__ = '0.10.1'
-__author__ = 'Scott Werner'
-__license__ = 'MIT'
-__copyright__ = 'Copyright 2017-2018 Scott Werner'
+__title__ = "Cloud Storage"
+__version__ = "0.10.1"
+__author__ = "Scott Werner"
+__license__ = "MIT"
+__copyright__ = "Copyright 2017-2018 Scott Werner"
 
 
 @unique
 class DriverName(Enum):
     """DriverName enumeration."""
-    AZURE = 'AZURE'
-    CLOUDFILES = 'CLOUDFILES'
-    GOOGLESTORAGE = 'GOOGLESTORAGE'
-    LOCAL = 'LOCAL'
-    MINIO = 'MINIO'
-    S3 = 'S3'
+
+    AZURE = "AZURE"
+    CLOUDFILES = "CLOUDFILES"
+    GOOGLESTORAGE = "GOOGLESTORAGE"
+    LOCAL = "LOCAL"
+    MINIO = "MINIO"
+    S3 = "S3"
 
 
 _DRIVER_IMPORTS = {
-    DriverName.AZURE: ('cloudstorage.drivers.microsoft', 'AzureStorageDriver'),
-    DriverName.CLOUDFILES: (
-        'cloudstorage.drivers.rackspace', 'CloudFilesDriver'),
-    DriverName.GOOGLESTORAGE: ('cloudstorage.drivers.google',
-                               'GoogleStorageDriver'),
-    DriverName.LOCAL: ('cloudstorage.drivers.local', 'LocalDriver'),
-    DriverName.MINIO: ('cloudstorage.drivers.minio', 'MinioDriver'),
-    DriverName.S3: ('cloudstorage.drivers.amazon', 'S3Driver'),
+    DriverName.AZURE: ("cloudstorage.drivers.microsoft", "AzureStorageDriver"),
+    DriverName.CLOUDFILES: ("cloudstorage.drivers.rackspace", "CloudFilesDriver"),
+    DriverName.GOOGLESTORAGE: ("cloudstorage.drivers.google", "GoogleStorageDriver"),
+    DriverName.LOCAL: ("cloudstorage.drivers.local", "LocalDriver"),
+    DriverName.MINIO: ("cloudstorage.drivers.minio", "MinioDriver"),
+    DriverName.S3: ("cloudstorage.drivers.amazon", "S3Driver"),
 }
 
 
@@ -102,4 +101,4 @@ def get_driver_by_name(driver_name: str) -> Driver:
 
 
 # Set up logging to ``/dev/null`` like a library is supposed to.
-logging.getLogger('cloudstorage').addHandler(logging.NullHandler())
+logging.getLogger("cloudstorage").addHandler(logging.NullHandler())

@@ -32,9 +32,11 @@ def rgetattr(obj, attr, default=_SENTINEL):
     if default is _SENTINEL:
         _getattr = getattr
     else:
+
         def _getattr(obj_, name):
             return getattr(obj_, name, default)
-    return functools.reduce(_getattr, [obj] + attr.split('.'))
+
+    return functools.reduce(_getattr, [obj] + attr.split("."))
 
 
 def rsetattr(obj, attr, val):
@@ -63,5 +65,5 @@ def rsetattr(obj, attr, val):
     :return: NoneType
     :rtype: None
     """
-    pre, _, post = attr.rpartition('.')
+    pre, _, post = attr.rpartition(".")
     return setattr(rgetattr(obj, pre) if pre else obj, post, val)
