@@ -3,13 +3,13 @@ import errno
 import hashlib
 import logging
 import os
+import json
 import pathlib
 import shutil
 import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Iterable, List
-import simplejson as json
 
 import filelock
 import itsdangerous
