@@ -24,7 +24,7 @@ Cloud Storage
 
 .. end-badges
 
-`Cloud Storage`_ is a Python +3.4 package which creates a unified API for the
+`Cloud Storage`_ is a Python +3.5 package which creates a unified API for the
 cloud storage services: Amazon Simple Storage Service (S3),
 Microsoft Azure Storage, Minio Cloud Storage, Rackspace Cloud Files,
 Google Cloud Storage, and the Local File System.

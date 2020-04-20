@@ -1,6 +1,7 @@
 """Local File System Driver."""
 import errno
 import hashlib
+import json
 import logging
 import os
 import pathlib
@@ -9,12 +10,10 @@ import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Iterable, List
-import simplejson as json
 
 import filelock
 import itsdangerous
-if os.name != 'nt':
-    import xattr
+
 from inflection import underscore
 
 from cloudstorage import Blob, Container, Driver, messages
@@ -38,6 +37,10 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
+
+if os.name != 'nt':
+    import xattr    # noqa: E402
+
 
 __all__ = ['LocalDriver']
 
@@ -98,7 +101,7 @@ class LocalDriver(Driver):
 
     :param salt: (optional) Salt for namespacing download and upload
       pre-signed URLs. For more information. see `itsdangerous
-      <https://pythonhosted.org/itsdangerous/>`_.
+      <https://palletsprojects.com/p/itsdangerous/>`_.
     :type salt: str or None
 
     :param kwargs: (optional) Extra driver options.
@@ -687,7 +690,7 @@ class XattrWindows:
                 ret[itemname] = itemvalue.encode('utf-8')
             else:
                 ret[itemname] = itemvalue
-        return  ret.items()
+        return ret.items()
 
     def _load(self) -> Dict:
         """

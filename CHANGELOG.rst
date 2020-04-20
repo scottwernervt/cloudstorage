@@ -3,6 +3,19 @@
 Changelog
 ---------
 
+0.10.1 (Unreleased)
++++++++++++++++++++
+
+Features
+
+* Add support to mimic ``xattr`` in Windows by storing data in ``.<filename>.xattr`` (`#56 <https://github.com/scottwernervt/cloudstorage/pull/56>`_). Thanks @RangelReale.
+* Add support for ``python 3.8``.
+
+Bugs
+
+* Freeze package ``azure`` to version `4.0.0` (`#58 <https://github.com/scottwernervt/cloudstorage/issues/58>`_). Thanks @Nadine-H.
+* Drop support for ``python 3.4`` due to ``PyYAML`` requirement ``!=3.4.*``.
+
 0.10.0 (2019-08-10)
 +++++++++++++++++++
 

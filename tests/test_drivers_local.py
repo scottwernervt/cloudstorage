@@ -1,5 +1,4 @@
 import shutil
-import os
 
 import pytest
 
@@ -153,9 +152,9 @@ def test_blob_upload_path(container, text_filename):
 def test_blob_windows_xattr(container, text_filename):
     if os.name != 'nt':
         pytest.skip("skipping Windows-only test")
-    blob = container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
+    container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
     try:
-        internal_blob = container.get_blob('.{}.xattr'.format(TEXT_FILENAME))
+        container.get_blob('.{}.xattr'.format(TEXT_FILENAME))
         pytest.fail('should not be possible to get internal xattr file')
     except NotFoundError:
         pass
@@ -164,7 +163,7 @@ def test_blob_windows_xattr(container, text_filename):
 def test_blob_windows_xattr_list(container, text_filename):
     if os.name != 'nt':
         pytest.skip("skipping Windows-only test")
-    blob = container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
+    container.upload_blob(text_filename, meta_data={'test': 'testvalue'})
     for blobitem in container:
         if blobitem.name.startswith('.') and blobitem.name.endswith('.xattr'):
             pytest.fail('should not be possible to get internal xattr file')

@@ -1,10 +1,6 @@
 """Exceptions for Cloud Storage errors."""
 
-try:
-    from http import HTTPStatus
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from httpstatus import HTTPStatus
+from http import HTTPStatus
 
 
 class CloudStorageError(Exception):

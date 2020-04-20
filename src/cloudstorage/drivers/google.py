@@ -71,7 +71,7 @@ class GoogleStorageDriver(Driver):
     * `Storage Client <https://googleapis.github.io/google-cloud-python/latest/storage/index.html>`_
     * `snippets.py
       <https://github.com/GoogleCloudPlatform/python-docs-samples/blob/
-      master/storage/cloud-client/snippets.py>`_
+      master/storage/cloud-client/snippets_test.py>`_
 
     :param key: (optional) File path to service worker credentials json file.
     :type key: str or None

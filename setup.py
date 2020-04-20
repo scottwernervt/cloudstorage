@@ -41,7 +41,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -65,13 +64,11 @@ setup(
         'inflection>=0.3.1',  # MIT
         'python-dateutil>=2.7.3',  # Simplified BSD
         'python-magic>=0.4.15',  # MIT
-        # Python 3.4 needs backports
-        'typing;python_version<"3.5"',  # PSF
-        'httpstatus35;python_version<"3.5"',  # PSF
     ],
     extras_require={
         'amazon': [
             'boto3>=1.8.00',  # Apache 2.0
+            'boto3-stubs[s3]>==1.12.41.0',  # MIT
         ],
         'google': [
             'google-cloud-storage>=1.18.0',  # Apache 2.0
@@ -83,14 +80,14 @@ setup(
             'xattr>=0.9.6; sys_platform != "win32"',  # MIT
         ],
         'microsoft': [
-            'azure>=4.0.0',  # MIT
+            'azure==4.0.0',  # MIT
         ],
         'minio': [
             'minio>=4.0.0',  # Apache 2.0
         ],
         'rackspace': [
             'openstacksdk<=0.17.2',  # Apache 2.0
-            'rackspacesdk>=0.7.5',  # Apache 2.0
+            'rackspacesdk==0.7.5',  # Apache 2.0
             'requests>=2.19.1',  # Apache 2.0
         ],
         'docs': [

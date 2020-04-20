@@ -1,5 +1,4 @@
 import random
-import os
 
 try:
     from http import HTTPStatus
