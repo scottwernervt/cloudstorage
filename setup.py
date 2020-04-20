@@ -83,14 +83,14 @@ setup(
             'xattr>=0.9.6; sys_platform != "win32"',  # MIT
         ],
         'microsoft': [
-            'azure>=4.0.0',  # MIT
+            'azure==4.0.0',  # MIT
         ],
         'minio': [
             'minio>=4.0.0',  # Apache 2.0
         ],
         'rackspace': [
             'openstacksdk<=0.17.2',  # Apache 2.0
-            'rackspacesdk>=0.7.5',  # Apache 2.0
+            'rackspacesdk==0.7.5',  # Apache 2.0
             'requests>=2.19.1',  # Apache 2.0
         ],
         'docs': [
