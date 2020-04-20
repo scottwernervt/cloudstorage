@@ -1,6 +1,6 @@
 """Amazon Simple Storage Service (S3) Driver."""
 import logging
-from typing import Any, Dict, Iterable, List  # noqa: F401
+from typing import Any, Dict, Iterable, List, TYPE_CHECKING  # noqa: F401
 from urllib.parse import quote, urljoin
 
 import boto3
@@ -22,6 +22,9 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
+
+if TYPE_CHECKING:
+    from cloudstorage.structures import CaseInsensitiveDict  # noqa
 
 __all__ = ['S3Driver']
 

@@ -1,5 +1,6 @@
 import abc
 import logging
+
 from abc import abstractmethod
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Union  # noqa: F401
@@ -14,7 +15,7 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
-from .structures import CaseInsensitiveDict
+from cloudstorage.structures import CaseInsensitiveDict
 
 __all__ = ['Blob', 'Container', 'Driver']
 
@@ -412,9 +413,9 @@ class Container:
         self.meta_data = meta_data
         self.created_at = created_at
 
-        self._attr = CaseInsensitiveDict()  # type: Dict[Any, Any]
+        self._attr = CaseInsensitiveDict()
         self._acl = acl  # type: Optional[str]
-        self._meta_data = CaseInsensitiveDict()  # type: Dict[Any, Any]
+        self._meta_data = CaseInsensitiveDict()
 
         # Track attributes for container update (PUT request)
         track_params = CaseInsensitiveDict({
@@ -448,7 +449,7 @@ class Container:
         :return: True if the blob exists.
         :rtype: bool
         """
-        if hasattr(blob, 'name'):
+        if isinstance(blob, Blob):
             blob_name = blob.name
         else:
             blob_name = blob

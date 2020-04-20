@@ -1,10 +1,12 @@
 """Custom typed annotations."""
-from io import IOBase
-from typing import Any, AnyStr, Dict, IO, Optional, Union
+from typing import Any, BinaryIO, Dict, Optional, TYPE_CHECKING, TextIO, Union
 
-FileLike = Union[IO[AnyStr], IOBase, str]
+if TYPE_CHECKING:
+    from cloudstorage.structures import CaseInsensitiveDict # noqa
+
+FileLike = Union[BinaryIO, TextIO, str]
 Acl = Optional[Dict[Any, Any]]
-MetaData = Optional[Dict[Any, Any]]
+MetaData = Optional["CaseInsensitiveDict"]
 ExtraOptions = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
 FormPost = Union[str, Dict[Any, Any]]

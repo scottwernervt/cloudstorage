@@ -2,16 +2,17 @@
 import hashlib
 import mimetypes
 import os
-from _hashlib import HASH
-from typing import Dict, Generator, Optional, Tuple
 
-import magic
+from _hashlib import HASH
+from typing import BinaryIO, Dict, Generator, Optional, TextIO, Tuple, Union
+
+import magic  # type: ignore
 
 from cloudstorage.typed import FileLike
 
 
-def read_in_chunks(file_object: FileLike,
-                   block_size: int = 4096) -> Generator[bytes, None, None]:
+def read_in_chunks(file_object: Union[BinaryIO, TextIO],
+                   block_size: int = 4096) -> Generator[Union[bytes, str], None, None]:
     """Return a generator which yields data in chunks.
 
     Source: `read-file-in-chunks-ram-usage-read-strings-from-binary-file
@@ -56,7 +57,6 @@ def file_checksum(filename: FileLike, hash_type: str = 'md5',
     :type block_size: int
 
     :return: Hash of file.
-    :rtype: :class:`_hashlib.HASH`
 
     :raise RuntimeError: If the hash algorithm is not found in :mod:`hashlib`.
 
@@ -96,16 +96,18 @@ def validate_file_or_path(filename: FileLike) -> Optional[str]:
 
     :raise FileNotFoundError: If the file path is invalid.
     """
+    name = None
+
     if isinstance(filename, str):
-        # Make sure it exists
         if not os.path.exists(filename):
             raise FileNotFoundError(filename)
+
         name = os.path.basename(filename)
     else:
         try:
             name = os.path.basename(str(filename.name))
         except AttributeError:
-            name = None
+            pass
 
     return name
 
@@ -119,6 +121,8 @@ def file_content_type(filename: FileLike) -> Optional[str]:
     :return: Content type.
     :rtype: str or None
     """
+    content_type = None
+
     if isinstance(filename, str):
         if os.path.isfile(filename):
             content_type = magic.from_file(filename=filename, mime=True)
@@ -126,7 +130,8 @@ def file_content_type(filename: FileLike) -> Optional[str]:
             content_type = mimetypes.guess_type(filename)[0]
     else:  # BufferedReader
         name = validate_file_or_path(filename)
-        content_type = mimetypes.guess_type(name)[0]
+        if name:
+            content_type = mimetypes.guess_type(name)[0]
 
     return content_type
 

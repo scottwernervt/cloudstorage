@@ -101,7 +101,7 @@ class LocalDriver(Driver):
 
     :param salt: (optional) Salt for namespacing download and upload
       pre-signed URLs. For more information. see `itsdangerous
-      <https://pythonhosted.org/itsdangerous/>`_.
+      <https://palletsprojects.com/p/itsdangerous/>`_.
     :type salt: str or None
 
     :param kwargs: (optional) Extra driver options.
