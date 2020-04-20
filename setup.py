@@ -16,7 +16,7 @@ def read(*names, **kwargs):
 
 setup(
     name='cloudstorage',
-    version='0.10.0',
+    version='0.10.1',
     license='MIT',
     description='Unified cloud storage API for storage services.',
     long_description='%s\n%s' % (

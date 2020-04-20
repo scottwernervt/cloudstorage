@@ -3,7 +3,7 @@
 Changelog
 ---------
 
-0.10.1 (Unreleased)
+0.10.1 (2020-04-20)
 +++++++++++++++++++
 
 Features
@@ -13,7 +13,7 @@ Features
 
 Bugs
 
-* Freeze package ``azure`` to version `4.0.0` (`#58 <https://github.com/scottwernervt/cloudstorage/issues/58>`_). Thanks @Nadine-H.
+* Freeze package ``azure`` to version `4.0.0` (`#58 <https://github.com/scottwernervt/cloudstorage/issues/58>`_).
 * Drop support for ``python 3.4`` due to ``PyYAML`` requirement ``!=3.4.*``.
 
 0.10.0 (2019-08-10)
