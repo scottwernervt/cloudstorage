@@ -17,8 +17,8 @@ When `reporting a bug <https://github.com/scottwernervt/cloudstorage/issues>`_ p
 Documentation improvements
 ==========================
 
-cloudstorage could always use more documentation, whether as part of the
-official cloudstorage docs, in docstrings, or even on the web in blog posts,
+``cloudstorage`` could always use more documentation, whether as part of the
+official ``cloudstorage`` docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Feature requests and feedback
@@ -38,27 +38,48 @@ Development
 To set up `cloudstorage` for local development:
 
 1. `Fork cloudstorage on GitHub <https://github.com/scottwernervt/cloudstorage/fork>`_.
-2. Clone your fork locally::
 
-    git clone git@github.com:your_name_here/cloudstorage.git
+2. Clone your fork locally
 
-3. Create a branch for local development::
+::
 
-    git checkout -b name-of-your-bugfix-or-feature
+    $ git clone git@github.com:your_name_here/cloudstorage.git
 
-   Now you can make your changes locally.
+3. Install development requirements. It is **highly recommended** that you use a ``virtualenv``. Use the following command to install an editable version of marshmallow along with its development requirements.
 
-4. When you're done making changes, run all the checks, and doc builder with `tox <http://tox.readthedocs.io/en/latest/install.html>`_ one command::
+::
 
-    tox
+    # After activating your virtualenv
+    $ pip install -e '.[dev]'
 
-5. Commit your changes and push your branch to GitHub::
+4. Install the ``pre-commit`` hooks, which will format and lint your git staged files.
 
-    git add .
-    git commit -m "Your detailed description of your changes."
-    git push origin name-of-your-bugfix-or-feature
+::
 
-6. Submit a pull request through the GitHub website.
+    # The pre-commit CLI was installed above
+    $ pre-commit install --allow-missing-config
+
+5. Create a branch for local development
+
+::
+
+    $ git checkout -b name-of-your-bugfix-or-feature
+
+6. When you're done making changes, run all the checks, and doc builder with `tox <http://tox.readthedocs.io/en/latest/install.html>`_ one command
+
+::
+
+    $ tox
+
+7. Commit your changes and push your branch to GitHub
+
+::
+
+    $ git add .
+    $ git commit -m "Your detailed description of your changes."
+    $ git push origin name-of-your-bugfix-or-feature
+
+8. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 -----------------------
