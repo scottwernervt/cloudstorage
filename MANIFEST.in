@@ -1,13 +1,24 @@
-graft docs
-graft src
-graft tests
-
+include *.enc
+include *.rst
+include *.yaml
 include AUTHORS.rst
 include CHANGELOG.rst
 include CONTRIBUTING.rst
 include LICENSE
 include README.rst
 
-include tox.ini .travis.yml
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs *.txt
+recursive-include docs Makefile
+recursive-include tests *.png
+recursive-include tests *.py
+recursive-include tests *.txt
 
-global-exclude *.py[cod] __pycache__ *.so *.dylib *.enc
+recursive-exclude docs *.pyc
+recursive-exclude docs *.pyo
+recursive-exclude tests *.pyc
+recursive-exclude tests *.pyo
+
+prune dist/docs
