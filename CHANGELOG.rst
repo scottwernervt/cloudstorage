@@ -3,6 +3,14 @@
 Changelog
 ---------
 
+1.0.0 (Unreleased)
++++++++++++++++++++
+
+Features
+
+* Start following (`Semantic Versioning <https://semver.org/>`_).
+
+
 0.10.1 (2020-04-20)
 +++++++++++++++++++
 
