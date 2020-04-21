@@ -184,8 +184,9 @@ class LocalDriver(Driver):
 
     def _check_path_accessible(self, path: str) -> bool:
         """
-        Check if the path is accessible. In windows custom files are used to simulate file attributes,
-        these must not be accessed.
+        Check if the path is accessible. In windows custom files are used to simulate
+        file attributes, these must not be accessed.
+
         :param filename:
         :return:
         """
@@ -686,7 +687,9 @@ class LocalDriver(Driver):
 class XattrWindows:
     """
     Simulate xattr on windows.
-    A file named ".<filename>.xattr" will be created on the same directory as the source file.
+
+    A file named ".<filename>.xattr" will be created on the same directory as the
+    source file.
     """
 
     def __init__(self, filename) -> None:

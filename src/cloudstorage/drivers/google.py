@@ -67,7 +67,8 @@ class GoogleStorageDriver(Driver):
 
     * `Google Cloud Storage Documentation
       <https://cloud.google.com/storage/docs>`_
-    * `Storage Client <https://googleapis.github.io/google-cloud-python/latest/storage/index.html>`_
+    * `Storage Client
+      <https://googleapis.github.io/google-cloud-python/latest/storage/index.html>`_
     * `snippets.py
       <https://github.com/GoogleCloudPlatform/python-docs-samples/blob/
       master/storage/cloud-client/snippets_test.py>`_
