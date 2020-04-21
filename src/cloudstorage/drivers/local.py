@@ -13,7 +13,6 @@ from typing import Dict, Iterable, List
 
 import filelock
 import itsdangerous
-
 from inflection import underscore
 
 from cloudstorage import Blob, Container, Driver, messages
@@ -40,7 +39,6 @@ from cloudstorage.typed import (
 
 if os.name != "nt":
     import xattr  # noqa: E402
-
 
 __all__ = ["LocalDriver"]
 

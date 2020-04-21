@@ -5,22 +5,17 @@ import logging
 import os
 import pathlib
 from datetime import datetime, timedelta
+from http import HTTPStatus
+from typing import Any, Dict, Iterable, List  # noqa: F401
 
-try:
-    from http import HTTPStatus
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from httpstatus import HTTPStatus
-from typing import Dict, Iterable, List, Any  # noqa: F401
+# noinspection PyPackageRequirements
+from google.auth.exceptions import GoogleAuthError
 
 # noinspection PyPackageRequirements
 from google.cloud import storage
 
 # noinspection PyPackageRequirements
 from google.cloud.exceptions import Conflict, NotFound
-
-# noinspection PyPackageRequirements
-from google.auth.exceptions import GoogleAuthError
 
 # noinspection PyPackageRequirements
 from google.cloud.storage.blob import Blob as GoogleBlob
@@ -32,17 +27,17 @@ from inflection import underscore
 from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
-    CredentialsError,
 )
 from cloudstorage.helpers import file_content_type, validate_file_or_path
 from cloudstorage.typed import (
-    FileLike,
-    MetaData,
     ContentLength,
     ExtraOptions,
+    FileLike,
     FormPost,
+    MetaData,
 )
 
 __all__ = ["GoogleStorageDriver"]

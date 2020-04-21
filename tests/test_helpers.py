@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from cloudstorage.helpers import (
@@ -7,7 +9,7 @@ from cloudstorage.helpers import (
     read_in_chunks,
     validate_file_or_path,
 )
-from tests.settings import *
+from tests import settings
 
 
 def test_read_in_chunks(binary_stream):
@@ -21,18 +23,18 @@ def test_read_in_chunks(binary_stream):
 
 def test_file_checksum_filename(text_filename):
     file_hash = file_checksum(text_filename, hash_type="md5", block_size=32)
-    assert file_hash.hexdigest() == TEXT_MD5_CHECKSUM
+    assert file_hash.hexdigest() == settings.TEXT_MD5_CHECKSUM
 
 
 def test_file_checksum_stream(binary_stream):
     file_hash = file_checksum(binary_stream, hash_type="md5", block_size=32)
-    assert file_hash.hexdigest() == BINARY_MD5_CHECKSUM
+    assert file_hash.hexdigest() == settings.BINARY_MD5_CHECKSUM
     assert binary_stream.tell() == 0
 
 
 def test_validate_file_or_path(text_filename, binary_stream):
-    assert validate_file_or_path(text_filename) == TEXT_FILENAME
-    assert validate_file_or_path(binary_stream) == BINARY_FILENAME
+    assert validate_file_or_path(text_filename) == settings.TEXT_FILENAME
+    assert validate_file_or_path(binary_stream) == settings.BINARY_FILENAME
 
 
 def test_file_content_type(text_filename, binary_stream):

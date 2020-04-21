@@ -2,49 +2,42 @@
 import hashlib
 import hmac
 import logging
-
-try:
-    from http import HTTPStatus
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from httpstatus import HTTPStatus
-
+from http import HTTPStatus
 from time import time
-from typing import Dict, Iterable, List, Tuple, Union, Any  # noqa: F401
+from typing import Any, Dict, Iterable, List, Tuple, Union  # noqa: F401
 from urllib.parse import quote, urlencode, urljoin
 
 import dateutil.parser
 import requests
-
 from inflection import underscore
+from keystoneauth1.exceptions import Unauthorized
 from openstack.exceptions import (
     HttpException,
     NotFoundException,
     ResourceNotFound,
 )
-from keystoneauth1.exceptions import Unauthorized
-from openstack.object_store.v1.obj import Object as OpenStackObject
 from openstack.object_store.v1.container import Container as OpenStackContainer
+from openstack.object_store.v1.obj import Object as OpenStackObject
 from rackspace import connection
 
 from cloudstorage import Blob, Container, Driver, messages
-from cloudstorage.typed import (
-    FileLike,
-    MetaData,
-    ContentLength,
-    ExtraOptions,
-    FormPost,
-)
 from cloudstorage.exceptions import (
     CloudStorageError,
+    CredentialsError,
     IsNotEmptyError,
     NotFoundError,
-    CredentialsError,
 )
 from cloudstorage.helpers import (
     file_content_type,
-    validate_file_or_path,
     parse_content_disposition,
+    validate_file_or_path,
+)
+from cloudstorage.typed import (
+    ContentLength,
+    ExtraOptions,
+    FileLike,
+    FormPost,
+    MetaData,
 )
 
 __all__ = ["CloudFilesDriver"]

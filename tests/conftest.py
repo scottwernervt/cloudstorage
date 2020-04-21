@@ -1,9 +1,10 @@
+import os
 from tempfile import mkstemp
 
 import pytest
 
+from tests import settings
 from tests.helpers import random_container_name
-from tests.settings import *
 
 ROOT = os.path.dirname(os.path.realpath(__file__))
 
@@ -24,7 +25,7 @@ def container(storage):
 
 @pytest.fixture(scope="session")
 def text_filename():
-    return os.path.join(ROOT, "data", TEXT_FILENAME)
+    return os.path.join(ROOT, "data", settings.TEXT_FILENAME)
 
 
 # noinspection PyShadowingNames
@@ -48,7 +49,7 @@ def text_blob(container, text_filename):
 # noinspection PyShadowingNames
 @pytest.fixture(scope="session")
 def binary_filename():
-    return os.path.join(ROOT, "data", BINARY_FILENAME)
+    return os.path.join(ROOT, "data", settings.BINARY_FILENAME)
 
 
 # noinspection PyShadowingNames
@@ -71,6 +72,6 @@ def binary_blob(container, binary_filename):
 
 @pytest.fixture(scope="function")
 def temp_file():
-    _, path = mkstemp(prefix=CONTAINER_PREFIX)
+    _, path = mkstemp(prefix=settings.CONTAINER_PREFIX)
     yield path
     os.remove(path)

@@ -2,7 +2,6 @@
 import hashlib
 import mimetypes
 import os
-
 from _hashlib import HASH
 from typing import BinaryIO, Dict, Generator, Optional, TextIO, Tuple, Union
 

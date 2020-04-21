@@ -1,8 +1,4 @@
-try:
-    from http import HTTPStatus
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from httpstatus import HTTPStatus
+from http import HTTPStatus
 
 import pytest
 import requests
@@ -15,22 +11,25 @@ from cloudstorage.exceptions import (
     NotFoundError,
 )
 from cloudstorage.helpers import file_checksum
+from tests import settings
 from tests.helpers import random_container_name, uri_validator
-from tests.settings import *
 
 pytestmark = pytest.mark.skipif(
-    not bool(AZURE_ACCOUNT_NAME), reason="settings missing account name and key."
+    not bool(settings.AZURE_ACCOUNT_NAME),
+    reason="settings missing account name and key.",
 )
 
 
 @pytest.fixture(scope="module")
 def storage():
-    driver = AzureStorageDriver(account_name=AZURE_ACCOUNT_NAME, key=AZURE_ACCOUNT_KEY)
+    driver = AzureStorageDriver(
+        account_name=settings.AZURE_ACCOUNT_NAME, key=settings.AZURE_ACCOUNT_KEY
+    )
 
     yield driver
 
     for container in driver:  # cleanup
-        if container.name.startswith(CONTAINER_PREFIX):
+        if container.name.startswith(settings.CONTAINER_PREFIX):
             for blob in container:
                 blob.delete()
 
@@ -38,11 +37,13 @@ def storage():
 
 
 def test_driver_validate_credentials():
-    driver = AzureStorageDriver(account_name=AZURE_ACCOUNT_NAME, key=AZURE_ACCOUNT_KEY)
+    driver = AzureStorageDriver(
+        account_name=settings.AZURE_ACCOUNT_NAME, key=settings.AZURE_ACCOUNT_KEY
+    )
     assert driver.validate_credentials() is None
 
     driver = AzureStorageDriver(
-        account_name=AZURE_ACCOUNT_NAME,
+        account_name=settings.AZURE_ACCOUNT_NAME,
         key="invalidkeyinvalidkeyinvalidkeyinvalidkeyin"
         "validkeyinvalidkeyinvalidkeyinvalidkeyinva"
         "li==",
@@ -120,14 +121,16 @@ def test_container_cdn_url(container):
 
 
 def test_container_generate_upload_url(container, binary_stream):
-    form_post = container.generate_upload_url(blob_name="prefix_", **BINARY_OPTIONS)
+    form_post = container.generate_upload_url(
+        blob_name="prefix_", **settings.BINARY_OPTIONS
+    )
     assert "url" in form_post and "fields" in form_post
     assert uri_validator(form_post["url"])
 
     url = form_post["url"]
     headers = form_post["headers"]
     multipart_form_data = {
-        "file": (BINARY_FORM_FILENAME, binary_stream, "image/png"),
+        "file": (settings.BINARY_FORM_FILENAME, binary_stream, "image/png"),
     }
 
     # https://blogs.msdn.microsoft.com/azureossds/2015/03/30/uploading-files-to-
@@ -136,10 +139,10 @@ def test_container_generate_upload_url(container, binary_stream):
     assert response.status_code == HTTPStatus.CREATED, response.text
 
     blob = container.get_blob("prefix_")
-    assert blob.meta_data == BINARY_OPTIONS["meta_data"]
-    assert blob.content_type == BINARY_OPTIONS["content_type"]
-    assert blob.content_disposition == BINARY_OPTIONS["content_disposition"]
-    assert blob.cache_control == BINARY_OPTIONS["cache_control"]
+    assert blob.meta_data == settings.BINARY_OPTIONS["meta_data"]
+    assert blob.content_type == settings.BINARY_OPTIONS["content_type"]
+    assert blob.content_disposition == settings.BINARY_OPTIONS["content_disposition"]
+    assert blob.cache_control == settings.BINARY_OPTIONS["cache_control"]
 
 
 def test_container_generate_upload_url_expiration(container, text_stream):
@@ -170,28 +173,32 @@ def test_container_get_blob_invalid(container):
 
 def test_blob_upload_path(container, text_filename):
     blob = container.upload_blob(text_filename)
-    assert blob.name == TEXT_FILENAME
-    assert blob.checksum == TEXT_MD5_CHECKSUM
+    assert blob.name == settings.TEXT_FILENAME
+    assert blob.checksum == settings.TEXT_MD5_CHECKSUM
 
 
 def test_blob_upload_stream(container, binary_stream):
     blob = container.upload_blob(
-        binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+        binary_stream,
+        blob_name=settings.BINARY_STREAM_FILENAME,
+        **settings.BINARY_OPTIONS,
     )
-    assert blob.name == BINARY_STREAM_FILENAME
-    assert blob.checksum == BINARY_MD5_CHECKSUM
+    assert blob.name == settings.BINARY_STREAM_FILENAME
+    assert blob.checksum == settings.BINARY_MD5_CHECKSUM
 
 
 def test_blob_upload_options(container, binary_stream):
     blob = container.upload_blob(
-        binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+        binary_stream,
+        blob_name=settings.BINARY_STREAM_FILENAME,
+        **settings.BINARY_OPTIONS,
     )
-    assert blob.name == BINARY_STREAM_FILENAME
-    assert blob.checksum == BINARY_MD5_CHECKSUM
-    assert blob.meta_data == BINARY_OPTIONS["meta_data"]
-    assert blob.content_type == BINARY_OPTIONS["content_type"]
-    assert blob.content_disposition == BINARY_OPTIONS["content_disposition"]
-    assert blob.cache_control == BINARY_OPTIONS["cache_control"]
+    assert blob.name == settings.BINARY_STREAM_FILENAME
+    assert blob.checksum == settings.BINARY_MD5_CHECKSUM
+    assert blob.meta_data == settings.BINARY_OPTIONS["meta_data"]
+    assert blob.content_type == settings.BINARY_OPTIONS["content_type"]
+    assert blob.content_disposition == settings.BINARY_OPTIONS["content_disposition"]
+    assert blob.cache_control == settings.BINARY_OPTIONS["cache_control"]
 
 
 def test_blob_delete(container, text_blob):
@@ -203,7 +210,7 @@ def test_blob_download_path(binary_blob, temp_file):
     binary_blob.download(temp_file)
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
-    assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
+    assert download_hash.hexdigest() == settings.BINARY_MD5_CHECKSUM
 
 
 def test_blob_download_stream(binary_blob, temp_file):
@@ -212,7 +219,7 @@ def test_blob_download_stream(binary_blob, temp_file):
 
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
-    assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
+    assert download_hash.hexdigest() == settings.BINARY_MD5_CHECKSUM
 
 
 def test_blob_cdn_url(binary_blob):
@@ -224,7 +231,7 @@ def test_blob_cdn_url(binary_blob):
 
 
 def test_blob_generate_download_url(binary_blob, temp_file):
-    content_disposition = BINARY_OPTIONS.get("content_disposition")
+    content_disposition = settings.BINARY_OPTIONS.get("content_disposition")
     download_url = binary_blob.generate_download_url(
         content_disposition=content_disposition
     )
@@ -240,7 +247,7 @@ def test_blob_generate_download_url(binary_blob, temp_file):
 
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
-    assert download_hash.hexdigest() == BINARY_MD5_CHECKSUM
+    assert download_hash.hexdigest() == settings.BINARY_MD5_CHECKSUM
 
 
 def test_blob_generate_download_url_expiration(binary_blob):

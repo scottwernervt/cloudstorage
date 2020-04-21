@@ -3,41 +3,37 @@ import base64
 import codecs
 import logging
 from datetime import datetime, timedelta
-
-try:
-    from http import HTTPStatus
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from httpstatus import HTTPStatus  # noqa: F401
-
 from typing import Dict, Iterable, List
 
-from azure.common import AzureMissingResourceHttpError
-from azure.common import AzureHttpError
-from azure.common import AzureConflictHttpError
-from azure.storage.blob import PublicAccess
-from azure.storage.blob import BlockBlobService
-from azure.storage.blob.models import Blob as AzureBlob
-from azure.storage.blob.models import Container as AzureContainer
-from azure.storage.blob.models import Include
-from azure.storage.blob.models import ContentSettings
-from azure.storage.blob.models import BlobPermissions
+from azure.common import (
+    AzureConflictHttpError,
+    AzureHttpError,
+    AzureMissingResourceHttpError,
+)
+from azure.storage.blob import BlockBlobService, PublicAccess
+from azure.storage.blob.models import (
+    Blob as AzureBlob,
+    BlobPermissions,
+    Container as AzureContainer,
+    ContentSettings,
+    Include,
+)
 from inflection import underscore
 
 from cloudstorage import Blob, Container, Driver, messages
 from cloudstorage.exceptions import (
-    NotFoundError,
     CloudStorageError,
-    IsNotEmptyError,
     CredentialsError,
+    IsNotEmptyError,
+    NotFoundError,
 )
 from cloudstorage.helpers import file_checksum, validate_file_or_path
 from cloudstorage.typed import (
-    FileLike,
-    MetaData,
     ContentLength,
     ExtraOptions,
+    FileLike,
     FormPost,
+    MetaData,
 )
 
 __all__ = ["AzureStorageDriver"]

@@ -1,3 +1,4 @@
+import os
 import shutil
 
 import pytest
@@ -9,37 +10,37 @@ from cloudstorage.exceptions import (
     NotFoundError,
     SignatureExpiredError,
 )
+from tests import settings
 from tests.helpers import random_container_name, uri_validator
-from tests.settings import *
 
-if LOCAL_KEY and not os.path.exists(LOCAL_KEY):
-    os.makedirs(LOCAL_KEY)
+if settings.LOCAL_KEY and not os.path.exists(settings.LOCAL_KEY):
+    os.makedirs(settings.LOCAL_KEY)
 
 pytestmark = pytest.mark.skipif(
-    not os.path.isdir(LOCAL_KEY), reason="Directory does not exist."
+    not os.path.isdir(settings.LOCAL_KEY), reason="Directory does not exist."
 )
 
 
 @pytest.fixture(scope="module")
 def storage():
-    driver = LocalDriver(key=LOCAL_KEY, secret=LOCAL_SECRET)
+    driver = LocalDriver(key=settings.LOCAL_KEY, secret=settings.LOCAL_SECRET)
 
     yield driver
 
     for container in driver:  # cleanup
-        if container.name.startswith(CONTAINER_PREFIX):
+        if container.name.startswith(settings.CONTAINER_PREFIX):
             for blob in container:
                 blob.delete()
 
             container.delete()
 
-    shutil.rmtree(LOCAL_KEY)
+    shutil.rmtree(settings.LOCAL_KEY)
 
 
 def test_driver_validate_credentials():
     if os.name == "nt":
         pytest.skip("skipping Windows incompatible test")
-    driver = LocalDriver(key=LOCAL_KEY)
+    driver = LocalDriver(key=settings.LOCAL_KEY)
     assert driver.validate_credentials() is None
 
     driver = LocalDriver(key="/")
@@ -107,22 +108,26 @@ def test_container_cdn_url(container):
 
 # noinspection PyShadowingNames
 def test_container_generate_upload_url(storage, container):
-    form_post = container.generate_upload_url(BINARY_FORM_FILENAME, **BINARY_OPTIONS)
+    form_post = container.generate_upload_url(
+        settings.BINARY_FORM_FILENAME, **settings.BINARY_OPTIONS
+    )
     assert "url" in form_post and "fields" in form_post
     assert "signature" in form_post["fields"]
 
     signature = form_post["fields"]["signature"]
     payload = storage.validate_signature(signature)
-    assert payload["content_disposition"] == BINARY_OPTIONS["content_disposition"]
-    assert payload["cache_control"] == BINARY_OPTIONS["cache_control"]
-    assert payload["blob_name"] == BINARY_FORM_FILENAME
+    assert (
+        payload["content_disposition"] == settings.BINARY_OPTIONS["content_disposition"]
+    )
+    assert payload["cache_control"] == settings.BINARY_OPTIONS["cache_control"]
+    assert payload["blob_name"] == settings.BINARY_FORM_FILENAME
     assert payload["container"] == container.name
-    assert payload["meta_data"] == BINARY_OPTIONS["meta_data"]
+    assert payload["meta_data"] == settings.BINARY_OPTIONS["meta_data"]
 
 
 # noinspection PyShadowingNames
 def test_container_generate_upload_url_expiration(storage, container):
-    form_post = container.generate_upload_url(TEXT_FORM_FILENAME, expires=-10)
+    form_post = container.generate_upload_url(settings.TEXT_FORM_FILENAME, expires=-10)
     signature = form_post["fields"]["signature"]
 
     with pytest.raises(SignatureExpiredError):
@@ -144,8 +149,8 @@ def test_container_get_blob_invalid(container):
 
 def test_blob_upload_path(container, text_filename):
     blob = container.upload_blob(text_filename)
-    assert blob.name == TEXT_FILENAME
-    assert blob.checksum == TEXT_MD5_CHECKSUM
+    assert blob.name == settings.TEXT_FILENAME
+    assert blob.checksum == settings.TEXT_MD5_CHECKSUM
 
 
 def test_blob_windows_xattr(container, text_filename):
@@ -153,7 +158,7 @@ def test_blob_windows_xattr(container, text_filename):
         pytest.skip("skipping Windows-only test")
     container.upload_blob(text_filename, meta_data={"test": "testvalue"})
     try:
-        container.get_blob(".{}.xattr".format(TEXT_FILENAME))
+        container.get_blob(".{}.xattr".format(settings.TEXT_FILENAME))
         pytest.fail("should not be possible to get internal xattr file")
     except NotFoundError:
         pass
@@ -170,26 +175,30 @@ def test_blob_windows_xattr_list(container, text_filename):
 
 def test_blob_upload_stream(container, binary_stream):
     blob = container.upload_blob(
-        filename=binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+        filename=binary_stream,
+        blob_name=settings.BINARY_STREAM_FILENAME,
+        **settings.BINARY_OPTIONS,
     )
-    assert blob.name == BINARY_STREAM_FILENAME
-    assert blob.checksum == BINARY_MD5_CHECKSUM
+    assert blob.name == settings.BINARY_STREAM_FILENAME
+    assert blob.checksum == settings.BINARY_MD5_CHECKSUM
 
 
 @pytest.mark.skipif(
-    LOCAL_KEY.startswith("/tmp"),
+    settings.LOCAL_KEY.startswith("/tmp"),
     reason="Extended attributes are not supported for tmpfs file system.",
 )
 def test_blob_upload_options(container, binary_stream):
     blob = container.upload_blob(
-        binary_stream, blob_name=BINARY_STREAM_FILENAME, **BINARY_OPTIONS
+        binary_stream,
+        blob_name=settings.BINARY_STREAM_FILENAME,
+        **settings.BINARY_OPTIONS,
     )
-    assert blob.name == BINARY_STREAM_FILENAME
-    assert blob.checksum == BINARY_MD5_CHECKSUM
-    assert blob.meta_data == BINARY_OPTIONS["meta_data"]
-    assert blob.content_type == BINARY_OPTIONS["content_type"]
-    assert blob.content_disposition == BINARY_OPTIONS["content_disposition"]
-    assert blob.cache_control == BINARY_OPTIONS["cache_control"]
+    assert blob.name == settings.BINARY_STREAM_FILENAME
+    assert blob.checksum == settings.BINARY_MD5_CHECKSUM
+    assert blob.meta_data == settings.BINARY_OPTIONS["meta_data"]
+    assert blob.content_type == settings.BINARY_OPTIONS["content_type"]
+    assert blob.content_disposition == settings.BINARY_OPTIONS["content_disposition"]
+    assert blob.cache_control == settings.BINARY_OPTIONS["cache_control"]
 
 
 def test_blob_delete(container, text_blob):
@@ -206,7 +215,7 @@ def test_blob_cdn_url(binary_blob):
 
 # noinspection PyShadowingNames
 def test_blob_generate_download_url(storage, binary_blob):
-    content_disposition = BINARY_OPTIONS.get("content_disposition")
+    content_disposition = settings.BINARY_OPTIONS.get("content_disposition")
     signature = binary_blob.generate_download_url(
         content_disposition=content_disposition
     )

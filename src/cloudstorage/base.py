@@ -1,12 +1,12 @@
 import abc
 import logging
-
 from abc import abstractmethod
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Union  # noqa: F401
 
 from cloudstorage import messages
 from cloudstorage.exceptions import NotFoundError
+from cloudstorage.structures import CaseInsensitiveDict
 from cloudstorage.typed import (
     Acl,
     ContentLength,
@@ -15,7 +15,6 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
-from cloudstorage.structures import CaseInsensitiveDict
 
 __all__ = ["Blob", "Container", "Driver"]
 
