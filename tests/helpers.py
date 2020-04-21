@@ -1,16 +1,15 @@
 import random
 import string
 import time
-
 from functools import wraps
 from urllib.parse import urlparse
 
-from tests.settings import CONTAINER_PREFIX
+from tests import settings
 
 
 def random_container_name() -> str:
-    rand_chars = ''.join(random.sample(string.ascii_letters, 8)).lower()
-    return '%s-%s' % (CONTAINER_PREFIX, rand_chars)
+    rand_chars = "".join(random.sample(string.ascii_letters, 8)).lower()
+    return "%s-%s" % (settings.CONTAINER_PREFIX, rand_chars)
 
 
 def uri_validator(uri: string) -> bool:

@@ -1,0 +1,14 @@
+[flake8]
+max-line-length = 80
+max-complexity = 18
+select = C,E,F,W,B,B950
+ignore = E203,E501,W503
+exclude =
+    .git
+    .eggs
+    .tox
+    __pycache__
+    docs/conf.py
+    old
+    build
+    dist
