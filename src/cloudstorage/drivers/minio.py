@@ -253,7 +253,7 @@ class MinioDriver(Driver):
         except (BucketAlreadyExists, BucketAlreadyOwnedByYou):
             pass
         except (InvalidBucketName, InvalidBucketError, ResponseError) as err:
-            raise CloudStorageError(err.message)
+            raise CloudStorageError(str(err))
 
         bucket = self._get_bucket(container_name)
         return self._make_container(bucket)
@@ -358,7 +358,7 @@ class MinioDriver(Driver):
         try:
             self.client.remove_object(blob.container.name, blob.name)
         except ResponseError as err:
-            raise CloudStorageError(err.message)
+            raise CloudStorageError(str(err))
 
     def blob_cdn_url(self, blob: Blob) -> str:
         container_url = self.container_cdn_url(blob.container)
