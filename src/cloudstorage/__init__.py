@@ -1,6 +1,6 @@
 """Cloud Storage
 
-:copyright: (c) 2017 by Scott Werner.
+:copyright: (c) 2018 by Scott Werner.
 :license: MIT, see LICENSE for more details.
 """
 import logging
@@ -8,6 +8,7 @@ from enum import Enum, unique
 
 from cloudstorage.base import Blob, Container, Driver
 from cloudstorage.exceptions import CloudStorageError
+from cloudstorage.typed import Drivers
 
 __all__ = [
     "Blob",
@@ -47,7 +48,7 @@ _DRIVER_IMPORTS = {
 }
 
 
-def get_driver(driver: DriverName) -> Driver:
+def get_driver(driver: DriverName) -> Drivers:
     """Get driver class by DriverName enumeration member.
 
     .. code-block:: python
@@ -72,7 +73,7 @@ def get_driver(driver: DriverName) -> Driver:
     raise CloudStorageError("Driver '%s' does not exist." % driver)
 
 
-def get_driver_by_name(driver_name: str) -> Driver:
+def get_driver_by_name(driver_name: str) -> Drivers:
     """Get driver class by driver name.
 
     .. code-block:: python
