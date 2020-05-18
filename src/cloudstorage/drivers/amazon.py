@@ -180,7 +180,7 @@ class S3Driver(Driver):
             error_code = int(err.response["Error"]["Code"])
             if error_code == 404:
                 raise NotFoundError(
-                    messages.BLOB_NOT_FOUND % (container.name, object_summary.key)
+                    messages.BLOB_NOT_FOUND % (object_summary.key, container.name)
                 )
 
             raise CloudStorageError(
