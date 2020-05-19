@@ -2,6 +2,7 @@ import abc
 import logging
 from abc import abstractmethod
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Union  # noqa: F401
 
 from cloudstorage import messages
@@ -252,6 +253,8 @@ class Blob:
 
         :raises NotFoundError: If the blob object doesn't exist.
         """
+        if isinstance(destination, Path):
+            destination = str(destination)
         self.driver.download_blob(self, destination)
 
     def generate_download_url(
@@ -698,6 +701,8 @@ class Container:
         :return: The uploaded blob.
         :rtype: Blob
         """
+        if isinstance(filename, Path):
+            filename = str(filename)
         return self.driver.upload_blob(
             container=self,
             filename=filename,

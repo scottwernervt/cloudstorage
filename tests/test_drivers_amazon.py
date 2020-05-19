@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 import pytest
 import requests
+from pathlib import Path
 
 from cloudstorage.drivers.amazon import S3Driver
 from cloudstorage.exceptions import (
@@ -164,6 +165,12 @@ def test_blob_upload_path(container, text_filename):
     assert blob.checksum == settings.TEXT_MD5_CHECKSUM
 
 
+def test_blob_upload_pathlib_path(container, text_filename):
+    blob = container.upload_blob(Path(text_filename))
+    assert blob.name == settings.TEXT_FILENAME
+    assert blob.checksum == settings.TEXT_MD5_CHECKSUM
+
+
 def test_blob_upload_stream(container, binary_stream):
     blob = container.upload_blob(
         filename=binary_stream,
@@ -195,6 +202,13 @@ def test_blob_delete(container, text_blob):
 
 def test_blob_download_path(binary_blob, temp_file):
     binary_blob.download(temp_file)
+    hash_type = binary_blob.driver.hash_type
+    download_hash = file_checksum(temp_file, hash_type=hash_type)
+    assert download_hash.hexdigest() == settings.BINARY_MD5_CHECKSUM
+
+
+def test_blob_download_pathlib_path(binary_blob, temp_file):
+    binary_blob.download(Path(temp_file))
     hash_type = binary_blob.driver.hash_type
     download_hash = file_checksum(temp_file, hash_type=hash_type)
     assert download_hash.hexdigest() == settings.BINARY_MD5_CHECKSUM
