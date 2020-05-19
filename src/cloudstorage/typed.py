@@ -1,4 +1,5 @@
 """Custom typed annotations."""
+from pathlib import Path
 from typing import Any, BinaryIO, Dict, Optional, TYPE_CHECKING, TextIO, Union, Type
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ Drivers = Union[
     Type["MinioDriver"],
     Type["CloudFilesDriver"],
 ]
-FileLike = Union[BinaryIO, TextIO, str]
+FileLike = Union[BinaryIO, TextIO, str, Path]
 Acl = Optional[Dict[Any, Any]]
 MetaData = Optional["CaseInsensitiveDict"]
 ExtraOptions = Optional[Dict[Any, Any]]
