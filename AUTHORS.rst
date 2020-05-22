@@ -14,3 +14,4 @@ Contributors
 
 * James Stewart `@JamesStewy <https://github.com/JamesStewy>`_
 * Matt Carr `@matt-carr <https://github.com/matt-carr>`_
+* Sibo Wang `@sibowsb <https://github.com/sibowsb>`_
