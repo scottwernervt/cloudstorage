@@ -8,9 +8,8 @@ from cloudstorage import Blob, Container
 from cloudstorage.drivers.minio import MinioDriver
 from cloudstorage.exceptions import CredentialsError
 from tests import settings
-from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
-from tests.integration.helpers import cleanup_storage
+from tests.integration.helpers import cleanup_storage, uri_validator
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.MINIO_ACCESS_KEY), reason="MINIO_ACCESS_KEY not set."

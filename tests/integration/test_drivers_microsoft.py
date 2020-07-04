@@ -7,9 +7,8 @@ from cloudstorage import Container
 from cloudstorage.drivers.microsoft import AzureStorageDriver
 from cloudstorage.exceptions import CredentialsError
 from tests import settings
-from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
-from tests.integration.helpers import cleanup_storage
+from tests.integration.helpers import cleanup_storage, uri_validator
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.AZURE_ACCOUNT_NAME),

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests import settings
-from tests.helpers import random_container_name
+from tests.integration.helpers import random_container_name
 
 PWD_PATH = Path(os.path.dirname(os.path.realpath(__file__)))
 DATA_PATH = PWD_PATH.parents[0] / "data"

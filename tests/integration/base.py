@@ -12,7 +12,7 @@ from cloudstorage.exceptions import (
 )
 from cloudstorage.helpers import file_checksum
 from tests import settings
-from tests.helpers import random_container_name, uri_validator
+from tests.integration.helpers import random_container_name, uri_validator
 
 
 def _get_blob_checksum(blob: Blob, download_to) -> str:

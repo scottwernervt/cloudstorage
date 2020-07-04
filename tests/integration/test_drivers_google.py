@@ -8,9 +8,8 @@ import requests
 from cloudstorage import Container
 from cloudstorage.drivers.google import GoogleStorageDriver
 from tests import settings
-from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
-from tests.integration.helpers import cleanup_storage
+from tests.integration.helpers import cleanup_storage, uri_validator
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.GOOGLE_CREDENTIALS)
