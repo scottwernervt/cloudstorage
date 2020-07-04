@@ -706,8 +706,8 @@ class XattrWindows:
 
     def __init__(self, blob_path: str) -> None:
         self.file_path = pathlib.Path(blob_path)
-        self.xattr_file_path = os.path.join(
-            self.file_path.parent, self.extension.format(self.file_path.name)
+        self.xattr_file_path = self.file_path.parent / self.extension.format(
+            self.file_path.name
         )
 
     def __setitem__(self, key: str, value) -> None:

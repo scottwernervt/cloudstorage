@@ -30,15 +30,16 @@ def storage():
 
 
 @pytest.fixture(scope="module")
-def windows_storage(storage):
-    driver = LocalDriver(key=settings.LOCAL_KEY, secret=settings.LOCAL_SECRET)
+def windows_storage():
+    local_key = settings.LOCAL_KEY + "windows"
+    driver = LocalDriver(key=local_key, secret=settings.LOCAL_SECRET)
     driver.is_windows = True
     driver.create_container("windows")
 
     yield driver
 
     cleanup_storage(driver)
-    shutil.rmtree(settings.LOCAL_KEY)
+    shutil.rmtree(local_key)
 
 
 class TestLocalDriver(DriverTestCases):
