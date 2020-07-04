@@ -1,9 +1,11 @@
 import random
 import string
 import time
+
 from functools import wraps
 from urllib.parse import urlparse
 
+from minio.error import NoSuchBucket
 from retry import retry
 
 from cloudstorage import Driver
@@ -11,7 +13,7 @@ from cloudstorage.exceptions import NotFoundError
 from tests import settings
 
 
-@retry((NotFoundError,), delay=1, backoff=2)
+@retry((NotFoundError, NoSuchBucket), delay=1, backoff=2)
 def cleanup_storage(storage: Driver):
     for container in storage:
         if not container.name.startswith(settings.CONTAINER_PREFIX):
