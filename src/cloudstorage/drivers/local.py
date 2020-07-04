@@ -740,14 +740,14 @@ class XattrWindows:
 
         :return: Dictionary of attributes.
         """
-        if os.path.exists(self.xattr_file_path):
+        if self.xattr_file_path.exists():
             with open(self.xattr_file_path) as json_file:
                 return json.load(json_file)
 
         return {}
 
     def remove_attributes(self):
-        if os.path.exists(self.xattr_file_path):
+        if self.xattr_file_path.exists():
             with lock_local_file(self.xattr_file_path):
                 try:
                     os.unlink(self.xattr_file_path)
