@@ -34,7 +34,11 @@ def windows_storage(storage):
     driver = LocalDriver(key=settings.LOCAL_KEY, secret=settings.LOCAL_SECRET)
     driver.is_windows = True
     driver.create_container("windows")
+
     yield driver
+
+    cleanup_storage(driver)
+    shutil.rmtree(settings.LOCAL_KEY)
 
 
 class TestLocalDriver(DriverTestCases):
