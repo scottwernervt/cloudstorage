@@ -7,12 +7,15 @@ import os
 import pathlib
 import shutil
 import sys
+
+from os import name as os_name
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Union
 
 import filelock
 import itsdangerous
+
 from inflection import underscore
 
 from cloudstorage import Blob, Container, Driver, messages
@@ -37,7 +40,7 @@ from cloudstorage.typed import (
     MetaData,
 )
 
-if os.name != "nt":
+if os_name != "nt":
     import xattr  # noqa: E402
 
 __all__ = ["LocalDriver"]
@@ -120,7 +123,7 @@ class LocalDriver(Driver):
 
         self.base_path = key
         self.salt = salt
-        self.is_windows = os.name == "nt"
+        self.is_windows = os_name == "nt"
 
         try:
             if not os.path.exists(key):
@@ -172,15 +175,65 @@ class LocalDriver(Driver):
             signer_kwargs={"key_derivation": "hmac", "digest_method": "SHA1"},
         )
 
-    def _make_xattr(self, filename: str):
-        """
-        Make a xattr-like object depending on the current platform.
-        :param filename:
-        :return:
+    def _parse_attributes(self, filename: str) -> Union["xattr.xattr", "XattrWindows"]:
+        """Parse extended filesystem attributes on the current operating system.
+
+        :param filename: Filename to parse attributes from.
+        :rtype: :class:`xattr.xattr` :class:`XattrWindows`
         """
         if self.is_windows:
             return XattrWindows(filename)
         return xattr.xattr(filename)
+
+    def _set_attributes(self, filename: str, attributes: Dict) -> None:
+        """Set extended filesystem attributes to a file.
+
+        Metadata is set to `user.metadata.<attr-name>` and remaining attributes
+        are set to `user.<attr-name>`.
+
+        References:
+
+        * `xattr <https://github.com/xattr/xattr>`_
+
+        :param filename: Filename path.
+        :type filename: str
+
+        :param attributes: Dictionary of `meta_data`, `content_<name>`, etc.
+        :type attributes: dict
+
+        :return: NoneType
+        :rtype: None
+
+        :raises CloudStorageError: If the local file system does not support
+          extended filesystem attributes.
+        """
+        xattrs = self._parse_attributes(filename)
+
+        for key, value in attributes.items():
+            if not value:
+                continue
+
+            try:
+                if key == "meta_data":
+                    for meta_key, meta_value in value.items():
+                        # user.metadata.name
+                        attr_name = (
+                            self._OBJECT_META_PREFIX + "metadata." + meta_key
+                        )  # noqa: E126
+
+                        if self.is_windows:
+                            xattrs[attr_name] = meta_value
+                        else:
+                            xattrs[attr_name] = meta_value.encode("utf-8")
+                else:
+                    # user.name
+                    attr_name = self._OBJECT_META_PREFIX + key
+                    if self.is_windows:
+                        xattrs[attr_name] = value
+                    else:
+                        xattrs[attr_name] = value.encode("utf-8")
+            except OSError:
+                logger.warning(messages.LOCAL_NO_ATTRIBUTES)
 
     def _check_path_accessible(self, path: str) -> bool:
         """
@@ -232,49 +285,6 @@ class LocalDriver(Driver):
             raise NotFoundError(messages.CONTAINER_NOT_FOUND % container.name)
 
         return full_path
-
-    def _set_file_attributes(self, filename: str, attributes: Dict) -> None:
-        """Set extended filesystem attributes to a file.
-
-        Metadata is set to `user.metadata.<attr-name>` and remaining attributes
-        are set to `user.<attr-name>`.
-
-        References:
-
-        * `xattr <https://github.com/xattr/xattr>`_
-
-        :param filename: Filename path.
-        :type filename: str
-
-        :param attributes: Dictionary of `meta_data`, `content_<name>`, etc.
-        :type attributes: dict
-
-        :return: NoneType
-        :rtype: None
-
-        :raises CloudStorageError: If the local file system does not support
-          extended filesystem attributes.
-        """
-        xattrs = self._make_xattr(filename)
-
-        for key, value in attributes.items():
-            if not value:
-                continue
-
-            try:
-                if key == "meta_data":
-                    for meta_key, meta_value in value.items():
-                        # user.metadata.name
-                        attr_name = (
-                            self._OBJECT_META_PREFIX + "metadata." + meta_key
-                        )  # noqa: E126
-                        xattrs[attr_name] = meta_value.encode("utf-8")
-                else:
-                    # user.name
-                    attr_name = self._OBJECT_META_PREFIX + key
-                    xattrs[attr_name] = value.encode("utf-8")
-            except OSError:
-                logger.warning(messages.LOCAL_NO_ATTRIBUTES)
 
     def _get_file_path(self, blob: Blob) -> str:
         """Get the blob's full folder path.
@@ -366,7 +376,7 @@ class LocalDriver(Driver):
         cache_control = None
 
         try:
-            attributes = self._make_xattr(full_path)
+            attributes = self._parse_attributes(full_path)
 
             for attr_key, attr_value in attributes.items():
                 value_str = None
@@ -525,7 +535,7 @@ class LocalDriver(Driver):
             attributes["content_type"] = content_type
 
         # Set meta data and other attributes
-        self._set_file_attributes(blob_path, attributes)
+        self._set_attributes(blob_path, attributes)
 
         return self.get_blob(container, blob_name)
 
@@ -692,18 +702,21 @@ class XattrWindows:
     source file.
     """
 
-    def __init__(self, filename) -> None:
-        self.filename = filename
-        p = pathlib.Path(filename)
-        self.xattr_filename = os.path.join(p.parent, ".{}.xattr".format(p.name))
+    extension = ".{}.xattr"
 
-    def __setitem__(self, key, value) -> None:
+    def __init__(self, blob_path: str) -> None:
+        self.file_path = pathlib.Path(blob_path)
+        self.xattr_file_path = os.path.join(
+            self.file_path.parent, self.extension.format(self.file_path.name)
+        )
+
+    def __setitem__(self, key: str, value) -> None:
         """
         Write an attribute to the json file.
         """
         data = self._load()
         data[key] = value
-        with open(self.xattr_filename, "w") as outfile:
+        with open(self.xattr_file_path, "w", encoding="utf-8") as outfile:
             json.dump(data, outfile)
 
     def items(self):
@@ -719,22 +732,24 @@ class XattrWindows:
                 ret[itemname] = itemvalue.encode("utf-8")
             else:
                 ret[itemname] = itemvalue
+
         return ret.items()
 
     def _load(self) -> Dict:
+        """Load file json attributes file or return empty dict.
+
+        :return: Dictionary of attributes.
         """
-        Load json file if it exists
-        :return:
-        """
-        if os.path.exists(self.xattr_filename):
-            with open(self.xattr_filename) as json_file:
+        if os.path.exists(self.xattr_file_path):
+            with open(self.xattr_file_path) as json_file:
                 return json.load(json_file)
+
         return {}
 
     def remove_attributes(self):
-        if os.path.exists(self.xattr_filename):
-            with lock_local_file(self.xattr_filename):
+        if os.path.exists(self.xattr_file_path):
+            with lock_local_file(self.xattr_file_path):
                 try:
-                    os.unlink(self.xattr_filename)
+                    os.unlink(self.xattr_file_path)
                 except OSError as err:
                     logger.exception(err)
