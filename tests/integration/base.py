@@ -28,7 +28,7 @@ def _get_blob_checksum(blob: Blob, download_to) -> str:
 
 # noinspection PyMethodMayBeStatic
 class DriverTestCases:
-    expire_http_status: int = HTTPStatus.FORBIDDEN
+    expire_http_status = HTTPStatus.FORBIDDEN  # type: str
 
     def test_validate_credentials(self):
         raise NotImplementedError
