@@ -21,7 +21,7 @@ EXTRAS_REQUIRE = {
     "microsoft": ["azure==4.0.0"],
     "minio": ["minio>=4.0.0"],
     "rackspace": ["openstacksdk<=0.17.2", "rackspacesdk==0.7.5", "requests>=2.19.1"],
-    "tests": ["flake8", "pytest", "prettyconf", "requests>=2.19.1"],
+    "tests": ["flake8", "pytest", "prettyconf", "requests>=2.19.1", "retry"],
     "lint": [
         "black==19.10b0",
         "flake8==3.7.9",
