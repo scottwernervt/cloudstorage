@@ -1,4 +1,4 @@
-"""Custom typed annotations."""
+"""Cloudstorage typed annotations."""
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, Optional, TYPE_CHECKING, TextIO, Union, Type
 
@@ -22,7 +22,7 @@ Drivers = Union[
 ]
 FileLike = Union[BinaryIO, TextIO, str, Path]
 Acl = Optional[Dict[Any, Any]]
-MetaData = Optional["CaseInsensitiveDict"]
+MetaData = Optional[Union["CaseInsensitiveDict", Dict]]
 ExtraOptions = Optional[Dict[Any, Any]]
 ContentLength = Dict[int, int]
 FormPost = Union[str, Dict[Any, Any]]
