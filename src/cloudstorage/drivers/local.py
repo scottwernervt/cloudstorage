@@ -705,10 +705,10 @@ class XattrWindows:
     extension = ".{}.xattr"
 
     def __init__(self, blob_path: str) -> None:
-        self.file_path = pathlib.Path(blob_path)
+        self.file_path = pathlib.Path(blob_path)  # type: pathlib.Path
         self.xattr_file_path = self.file_path.parent / self.extension.format(
             self.file_path.name
-        )
+        )  # type: pathlib.Path
 
     def __setitem__(self, key: str, value) -> None:
         """
@@ -741,15 +741,15 @@ class XattrWindows:
         :return: Dictionary of attributes.
         """
         if self.xattr_file_path.exists():
-            with open(self.xattr_file_path) as json_file:
+            with open(self.xattr_file_path.name) as json_file:
                 return json.load(json_file)
 
         return {}
 
     def remove_attributes(self):
         if self.xattr_file_path.exists():
-            with lock_local_file(self.xattr_file_path):
+            with lock_local_file(self.xattr_file_path.name):
                 try:
-                    os.unlink(self.xattr_file_path)
+                    self.xattr_file_path.unlink()
                 except OSError as err:
                     logger.exception(err)
