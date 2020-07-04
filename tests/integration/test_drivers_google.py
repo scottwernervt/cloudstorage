@@ -1,8 +1,6 @@
 import os
-import random
 
 from http import HTTPStatus
-from time import sleep
 
 import pytest
 import requests
@@ -12,6 +10,7 @@ from cloudstorage.drivers.google import GoogleStorageDriver
 from tests import settings
 from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
+from tests.integration.helpers import cleanup_storage
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.GOOGLE_CREDENTIALS)
@@ -23,18 +22,8 @@ pytestmark = pytest.mark.skipif(
 @pytest.fixture(scope="module")
 def storage():
     driver = GoogleStorageDriver(key=settings.GOOGLE_CREDENTIALS)
-
     yield driver
-
-    seconds = random.random() * 3
-    for container in driver:
-        if container.name.startswith(settings.CONTAINER_PREFIX):
-            for blob in container:
-                sleep(seconds)
-                blob.delete()
-
-            sleep(seconds)
-            container.delete()
+    cleanup_storage(driver)
 
 
 class TestGoogleDriver(DriverTestCases):

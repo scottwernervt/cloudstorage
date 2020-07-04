@@ -10,6 +10,7 @@ from cloudstorage.exceptions import CredentialsError
 from tests import settings
 from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
+from tests.integration.helpers import cleanup_storage
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.MINIO_ACCESS_KEY), reason="MINIO_ACCESS_KEY not set."
@@ -24,15 +25,8 @@ def storage():
         settings.MINIO_SECRET_KEY,
         settings.MINIO_REGION,
     )
-
     yield driver
-
-    for container in driver:  # cleanup
-        if container.name.startswith(settings.CONTAINER_PREFIX):
-            for blob in container:
-                blob.delete()
-
-            container.delete()
+    cleanup_storage(driver)
 
 
 class TestMinioDriver(DriverTestCases):

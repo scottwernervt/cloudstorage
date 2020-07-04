@@ -9,6 +9,7 @@ from cloudstorage.exceptions import CredentialsError
 from tests import settings
 from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
+from tests.integration.helpers import cleanup_storage
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.AMAZON_KEY), reason="AMAZON_KEY not set.",
@@ -20,15 +21,8 @@ def storage():
     driver = S3Driver(
         settings.AMAZON_KEY, settings.AMAZON_SECRET, settings.AMAZON_REGION
     )
-
     yield driver
-
-    for container in driver:  # cleanup
-        if container.name.startswith(settings.CONTAINER_PREFIX):
-            for blob in container:
-                blob.delete()
-
-            container.delete()
+    cleanup_storage(driver)
 
 
 class TestAmazonDriver(DriverTestCases):

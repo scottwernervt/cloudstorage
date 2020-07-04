@@ -11,6 +11,7 @@ from cloudstorage.exceptions import CredentialsError, SignatureExpiredError
 from cloudstorage.helpers import file_checksum
 from tests import settings
 from tests.integration.base import DriverTestCases
+from tests.integration.helpers import cleanup_storage
 
 if settings.LOCAL_KEY and not os.path.exists(settings.LOCAL_KEY):
     os.makedirs(settings.LOCAL_KEY)
@@ -23,16 +24,8 @@ pytestmark = pytest.mark.skipif(
 @pytest.fixture(scope="module")
 def storage():
     driver = LocalDriver(key=settings.LOCAL_KEY, secret=settings.LOCAL_SECRET)
-
     yield driver
-
-    for container in driver:  # cleanup
-        if container.name.startswith(settings.CONTAINER_PREFIX):
-            for blob in container:
-                blob.delete()
-
-            container.delete()
-
+    cleanup_storage(driver)
     shutil.rmtree(settings.LOCAL_KEY)
 
 

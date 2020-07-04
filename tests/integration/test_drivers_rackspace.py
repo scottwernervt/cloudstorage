@@ -10,6 +10,7 @@ from cloudstorage.helpers import file_checksum, parse_content_disposition
 from tests import settings
 from tests.helpers import uri_validator
 from tests.integration.base import DriverTestCases
+from tests.integration.helpers import cleanup_storage
 
 pytestmark = pytest.mark.skipif(
     not bool(settings.RACKSPACE_KEY), reason="settings missing key and secret"
@@ -21,8 +22,8 @@ def storage():
     driver = CloudFilesDriver(
         settings.RACKSPACE_KEY, settings.RACKSPACE_SECRET, settings.RACKSPACE_REGION
     )
-
     yield driver
+    cleanup_storage(driver)
 
     for container in driver:  # cleanup
         if container.name.startswith(settings.CONTAINER_PREFIX):
