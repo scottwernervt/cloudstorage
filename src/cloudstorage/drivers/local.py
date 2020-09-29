@@ -702,6 +702,8 @@ class XattrWindows:
         Write an attribute to the json file.
         """
         data = self._load()
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
         data[key] = value
         with open(self.xattr_filename, "w") as outfile:
             json.dump(data, outfile)
