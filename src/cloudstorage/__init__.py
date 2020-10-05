@@ -46,7 +46,10 @@ _DRIVER_IMPORTS = {
     DriverName.LOCAL: ("cloudstorage.drivers.local", "LocalDriver"),
     DriverName.MINIO: ("cloudstorage.drivers.minio", "MinioDriver"),
     DriverName.S3: ("cloudstorage.drivers.amazon", "S3Driver"),
-    DriverName.DIGITALOCEANSPACES: ("cloudstorage.drivers.digitalocean", "DigitalOceanSpacesDriver"),
+    DriverName.DIGITALOCEANSPACES: (
+        "cloudstorage.drivers.digitalocean",
+        "DigitalOceanSpacesDriver",
+    ),
 }
 
 

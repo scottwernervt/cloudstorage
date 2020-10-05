@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Iterable, List
+from typing import Dict, List
 
 import boto3
 
@@ -53,7 +53,7 @@ class DigitalOceanSpacesDriver(S3Driver):
 
     @property
     def regions(self) -> List[str]:
-        return ['nyc3', 'ams3', 'sfo2', 'sgp1', 'fra1']
+        return ["nyc3", "ams3", "sfo2", "sgp1", "fra1"]
 
     # noinspection PyUnresolvedReferences
     @property
@@ -63,5 +63,8 @@ class DigitalOceanSpacesDriver(S3Driver):
         :return: The s3 resource instance.
         :rtype: :class:`boto3.resources.base.ServiceResource`
         """
-        return self.session.resource(service_name="s3", region_name=self.region,
-                                     endpoint_url=f"https://{self.region}.digitaloceanspaces.com")
+        return self.session.resource(
+            service_name="s3",
+            region_name=self.region,
+            endpoint_url=f"https://{self.region}.digitaloceanspaces.com",
+        )
