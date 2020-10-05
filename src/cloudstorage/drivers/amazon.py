@@ -224,6 +224,19 @@ class S3Driver(Driver):
             created_at=created_at,
         )
 
+    def _create_bucket_params(self, params: Dict[Any, Any]) -> Dict[Any, Any]:
+        """Process extra create bucket params.
+
+        :param params: Default create bucket parameters.
+        :return: Final create bucket parameters.
+        """
+        # TODO: BUG: Creating S3 bucket in us-east-1
+        if self.region != "us-east-1":
+            params["CreateBucketConfiguration"] = {
+                "LocationConstraint": self.region,
+            }
+        return params
+
     @property
     def session(self) -> boto3.session.Session:
         """Amazon Web Services session.
@@ -267,12 +280,7 @@ class S3Driver(Driver):
         if acl:
             params["ACL"] = acl.lower()
 
-        # TODO: BUG: Creating S3 bucket in us-east-1
-        # See https://github.com/boto/boto3/issues/125
-        if self.region != "us-east-1":
-            params["CreateBucketConfiguration"] = {
-                "LocationConstraint": self.region,
-            }
+        params = self._create_bucket_params(params)
 
         logger.debug("params=%s", params)
 

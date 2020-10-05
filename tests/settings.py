@@ -43,6 +43,10 @@ AMAZON_KEY = config("AMAZON_KEY", default=None)
 AMAZON_SECRET = config("AMAZON_SECRET", default=None)
 AMAZON_REGION = config("AMAZON_REGION", default="us-east-1")
 
+DIGITALOCEAN_KEY = config("DIGITALOCEAN_KEY", default=None)
+DIGITALOCEAN_SECRET = config("DIGITALOCEAN_SECRET", default=None)
+DIGITALOCEAN_REGION = config("DIGITALOCEAN_REGION", default="sfo2")
+
 AZURE_ACCOUNT_NAME = config("AZURE_ACCOUNT_NAME", default=None)
 AZURE_ACCOUNT_KEY = config("AZURE_ACCOUNT_KEY", default=None)
 
