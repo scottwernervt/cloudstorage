@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import boto3
 
@@ -51,8 +51,13 @@ class DigitalOceanSpacesDriver(S3Driver):
     ) -> None:
         super().__init__(key, secret, region, **kwargs)
 
+    def _create_bucket_params(self, params: Dict[Any, Any]) -> Dict[Any, Any]:
+        return params
+
     @property
     def regions(self) -> List[str]:
+        """List of DigitalOcean regions that support Spaces.
+        """
         return ["nyc3", "ams3", "sfo2", "sgp1", "fra1"]
 
     # noinspection PyUnresolvedReferences
@@ -68,3 +73,7 @@ class DigitalOceanSpacesDriver(S3Driver):
             region_name=self.region,
             endpoint_url=f"https://{self.region}.digitaloceanspaces.com",
         )
+
+    def validate_credentials(self) -> None:
+        # Not available
+        pass

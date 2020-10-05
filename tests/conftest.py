@@ -72,6 +72,9 @@ def binary_blob(container, binary_filename):
 
 @pytest.fixture(scope="function")
 def temp_file():
-    _, path = mkstemp(prefix=settings.CONTAINER_PREFIX)
+    fd, path = mkstemp(prefix=settings.CONTAINER_PREFIX)
+    if os.name == "nt":
+        # Must close in Windows, otherwise errors as file being used
+        os.close(fd)
     yield path
     os.remove(path)
