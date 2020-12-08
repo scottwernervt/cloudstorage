@@ -1,4 +1,5 @@
 import os
+import io
 from tempfile import mkstemp
 
 import pytest
@@ -57,6 +58,14 @@ def binary_filename():
 def binary_stream(binary_filename):
     with open(binary_filename, "rb") as binary_stream:
         yield binary_stream
+
+
+@pytest.fixture(scope="function")
+def binary_bytes():
+    f = io.BytesIO()
+    f.write(b'1' * 1024 * 1024 * 10)
+    f.seek(0)
+    yield f
 
 
 # noinspection PyShadowingNames
