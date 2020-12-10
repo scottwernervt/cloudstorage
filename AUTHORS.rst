@@ -16,3 +16,4 @@ Contributors
 * Matt Carr `@matt-carr <https://github.com/matt-carr>`_
 * Sibo Wang `@sibowsb <https://github.com/sibowsb>`_
 * Rangel Reale `@RangelReale <https://github.com/RangelReale>`_
+* Alexander Verbitsky `@habibutsu <https://github.com/habibutsu>`_

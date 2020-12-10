@@ -508,14 +508,18 @@ class LocalDriver(Driver):
         base_path = os.path.dirname(blob_path)
         self._make_path(base_path)
 
+        tmp_blob_path = f'{blob_path}.tmp'
+
         with lock_local_file(blob_path):
             if isinstance(filename, str):
-                shutil.copy(filename, blob_path)
+                shutil.copy(filename, tmp_blob_path)
             else:
-                with open(blob_path, "wb") as blob_file:
+                with open(tmp_blob_path, "wb") as blob_file:
                     for data in filename:
                         blob_file.write(data)
+                    os.fsync(blob_file.fileno())
 
+        os.rename(tmp_blob_path, blob_path)
         # Disable execute mode on file
         os.chmod(blob_path, int("664", 8))
 
