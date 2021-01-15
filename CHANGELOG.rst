@@ -25,8 +25,6 @@ Bugs
 * Handle ``pathlib.Path`` properly for ``Blob.download`` download and ``Container.upload_blob`` (`#65 <https://github.com/scottwernervt/cloudstorage/pull/65>`_). Thanks @sibowsb!
 * Fix Bob ``NotFoundError`` message for AWS driver (`#64 <https://github.com/scottwernervt/cloudstorage/pull/64>`_). Thanks @sibowsb!
 
-Other
-
 0.10.1 (2020-04-20)
 +++++++++++++++++++
 
