@@ -11,6 +11,20 @@ Features
 * Start following (`Semantic Versioning <https://semver.org/>`_).
 
 
+0.11.0 (2021-01-15)
++++++++++++++++++++
+
+Features
+
+* Atomic local file write (`#68 <https://github.com/scottwernervt/cloudstorage/pull/68>`_). Thanks @habibutsu.
+* New DigitalOcean Spaces Driver (`#67 <https://github.com/scottwernervt/cloudstorage/pull/67>`_). Thanks @RangelReale.
+
+Bugs
+
+* Convert ``bytes`` to ``str`` before saving the json file for Windows Xattr simulator (`#66 <https://github.com/scottwernervt/cloudstorage/pull/66>`_). Thanks @RangelReale!
+* Handle ``pathlib.Path`` properly for ``Blob.download`` download and ``Container.upload_blob`` (`#65 <https://github.com/scottwernervt/cloudstorage/pull/65>`_). Thanks @sibowsb!
+* Fix Bob ``NotFoundError`` message for AWS driver (`#64 <https://github.com/scottwernervt/cloudstorage/pull/64>`_). Thanks @sibowsb!
+
 0.10.1 (2020-04-20)
 +++++++++++++++++++
 
