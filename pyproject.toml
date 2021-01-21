@@ -2,6 +2,24 @@
 requires = ["setuptools>=35.0.2", "wheel>=0.29.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v --tb=short"
+norecursedirs = [
+    ".eggs",
+    ".git",
+    ".pytest_cache",
+    ".tox",
+    "build",
+    "dist",
+    "docs",
+    "env",
+    "venv",
+]
+testpaths = [
+    "tests",
+]
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
