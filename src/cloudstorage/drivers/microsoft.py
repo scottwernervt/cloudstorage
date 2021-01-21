@@ -280,7 +280,9 @@ class AzureStorageDriver(Driver):
     def container_cdn_url(self, container: Container) -> str:
         azure_container = self._get_azure_container(container.name)
         url = "{}://{}/{}".format(
-            self.service.protocol, self.service.primary_endpoint, azure_container.name,
+            self.service.protocol,
+            self.service.primary_endpoint,
+            azure_container.name,
         )
         return url
 

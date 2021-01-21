@@ -17,7 +17,7 @@ SALT = hashlib.sha1(os.urandom(128)).hexdigest()
 TEXT_FILENAME = "flask.txt"
 TEXT_STREAM_FILENAME = "flask-stream.txt"
 TEXT_FORM_FILENAME = "flask-form.txt"
-TEXT_MD5_CHECKSUM = "2a5a634f5c8d931350e83e41c9b3b0bb"
+TEXT_MD5_CHECKSUM = "5a9b3669e3a17311e9135fe65e0877a8"
 
 BINARY_FILENAME = "avatar.png"
 BINARY_FORM_FILENAME = "avatar-form.png"

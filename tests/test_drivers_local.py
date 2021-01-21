@@ -187,16 +187,13 @@ def test_blob_upload_stream(container, binary_stream):
 
 
 def test_blob_upload_stream_interrupted(container, binary_bytes):
-    BLOB_NAME = 'data.bin'
+    BLOB_NAME = "data.bin"
     md5 = hashlib.md5()
     md5.update(binary_bytes.getbuffer())
     mk5_checksum = md5.hexdigest()
 
     def _upload():
-        container.upload_blob(
-            filename=binary_bytes,
-            blob_name=BLOB_NAME
-        )
+        container.upload_blob(filename=binary_bytes, blob_name=BLOB_NAME)
 
     p = mp.Process(target=_upload)
     p.start()
@@ -204,7 +201,7 @@ def test_blob_upload_stream_interrupted(container, binary_bytes):
     os.kill(p.pid, 9)
     p.join()
 
-    bad_blob = container.get_blob(BLOB_NAME + '.tmp')
+    bad_blob = container.get_blob(BLOB_NAME + ".tmp")
     assert bad_blob.checksum != mk5_checksum
     bad_blob.delete()
 

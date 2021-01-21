@@ -63,7 +63,7 @@ def binary_stream(binary_filename):
 @pytest.fixture(scope="function")
 def binary_bytes():
     f = io.BytesIO()
-    f.write(b'1' * 1024 * 1024 * 10)
+    f.write(b"1" * 1024 * 1024 * 10)
     f.seek(0)
     yield f
 
