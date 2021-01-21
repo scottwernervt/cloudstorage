@@ -30,7 +30,8 @@ commands = pytest {posargs}
 extras =
     check
 commands =
-    python setup.py check --strict --metadata --restructuredtext
+    python setup.py sdist
+    twine check dist/*.tar.gz
     check-manifest -v
 
 [testenv:lint]
