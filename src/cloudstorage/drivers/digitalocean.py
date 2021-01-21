@@ -56,8 +56,7 @@ class DigitalOceanSpacesDriver(S3Driver):
 
     @property
     def regions(self) -> List[str]:
-        """List of DigitalOcean regions that support Spaces.
-        """
+        """List of DigitalOcean regions that support Spaces."""
         return ["nyc3", "ams3", "sfo2", "sgp1", "fra1"]
 
     # noinspection PyUnresolvedReferences

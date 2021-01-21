@@ -107,7 +107,7 @@ class MinioDriver(Driver):
         key: str,
         secret: str = None,
         region: str = "us-east-1",
-        **kwargs: Dict
+        **kwargs: Dict,
     ) -> None:
         secure = kwargs.pop("secure", True)
         http_client = kwargs.pop("http_client", None)

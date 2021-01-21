@@ -508,7 +508,7 @@ class LocalDriver(Driver):
         base_path = os.path.dirname(blob_path)
         self._make_path(base_path)
 
-        tmp_blob_path = f'{blob_path}.tmp'
+        tmp_blob_path = f"{blob_path}.tmp"
 
         with lock_local_file(blob_path):
             if isinstance(filename, str):

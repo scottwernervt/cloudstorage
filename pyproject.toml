@@ -1,6 +1,54 @@
+[build-system]
+requires = ["setuptools>=35.0.2", "wheel>=0.29.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist =
+    check
+    lint
+    py36
+    py37
+    py38
+    py39
+    docs
+
+[testenv]
+extras =
+    tests
+    amazon
+    google
+    local
+    microsoft
+    minio
+    rackspace
+passenv = *
+commands = pytest {posargs}
+
+[testenv:check]
+extras =
+    check
+commands =
+    python setup.py check --strict --metadata --restructuredtext
+    check-manifest -v
+
+[testenv:lint]
+extras =
+    lint
+commands =
+    pre-commit run --all-files
+
+[testenv:docs]
+deps = -rdocs/requirements.txt
+commands =
+    sphinx-build docs/ dist/docs {posargs}
+    sphinx-build -b linkcheck docs dist/docs
+"""
+
 [tool.black]
 line-length = 88
-target-version = ["py35", "py36", "py37", "py38"]
+target-version = ["py36", "py37", "py38"]
 include = '\.pyi?$'
 exclude = '''
 /(
