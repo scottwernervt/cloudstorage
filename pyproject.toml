@@ -8,10 +8,10 @@ legacy_tox_ini = """
 envlist =
     check
     lint
-    py35
     py36
     py37
     py38
+    py39
     docs
 
 [testenv]
@@ -27,20 +27,17 @@ passenv = *
 commands = pytest {posargs}
 
 [testenv:check]
-deps =
-    docutils==0.16
-    check-manifest==0.41
-    readme-renderer==25.0
-    pygments==2.6.1
-skip_install = true
+extras =
+    check
 commands =
     python setup.py check --strict --metadata --restructuredtext
     check-manifest -v
 
 [testenv:lint]
-deps = pre-commit~=2.0
-skip_install = true
-commands = pre-commit run --all-files
+extras =
+    lint
+commands =
+    pre-commit run --all-files
 
 [testenv:docs]
 deps = -rdocs/requirements.txt
@@ -51,7 +48,7 @@ commands =
 
 [tool.black]
 line-length = 88
-target-version = ["py35", "py36", "py37", "py38"]
+target-version = ["py36", "py37", "py38"]
 include = '\.pyi?$'
 exclude = '''
 /(
