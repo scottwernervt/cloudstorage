@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Any, Dict, Iterable, List  # noqa: F401
 
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+
 # noinspection PyPackageRequirements
 from google.auth.exceptions import GoogleAuthError
 
@@ -109,6 +112,13 @@ class GoogleStorageDriver(Driver):
             )
 
         self._client = storage.Client()
+
+        retries_strategy = Retry(
+            total=5,
+            backoff_factor=0.1,
+            status_forcelist=[408, 429])
+        http = self._client._http
+        http.mount('https://', HTTPAdapter(max_retries=retries_strategy))
 
     def __iter__(self) -> Iterable[Container]:
         for bucket in self.client.list_buckets():
