@@ -97,6 +97,9 @@ ENV/
 # JetBrains
 .idea
 
+# VS Code
+.vscode
+
 # Test API key and secret files
 settings.ini
 gcs-service-account.json
