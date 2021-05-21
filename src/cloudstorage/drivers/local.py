@@ -538,7 +538,6 @@ class LocalDriver(Driver):
 
     def get_blobs(self, container: Container) -> Iterable[Blob]:
         container_path = self._get_folder_path(container, validate=True)
-
         for folder, sub_folders, files in os.walk(container_path, topdown=True):
             # Remove unwanted sub-folders
             for sub_folder in IGNORE_FOLDERS:
@@ -549,7 +548,7 @@ class LocalDriver(Driver):
                 full_path = os.path.join(folder, name)
                 if not self._check_path_accessible(full_path):
                     continue
-                object_name = pathlib.Path(full_path).name
+                object_name = pathlib.Path(full_path).relative_to(container.cdn_url).as_posix()
                 yield self._make_blob(container, object_name)
 
     def download_blob(self, blob: Blob, destination: FileLike) -> None:

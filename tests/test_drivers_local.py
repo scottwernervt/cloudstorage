@@ -1,3 +1,4 @@
+import io
 import os
 import shutil
 import multiprocessing as mp
@@ -140,6 +141,15 @@ def test_container_generate_upload_url_expiration(storage, container):
 def test_container_get_blob(container, text_blob):
     text_get_blob = container.get_blob(text_blob.name)
     assert text_get_blob == text_blob
+
+
+def test_container_get_blobs(container):
+    container.upload_blob(
+        io.BytesIO(b'Hello'),
+        blob_name='some/where/hello.txt'
+    )
+
+    assert [blob.name for blob in container] == ['some/where/hello.txt']
 
 
 def test_container_get_blob_invalid(container):
