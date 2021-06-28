@@ -2,6 +2,7 @@
 import logging
 from typing import Any, Dict, Iterable, List, TYPE_CHECKING  # noqa: F401
 from urllib.parse import quote, urljoin
+from functools import lru_cache
 
 import boto3
 from botocore.exceptions import ClientError, ParamValidationError, WaiterError
@@ -108,6 +109,7 @@ class S3Driver(Driver):
 
         return normalized
 
+    @lru_cache
     def _get_bucket(self, bucket_name: str, validate: bool = True):
         """Get a S3 bucket.
 
