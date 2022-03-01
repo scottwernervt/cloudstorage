@@ -17,3 +17,4 @@ Contributors
 * Sibo Wang `@sibowsb <https://github.com/sibowsb>`_
 * Rangel Reale `@RangelReale <https://github.com/RangelReale>`_
 * Alexander Verbitsky `@habibutsu <https://github.com/habibutsu>`_
+* Tim Weber `@scy <https://github.com/scy>`_
