@@ -40,6 +40,7 @@ extras =
     local
     microsoft
     minio
+    owncloud
     rackspace
 passenv = *
 commands = pytest {posargs}

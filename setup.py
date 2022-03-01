@@ -21,6 +21,7 @@ EXTRAS_REQUIRE = {
     ],
     "microsoft": ["azure==4.0.0"],
     "minio": ["minio==4.0.0"],
+    "owncloud": ["pyocclient>=0.6"],
     "rackspace": ["openstacksdk<=0.17.2", "rackspacesdk==0.7.5", "requests>=2.19.1"],
     "tests": ["flake8==3.8.4", "prettyconf", "pytest==6.2.1", "requests>=2.19.1"],
     "lint": [
@@ -121,6 +122,7 @@ setup(
             "cloudstorage",
             "gcs",
             "minio",
+            "owncloud",
         ]
     ),
     install_requires=INSTALL_REQUIRES,
