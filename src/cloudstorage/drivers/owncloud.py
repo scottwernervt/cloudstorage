@@ -35,6 +35,8 @@ class OwnCloudDriver(Driver):
         password: str = None,
         **kwargs,
     ):
+        if user == "":
+            user = None
         if user is None:
             if password is None:
                 # Public link with no credentials.
