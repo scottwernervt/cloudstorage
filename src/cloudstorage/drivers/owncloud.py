@@ -11,9 +11,6 @@ from cloudstorage.exceptions import (
     IsNotEmptyError,
     NotFoundError,
 )
-from cloudstorage.helpers import (
-    read_in_chunks,
-)
 from cloudstorage.typed import (
     ContentLength,
     ExtraOptions,

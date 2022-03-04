@@ -35,6 +35,7 @@ class DriverName(Enum):
     GOOGLESTORAGE = "GOOGLESTORAGE"
     LOCAL = "LOCAL"
     MINIO = "MINIO"
+    OWNCLOUD = "OWNCLOUD"
     S3 = "S3"
     DIGITALOCEANSPACES = "DIGITALOCEANSPACES"
 
@@ -45,6 +46,7 @@ _DRIVER_IMPORTS = {
     DriverName.GOOGLESTORAGE: ("cloudstorage.drivers.google", "GoogleStorageDriver"),
     DriverName.LOCAL: ("cloudstorage.drivers.local", "LocalDriver"),
     DriverName.MINIO: ("cloudstorage.drivers.minio", "MinioDriver"),
+    DriverName.OWNCLOUD: ("cloudstorage.drivers.owncloud", "OwnCloudDriver"),
     DriverName.S3: ("cloudstorage.drivers.amazon", "S3Driver"),
     DriverName.DIGITALOCEANSPACES: (
         "cloudstorage.drivers.digitalocean",
@@ -68,7 +70,8 @@ def get_driver(driver: DriverName) -> Drivers:
     :return: DriverName driver class.
     :rtype: :class:`.AzureStorageDriver`, :class:`.CloudFilesDriver`,
       :class:`.GoogleStorageDriver`, :class:`.S3Driver`, :class:`.LocalDriver`,
-      :class:`.MinioDriver`, :class:`.DigitalOceanSpacesDriver`
+      :class:`.MinioDriver`, :class:`.OwnCloudDriver`,
+      :class:`.DigitalOceanSpacesDriver`
     """
     if driver in _DRIVER_IMPORTS:
         mod_name, driver_name = _DRIVER_IMPORTS[driver]
@@ -95,13 +98,15 @@ def get_driver_by_name(driver_name: str) -> Drivers:
         * `S3`
         * `LOCAL`
         * `MINIO`
+        * `OWNCLOUD`
         * `DIGITALOCEANSPACES`
     :type driver_name: str
 
     :return: DriverName driver class.
     :rtype: :class:`.AzureStorageDriver`, :class:`.CloudFilesDriver`,
       :class:`.GoogleStorageDriver`, :class:`.S3Driver`, :class:`.LocalDriver`,
-      :class:`.MinioDriver`, :class:`.DigitalOceanSpacesDriver`
+      :class:`.MinioDriver`, :class:`.OwnCloudDriver`,
+      :class:`.DigitalOceanSpacesDriver`
     """
     driver = DriverName[driver_name]
     return get_driver(driver)
