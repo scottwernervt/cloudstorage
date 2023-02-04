@@ -6,17 +6,13 @@ from typing import Dict, Iterable, List  # noqa: F401
 from urllib.parse import quote, urljoin
 
 from inflection import camelize, underscore
-from minio import Minio, PostPolicy, definitions
+from minio import Minio
+from minio.datatypes import PostPolicy
 from minio.error import (
-    BucketAlreadyExists,
-    BucketAlreadyOwnedByYou,
-    BucketNotEmpty,
-    InvalidAccessKeyId,
-    InvalidBucketError,
-    InvalidBucketName,
-    NoSuchKey,
-    ResponseError,
-    SignatureDoesNotMatch,
+    MinioException,
+    InvalidResponseError,
+    ServerError,
+    S3Error
 )
 
 from cloudstorage import Blob, Container, Driver, messages
@@ -37,6 +33,8 @@ from cloudstorage.typed import (
     FormPost,
     MetaData,
 )
+
+from minio.datatypes import Bucket, Object
 
 __all__ = ["MinioDriver"]
 
@@ -148,14 +146,14 @@ class MinioDriver(Driver):
 
         return normalized
 
-    def _get_bucket(self, bucket_name: str) -> definitions.Bucket:
+    def _get_bucket(self, bucket_name: str) -> Bucket:
         """Get a Minio bucket.
 
         :param bucket_name: The Bucket's name identifier.
         :type bucket_name: str
 
         :return: Bucket resource object.
-        :rtype: :class:`minio.definitions.Bucket`
+        :rtype: :class:`minio.datatypes.Bucket`
 
         :raises NotFoundError: If the bucket does not exist.
         """
@@ -164,14 +162,14 @@ class MinioDriver(Driver):
                 return bucket
         raise NotFoundError(messages.CONTAINER_NOT_FOUND % bucket_name)
 
-    def _make_obj(self, container: Container, obj: definitions.Object) -> Blob:
+    def _make_obj(self, container: Container, obj: Object) -> Blob:
         """Convert Minio Object to Blob instance.
 
         :param container: The container that holds the blob.
         :type container: :class:`.Container`
 
         :param obj: Minio object stats.
-        :type obj: :class:`minio.definitions.Object`
+        :type obj: :class:`minio.datatypes.Object`
 
         :return: A blob object.
         :rtype: :class:`.Blob`
@@ -205,11 +203,11 @@ class MinioDriver(Driver):
             expires_at=None,
         )
 
-    def _make_container(self, bucket: definitions.Bucket) -> Container:
+    def _make_container(self, bucket: Bucket) -> Container:
         """Convert Minio Bucket to Container.
 
         :param bucket: Minio bucket.
-        :type bucket: :class:`minio.definitions.Bucket`
+        :type bucket: :class:`minio.datatypes.Bucket`
 
         :return: The container if it exists.
         :rtype: :class:`.Container`
@@ -232,7 +230,7 @@ class MinioDriver(Driver):
         try:
             for _ in self.client.list_buckets():
                 break
-        except (InvalidAccessKeyId, SignatureDoesNotMatch) as err:
+        except (MinioException) as err:
             raise CredentialsError(str(err))
 
     @property
@@ -250,9 +248,7 @@ class MinioDriver(Driver):
 
         try:
             self.client.make_bucket(container_name)
-        except (BucketAlreadyExists, BucketAlreadyOwnedByYou):
-            pass
-        except (InvalidBucketName, InvalidBucketError, ResponseError) as err:
+        except (MinioException) as err:
             raise CloudStorageError(str(err))
 
         bucket = self._get_bucket(container_name)
@@ -270,7 +266,7 @@ class MinioDriver(Driver):
 
         try:
             self.client.remove_bucket(container.name)
-        except BucketNotEmpty:
+        except MinioException:
             raise IsNotEmptyError(messages.CONTAINER_NOT_EMPTY % bucket.name)
 
     def container_cdn_url(self, container: Container) -> str:
@@ -332,7 +328,7 @@ class MinioDriver(Driver):
     def get_blob(self, container: Container, blob_name: str) -> Blob:
         try:
             obj = self.client.stat_object(container.name, blob_name)
-        except NoSuchKey:
+        except MinioException:
             raise NotFoundError(messages.BLOB_NOT_FOUND % (blob_name, container.name))
         return self._make_obj(container, obj)
 
@@ -357,7 +353,7 @@ class MinioDriver(Driver):
     def delete_blob(self, blob: Blob) -> None:
         try:
             self.client.remove_object(blob.container.name, blob.name)
-        except ResponseError as err:
+        except InvalidResponseError as err:
             raise CloudStorageError(str(err))
 
     def blob_cdn_url(self, blob: Blob) -> str:
