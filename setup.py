@@ -11,8 +11,8 @@ INSTALL_REQUIRES = [
     "python-magic>=0.4.15",
 ]
 EXTRAS_REQUIRE = {
-    "amazon": ["boto3>=1.8.00", "boto3-stubs[s3]>==1.12.41.0"],
-    "digitalocean": ["boto3>=1.8.00", "boto3-stubs[s3]>==1.12.41.0"],
+    "amazon": ["boto3>=1.8.00", "boto3-stubs[s3]>=1.12.41.0"],
+    "digitalocean": ["boto3>=1.8.00", "boto3-stubs[s3]>=1.12.41.0"],
     "google": ["google-cloud-storage>=1.18.0", "requests>=2.19.1"],
     "local": [
         "filelock>=3.0.0",
