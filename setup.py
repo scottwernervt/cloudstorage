@@ -11,8 +11,8 @@ INSTALL_REQUIRES = [
     "python-magic>=0.4.15",
 ]
 EXTRAS_REQUIRE = {
-    "amazon": ["boto3>=1.8.00", "boto3-stubs[s3]>==1.12.41.0"],
-    "digitalocean": ["boto3>=1.8.00", "boto3-stubs[s3]>==1.12.41.0"],
+    "amazon": ["boto3>=1.8.00", "boto3-stubs[s3]>=1.12.41.0"],
+    "digitalocean": ["boto3>=1.8.00", "boto3-stubs[s3]>=1.12.41.0"],
     "google": ["google-cloud-storage>=1.18.0", "requests>=2.19.1"],
     "local": [
         "filelock>=3.0.0",
@@ -21,6 +21,7 @@ EXTRAS_REQUIRE = {
     ],
     "microsoft": ["azure==4.0.0"],
     "minio": ["minio==4.0.0"],
+    "owncloud": ["pyocclient>=0.6"],
     "rackspace": ["openstacksdk<=0.17.2", "rackspacesdk==0.7.5", "requests>=2.19.1"],
     "tests": ["flake8==3.8.4", "prettyconf", "pytest==6.2.1", "requests>=2.19.1"],
     "lint": [
@@ -121,6 +122,7 @@ setup(
             "cloudstorage",
             "gcs",
             "minio",
+            "owncloud",
         ]
     ),
     install_requires=INSTALL_REQUIRES,
